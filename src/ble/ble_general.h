@@ -23,6 +23,12 @@
 // BLE files
 #include "ble.h"
 #include "ble_hci.h"
+#include "ble_gap.h"
+#include "ble_err.h"
+#include "ble_cts_c.h"
+#include "nrf_ble_gatts_c.h"
+#include "ble_db_discovery.h"
+#include "nrf_ble_ancs_c.h"
 #include "ble_srv_common.h"
 #include "ble_advdata.h"
 #include "ble_advertising.h"
@@ -30,8 +36,10 @@
 #include "ble_conn_state.h"
 #include "nrf_ble_gatt.h"
 #include "peer_manager.h"
+#include "peer_manager_handler.h"
 #include "nrf_ble_qwr.h"
 #include "nrf_sdh_ble.h"
+#include "nrf_ble_gq.h"
 
 // Application Includes
 #include "ble_cus.h"

@@ -782,6 +782,39 @@ macro(nRF5_addBLEAdvertising)
             )
 endmacro()
 
+# adds Bluetooth Low Energy DB Discovery support library
+macro(nRF5_addBLE_DB_Discovery)
+    list(APPEND INCLUDE_DIRS
+            "${SDK_ROOT}/components/ble/ble_db_discovery"
+            )
+
+    list(APPEND SOURCE_FILES
+            "${SDK_ROOT}/components/ble/ble_db_discovery/ble_db_discovery.c"
+            )
+endmacro()
+
+# adds Bluetooth Low Energy GQ support library
+macro(nRF5_addBLE_GQ)
+    list(APPEND INCLUDE_DIRS
+            "${SDK_ROOT}/components/ble/nrf_ble_gq"
+            )
+
+    list(APPEND SOURCE_FILES
+            "${SDK_ROOT}/components/ble/nrf_ble_gq/nrf_ble_gq.c"
+            )
+endmacro()
+
+# adds Bluetooth Low Energy GQ support library
+macro(nRF5_addBLE_GATTS)
+    list(APPEND INCLUDE_DIRS
+            "${SDK_ROOT}/components/ble/ble_services/experimental_gatts_c"
+            )
+
+    list(APPEND SOURCE_FILES
+            "${SDK_ROOT}/components/ble/ble_services/experimental_gatts_c/nrf_ble_gatts_c.c"
+            )
+endmacro()
+
 # adds Bluetooth Low Energy Queued Write library
 macro(nRF5_addBLEQWR)
     list(APPEND INCLUDE_DIRS
@@ -915,4 +948,20 @@ macro(nRF5_addBLEService NAME)
         nRF5_addBootloaderButtonlessLibs()
         nRF5_addBLEPeerManager()
     endif()
+endmacro()
+
+macro(nRF5_addBLEANCS)
+    nRF5_addBLEAdvertising()
+    nRF5_addBLELinkCtxManager()
+    nRF5_addBLEGATT()
+
+    list(APPEND INCLUDE_DIRS
+            "${SDK_ROOT}/components/ble/ble_services/ble_ancs_c"
+            )
+
+    list(APPEND SOURCE_FILES
+            "${SDK_ROOT}/components/ble/ble_services/ble_ancs_c/nrf_ble_ancs_c.c"
+            "${SDK_ROOT}/components/ble/ble_services/ble_ancs_c/ancs_app_attr_get.c"
+            "${SDK_ROOT}/components/ble/ble_services/ble_ancs_c/ancs_attr_parser.c"
+            )
 endmacro()

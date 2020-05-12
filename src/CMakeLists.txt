@@ -41,6 +41,11 @@ nRF5_addBLEQWR()
 nRF5_addBLEAdvertising()
 nRF5_addBLEPeerManager()
 nRF5_addBLELinkCtxManager()
+nRF5_addBLEANCS()
+nRF5_addBLE_DB_Discovery()
+nRF5_addBLE_GQ()
+nRF5_addBLE_GATTS()
+nRF5_addBLEService("ble_cts_c")
 
 include_directories(.)
 include_directories(FreeRTOS/Source/portable/GCC/ARM_CM4F)
@@ -68,6 +73,8 @@ list(APPEND SOURCE_FILES
         ble/ble_general.c
         ble/ble_cus.h
         ble/ble_cus.c
+        ble/ble_ancs.h
+        ble/ble_ancs.c
         drivers/drv2605l.h
         drivers/drv2605l.c
         components/sensors.h

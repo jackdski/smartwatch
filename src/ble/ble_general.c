@@ -51,6 +51,12 @@ static char const * month_of_year[] =
                 "December"
         };
 
+// TODO
+void ble_cts_c_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context) {
+    if (p_ble_evt == NULL) {
+        return;
+    }
+}
 
 /**@brief Function for handling Queued Write Module errors.
  *
