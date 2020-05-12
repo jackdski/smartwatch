@@ -14,6 +14,7 @@
 #include "nrf_sdh.h"
 #include "nrf_sdh_soc.h"
 #include "nrf_sdh_ble.h"
+#include "nrf_delay.h"
 #include "app_error.h"
 #include "app_timer.h"
 #include "bsp_btn_ble.h"
@@ -43,7 +44,7 @@
 
 // Application Includes
 #include "ble_cus.h"
-
+#include "ble_ancs.h"
 
 // BLE settings
 #define DEVICE_NAME                     "jdski_smartwatch"    /**< Name of device. Will be included in the advertising data. */
@@ -53,6 +54,13 @@
 #define APP_ADV_DURATION                18000                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 #define APP_BLE_OBSERVER_PRIO           3                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                       /**< A tag identifying the SoftDevice BLE configuration. */
+
+
+#define APP_ADV_FAST_INTERVAL           0x0028                                      /**< Fast advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
+#define APP_ADV_SLOW_INTERVAL           0x0C80                                      /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
+
+#define APP_ADV_FAST_DURATION           3000                                        /**< The advertising duration of fast advertising in units of 10 milliseconds. */
+#define APP_ADV_SLOW_DURATION           18000                                       /**< The advertising duration of slow advertising in units of 10 milliseconds. */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (0.1 seconds). */
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
@@ -75,23 +83,52 @@
 #define SEC_PARAM_MIN_KEY_SIZE          7                                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 
-// functions
-void nrf_qwr_error_handler(uint32_t nrf_error);
-void on_cus_evt(ble_cus_t * p_cus_service, ble_cus_evt_t * p_evt);
-void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context);
-void on_adv_evt(ble_adv_evt_t ble_adv_evt);
-void pm_evt_handler(pm_evt_t const * p_evt);
-void on_conn_params_evt(ble_conn_params_evt_t * p_evt);
-void conn_params_error_handler(uint32_t nrf_error);
-void notification_timeout_handler(void * p_context);
+typedef struct {
+    bool connected;
+    bool cts_discovered;
+    bool cts_request;
+    bool ancs_discovered;
+    bool gatts_discovered;
+} BLE_Manager_t;
+
+
+// BLE Manager Task
+void BLE_Manager_Task(void * arg);
+void ble_manager_init(BLE_Manager_t * p_inst);
+
+// init functions
 void ble_stack_init(void);
 void services_init(void) ;
 void gap_params_init(void);
 void gatt_init(void);
+void db_discovery_init(void);
 void advertising_init(void);
-void advertising_start(void * p_erase_bonds);
 void conn_params_init(void);
 void peer_manager_init(void);
+void apple_notification_setup(void);
+void advertising_start(void * p_erase_bonds);
+
+// handler functions
+void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context);
+void gatts_c_evt_handler(nrf_ble_gatts_c_evt_t * p_evt);
+void ancs_c_evt_handler(ble_ancs_c_evt_t * p_evt);
+void pm_evt_handler(pm_evt_t const * p_evt);
+void db_disc_handler(ble_db_discovery_evt_t * p_evt);
+void nrf_qwr_error_handler(uint32_t nrf_error);
+void current_time_error_handler(uint32_t nrf_error);
+void conn_params_error_handler(uint32_t nrf_error);
+void apple_notification_error_handler(uint32_t nrf_error);
+void notification_timeout_handler(void * p_context);
+
+// on event functions
+void on_cus_evt(ble_cus_t * p_cus_service, ble_cus_evt_t * p_evt);
+void on_cts_c_evt(ble_cts_c_t * p_cts, ble_cts_c_evt_t * p_evt);
+void on_adv_evt(ble_adv_evt_t ble_adv_evt);
+void on_conn_params_evt(ble_conn_params_evt_t * p_evt);
+
+// misc
+void peer_list_get(pm_peer_id_t * p_peers, uint32_t * p_size);
+void current_time_print(ble_cts_c_evt_t * p_evt);
 void delete_bonds(void);
 
 #endif //JDSMARTWATCHPROJECT_BLE_GENERAL_H

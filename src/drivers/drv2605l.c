@@ -79,6 +79,7 @@ ret_code_t drv2605l_config(DRV2605L_t * p_inst) {
         return NRF_ERROR_NULL;
     }
 
+    p_inst->initialized = false;
     p_inst->en_pin      = DRV_EN_PIN;
     p_inst->state       = DRV_Get_Voltage; // DRV_Init;
     p_inst->period_us   = DRV_PERIOD_US;

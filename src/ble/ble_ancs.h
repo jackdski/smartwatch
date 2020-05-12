@@ -9,8 +9,12 @@
 #include <stdint.h>
 #include <string.h>
 
+// nRF files
 #include "nordic_common.h"
 #include "nrf.h"
+#include "nrf_log_default_backends.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 #include "app_error.h"
 #include "ble_hci.h"
 #include "ble_gap.h"
@@ -24,45 +28,17 @@
 #include "ble_conn_state.h"
 #include "nrf_ble_gq.h"
 
+#define ATTR_DATA_SIZE                 BLE_ANCS_ATTR_DATA_MAX                 /**< Allocated size for attribute data. */
 
-/**@brief String literals for the iOS notification categories. used then printing to UART. */
-static char const * lit_catid[BLE_ANCS_NB_OF_CATEGORY_ID] = {
-                "Other",
-                "Incoming Call",
-                "Missed Call",
-                "Voice Mail",
-                "Social",
-                "Schedule",
-                "Email",
-                "News",
-                "Health And Fitness",
-                "Business And Finance",
-                "Location",
-                "Entertainment"
-        };
+extern char const * lit_catid[BLE_ANCS_NB_OF_CATEGORY_ID];
+extern char const * lit_eventid[BLE_ANCS_NB_OF_EVT_ID];
+extern char const * lit_attrid[BLE_ANCS_NB_OF_NOTIF_ATTR];
+extern char const * lit_appid[BLE_ANCS_NB_OF_APP_ATTR];
 
-/**@brief String literals for the iOS notification event types. Used then printing to UART. */
-char const * lit_eventid[BLE_ANCS_NB_OF_EVT_ID] = {
-                "Added",
-                "Modified",
-                "Removed"
-        };
-
-/**@brief String literals for the iOS notification attribute types. Used when printing to UART. */
-char const * lit_attrid[BLE_ANCS_NB_OF_NOTIF_ATTR] = {
-                "App Identifier",
-                "Title",
-                "Subtitle",
-                "Message",
-                "Message Size",
-                "Date",
-                "Positive Action Label",
-                "Negative Action Label"
-        };
-
-/**@brief String literals for the iOS notification attribute types. Used When printing to UART. */
-char const * lit_appid[BLE_ANCS_NB_OF_APP_ATTR] = {
-                "Display Name"
-        };
+// Functions
+void ancs_notif_print(ble_ancs_c_evt_notif_t * p_notif);
+void ancs_notif_attr_print(ble_ancs_c_attr_t * p_attr);
+void ancs_app_attr_print(ble_ancs_c_attr_t * p_attr);
+void ancs_err_code_print(uint16_t err_code_np);
 
 #endif //JDSMARTWATCHPROJECT_BLE_ANCS_H

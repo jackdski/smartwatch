@@ -198,6 +198,7 @@ typedef struct {
     eDRV_Loop_Gain  loop_gain;
     bool            enable;
     bool            go_bit;
+    bool            initialized;
 } DRV2605L_t;
 
 #define DRV2605L_READ(p_reg_addr, p_buffer, byte_cnt) \

@@ -50,6 +50,7 @@
 TaskHandle_t m_logger_thread;                                /**< Definition of Logger thread. */
 TaskHandle_t thLED;
 TaskHandle_t thHaptic;
+TaskHandle_t thBLEMan;
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -101,7 +102,6 @@ static void application_timers_start(void)
  *
  * @note This function will not return.
  *
- * TODO: Find a new place for this
  */
 void sleep_mode_enter(void) {
     ret_code_t err_code;
@@ -123,35 +123,14 @@ void sleep_mode_enter(void) {
  *
  * @param[in]   event   Event generated when button is pressed.
  */
-static void bsp_event_handler(bsp_event_t event)
-{
-//    ret_code_t err_code;
+static void bsp_event_handler(bsp_event_t event) {
+    ret_code_t err_code;
 
     switch (event)
     {
         case BSP_EVENT_SLEEP:
             sleep_mode_enter();
             break; // BSP_EVENT_SLEEP
-
-//        case BSP_EVENT_DISCONNECT:
-//            err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-//            if (err_code != NRF_ERROR_INVALID_STATE)
-//            {
-//                APP_ERROR_CHECK(err_code);
-//            }
-//            break; // BSP_EVENT_DISCONNECT
-//
-//        case BSP_EVENT_WHITELIST_OFF:
-//            if (m_conn_handle == BLE_CONN_HANDLE_INVALID)
-//            {
-//                err_code = ble_advertising_restart_without_whitelist(&m_advertising);
-//                if (err_code != NRF_ERROR_INVALID_STATE)
-//                {
-//                    APP_ERROR_CHECK(err_code);
-//                }
-//            }
-//            break; // BSP_EVENT_KEY_0
-
         default:
             break;
     }
@@ -162,8 +141,7 @@ static void bsp_event_handler(bsp_event_t event)
  *
  * @param[out] p_erase_bonds  Will be true if the clear bonding button was pressed to wake the application up.
  */
-static void buttons_leds_init(bool * p_erase_bonds)
-{
+static void buttons_leds_init(bool * p_erase_bonds) {
     ret_code_t err_code;
     bsp_event_t startup_event;
 
@@ -243,7 +221,7 @@ static void led_task(void * arg) {
 
     while(1) {
         nrf_gpio_pin_toggle(LED_2);
-        vTaskDelay(pdMS_TO_TICKS(200));
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
@@ -265,11 +243,11 @@ int main(void) {
     power_management_init();
     gap_params_init();
     gatt_init();
-    advertising_init();
+    db_discovery_init();
     services_init();
+    advertising_init();
     conn_params_init();
     peer_manager_init();
-    application_timers_start();
     NRF_LOG_INFO("Peripherals initialized");
 
     // Start execution.
@@ -282,6 +260,10 @@ int main(void) {
     }
 
     if (pdPASS != xTaskCreate(haptic_task, "Haptic", 256, NULL, 1, &thHaptic)) {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
+
+    if(pdPASS != xTaskCreate(BLE_Manager_Task, "BLE Man", 256, NULL, 2, &thBLEMan)) {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
 

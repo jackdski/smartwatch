@@ -5,8 +5,13 @@
 #define SEGGER_RTT_CONFIG_DEFAULT_MODE  2 // block until processed
 
 #define NRF_BLE_GQ_ENABLED                      1
-#define NRF_BLE_GQ_DATAPOOL_ELEMENT_COUNT       8
-#define NRF_BLE_GQ_DATAPOOL_ELEMENT_SIZE        20
-#define NRF_BLE_GQ_QUEUE_SIZE                   5
-#define NRF_BLE_GQ_GATTC_WRITE_MAX_DATA_LEN     3
+#define BLE_CTS_C_ENABLED                       1
+#define BLE_ANCS_C_ENABLED                      1
+#define BLE_DB_DISCOVERY_ENABLED                1
+#define NRF_BLE_GATTS_C_ENABLED                 1
+
+#define NRF_BLE_GQ_DATAPOOL_ELEMENT_COUNT       10
+#define NRF_BLE_GQ_DATAPOOL_ELEMENT_SIZE        25
+#define NRF_BLE_GQ_QUEUE_SIZE                   10
+#define NRF_BLE_GQ_GATTC_WRITE_MAX_DATA_LEN     25
 #define NRF_BLE_GQ_GATTS_HVX_MAX_DATA_LEN       16

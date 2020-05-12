@@ -49,16 +49,18 @@ void haptic_status_check_callback(TimerHandle_t xTimer) {
 
 void haptic_task(void * arg) {
     UNUSED_PARAMETER(arg);
-
+    ret_code_t  err;
     drv2605l_config(&drv_settings);
-    haptic_init(&drv_settings);
+
+    err = haptic_init(&drv_settings);
+
     haptic_buzz_timer = xTimerCreate("Buzz", pdMS_TO_TICKS(2000), pdTRUE, ( void * ) 0, haptic_buzz_callback);
     haptic_status_check = xTimerCreate("StatusCheck", pdMS_TO_TICKS(2500), pdTRUE, (void *)0, haptic_status_check_callback);
 
     while(1) {
         switch (drv_settings.state) {
             case DRV_Get_Voltage: {
-                NRF_LOG_INFO("HAPTIC: Requesting voltage")
+//                NRF_LOG_INFO("HAPTIC: Requesting voltage")
                 haptic_request_vbatt();
                 set_drv_vbatt(&drv_settings);
                 xTimerStart(haptic_buzz_timer, 10);
@@ -100,7 +102,12 @@ void haptic_task(void * arg) {
                 drv_settings.state = DRV_Idle;
             }
             case DRV_Init: {
-                drv_settings.state = DRV_Get_Voltage;
+                if(err != NRF_SUCCESS) {
+                    haptic_init(&drv_settings);
+                }
+                else {
+                    drv_settings.state = DRV_Get_Voltage;
+                }
                 break;
             }
             case DRV_Idle:  {
@@ -119,16 +126,24 @@ void haptic_task(void * arg) {
 
 // Haptic Functions
 ret_code_t haptic_init(DRV2605L_t * p_inst) {
+    ret_code_t err;
     nrf_gpio_cfg_output(p_inst->en_pin);
     nrf_gpio_pin_write(p_inst->en_pin, true);
 
     if (p_inst->motor_type == LRA_MODE) {
-        APP_ERROR_CHECK(nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, drv2605l_init_transfers_lra,
-                                             DRV2605L_INIT_TRANSFER_COUNT, NULL));
+        err = nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, drv2605l_init_transfers_lra,
+                                             DRV2605L_INIT_TRANSFER_COUNT, NULL);
     } else if (p_inst->motor_type == ERM_MODE) {
-        APP_ERROR_CHECK(nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, drv2605l_init_transfers_erm,
-                                             DRV2605L_INIT_TRANSFER_COUNT, NULL));
+        err = nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, drv2605l_init_transfers_erm,
+                                             DRV2605L_INIT_TRANSFER_COUNT, NULL);
     }
+
+    // see if device was NACK'd
+    if(err != NRF_SUCCESS) {
+        p_inst->initialized = false;
+        return NRF_ERROR_BUSY;
+    }
+
 
     // read DIAG_RESULT until auto-calibration is complete
     // read STATUS reg, bit 3
@@ -137,7 +152,13 @@ ret_code_t haptic_init(DRV2605L_t * p_inst) {
         static nrf_twi_mngr_transfer_t const transfers[2] = {
                 DRV2605L_READ(&drv2605l_status_reg_addr, &status_reg, 1)
         };
-        APP_ERROR_CHECK(nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, transfers, 2, NULL));
+        err = nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, transfers, 2, NULL);
+
+        // see if device was NACK'd
+        if(err != NRF_SUCCESS) {
+            p_inst->initialized = false;
+            return NRF_ERROR_BUSY;
+        }
         attempts--;
     }
 
@@ -153,6 +174,7 @@ ret_code_t haptic_init(DRV2605L_t * p_inst) {
 //        // write 0x06 to DRV_LIB_REG
 //    }
     p_inst->state = DRV_Get_Voltage;
+    p_inst->initialized = true;
     return NRF_SUCCESS;
 }
 
