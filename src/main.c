@@ -38,6 +38,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+// LittlevGL
+#include "lvgl/lvgl.h"
+
 // Application files
 #include "ble/ble_general.h"
 #include "ble/ble_cus.h"
@@ -195,6 +198,10 @@ void vApplicationIdleHook( void ) {
     idle_state_handle();
 }
 
+void vApplicationTickHook(void) {
+    lv_tick_inc(1);
+}
+
 /**@brief Function for initializing the clock.
  */
 static void clock_init(void) {
@@ -236,6 +243,9 @@ int main(void) {
     conn_params_init();
     peer_manager_init();
     NRF_LOG_INFO("Peripherals initialized");
+
+    lv_init();
+    NRF_LOG_INFO("LVGL initialized");
 
     // Start execution.
     if (pdPASS != xTaskCreate(logger_thread, "LOGGER", 256, NULL, 1, &m_logger_thread)) {

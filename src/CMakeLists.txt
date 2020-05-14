@@ -66,6 +66,146 @@ set(FREERTOS_SRC
         FreeRTOS/Source/portable/MemMang/heap_4.c
         )
 
+set(LVGL_SRC
+        lv_conf.h
+        lvgl/lvgl.h
+        lvgl/src/lv_core/lv_obj.c
+        lvgl/src/lv_core/lv_obj.h
+        lvgl/src/lv_core/lv_group.c
+        lvgl/src/lv_core/lv_group.h
+        lvgl/src/lv_core/lv_disp.c
+        lvgl/src/lv_core/lv_disp.h
+        lvgl/src/lv_core/lv_debug.h
+        lvgl/src/lv_core/lv_debug.c
+        lvgl/src/lv_core/lv_indev.c
+        lvgl/src/lv_core/lv_indev.h
+        lvgl/src/lv_core/lv_refr.c
+        lvgl/src/lv_core/lv_refr.h
+        lvgl/src/lv_core/lv_style.c
+        lvgl/src/lv_core/lv_style.h
+
+        lvgl/src/lv_misc/lv_anim.c
+        lvgl/src/lv_misc/lv_anim.h
+        lvgl/src/lv_misc/lv_async.h
+        lvgl/src/lv_misc/lv_async.c
+        lvgl/src/lv_misc/lv_fs.c
+        lvgl/src/lv_misc/lv_fs.h
+        lvgl/src/lv_misc/lv_task.c
+        lvgl/src/lv_misc/lv_task.h
+        lvgl/src/lv_misc/lv_area.c
+        lvgl/src/lv_misc/lv_area.h
+        lvgl/src/lv_misc/lv_bidi.c
+        lvgl/src/lv_misc/lv_bidi.h
+        lvgl/src/lv_misc/lv_circ.c
+        lvgl/src/lv_misc/lv_circ.h
+        lvgl/src/lv_misc/lv_color.c
+        lvgl/src/lv_misc/lv_color.h
+        lvgl/src/lv_misc/lv_fs.c
+        lvgl/src/lv_misc/lv_fs.h
+        lvgl/src/lv_misc/lv_gc.c
+        lvgl/src/lv_misc/lv_gc.h
+        lvgl/src/lv_misc/lv_ll.c
+        lvgl/src/lv_misc/lv_ll.h
+        lvgl/src/lv_misc/lv_log.c
+        lvgl/src/lv_misc/lv_log.h
+        lvgl/src/lv_misc/lv_math.c
+        lvgl/src/lv_misc/lv_math.h
+        lvgl/src/lv_misc/lv_mem.c
+        lvgl/src/lv_misc/lv_mem.h
+        lvgl/src/lv_misc/lv_printf.c
+        lvgl/src/lv_misc/lv_printf.h
+        lvgl/src/lv_misc/lv_task.c
+        lvgl/src/lv_misc/lv_task.h
+        lvgl/src/lv_misc/lv_templ.c
+        lvgl/src/lv_misc/lv_templ.h
+        lvgl/src/lv_misc/lv_txt.c
+        lvgl/src/lv_misc/lv_txt.h
+        lvgl/src/lv_misc/lv_types.h
+        lvgl/src/lv_misc/lv_utils.c
+        lvgl/src/lv_misc/lv_utils.h
+
+        lvgl/src/lv_draw/lv_draw.c
+        lvgl/src/lv_draw/lv_draw.h
+        lvgl/src/lv_draw/lv_draw_arc.c
+        lvgl/src/lv_draw/lv_draw_arc.h
+        lvgl/src/lv_draw/lv_draw_basic.c
+        lvgl/src/lv_draw/lv_draw_basic.h
+        lvgl/src/lv_draw/lv_draw_img.c
+        lvgl/src/lv_draw/lv_draw_img.h
+        lvgl/src/lv_draw/lv_draw_label.c
+        lvgl/src/lv_draw/lv_draw_label.h
+        lvgl/src/lv_draw/lv_draw_line.c
+        lvgl/src/lv_draw/lv_draw_line.h
+        lvgl/src/lv_draw/lv_draw_rect.c
+        lvgl/src/lv_draw/lv_draw_rect.h
+        lvgl/src/lv_draw/lv_draw_triangle.c
+        lvgl/src/lv_draw/lv_draw_triangle.h
+        lvgl/src/lv_draw/lv_img_cache.c
+        lvgl/src/lv_draw/lv_img_cache.h
+        lvgl/src/lv_draw/lv_img_decoder.c
+        lvgl/src/lv_draw/lv_img_decoder.h
+
+        lvgl/src/lv_hal/lv_hal.h
+        lvgl/src/lv_hal/lv_hal_disp.c
+        lvgl/src/lv_hal/lv_hal_disp.h
+        lvgl/src/lv_hal/lv_hal_indev.c
+        lvgl/src/lv_hal/lv_hal_indev.h
+        lvgl/src/lv_hal/lv_hal_tick.c
+        lvgl/src/lv_hal/lv_hal_tick.h
+
+        lvgl/src/lv_font/lv_font.c
+        lvgl/src/lv_font/lv_font.h
+        lvgl/src/lv_font/lv_font_fmt_txt.c
+        lvgl/src/lv_font/lv_font_fmt_txt.h
+        #  lvgl/src/lv_font/lv_font_roboto_16.c
+        lvgl/src/lv_font/lv_symbol_def.h
+
+        lvgl/src/lv_themes/lv_theme.c
+        lvgl/src/lv_themes/lv_theme.h
+
+        lvgl/src/lv_objx/lv_btn.h
+        lvgl/src/lv_objx/lv_btn.c
+
+        lvgl/src/lv_objx/lv_cont.h
+        lvgl/src/lv_objx/lv_cont.c
+
+        lvgl/src/lv_objx/lv_label.h
+        lvgl/src/lv_objx/lv_label.c
+
+        lvgl/src/lv_themes/lv_theme.c
+        lvgl/src/lv_themes/lv_theme.h
+        lvgl/src/lv_themes/lv_theme_night.h
+        lvgl/src/lv_themes/lv_theme_night.c
+
+        lvgl/src/lv_objx/lv_list.c
+        lvgl/src/lv_objx/lv_list.h
+        lvgl/src/lv_objx/lv_tileview.c
+        lvgl/src/lv_objx/lv_tileview.h
+        lvgl/src/lv_objx/lv_tabview.c
+        lvgl/src/lv_objx/lv_tabview.h
+        lvgl/src/lv_objx/lv_btnm.c
+        lvgl/src/lv_objx/lv_btnm.h
+        lvgl/src/lv_objx/lv_page.c
+        lvgl/src/lv_objx/lv_page.h
+        lvgl/src/lv_objx/lv_img.c
+        lvgl/src/lv_objx/lv_img.h
+        lvgl/src/lv_objx/lv_lmeter.c
+        lvgl/src/lv_objx/lv_lmeter.h
+        lvgl/src/lv_objx/lv_arc.c
+        lvgl/src/lv_objx/lv_arc.h
+        lvgl/src/lv_objx/lv_gauge.c
+        lvgl/src/lv_objx/lv_gauge.h
+
+        lvgl/src/lv_objx/lv_mbox.c
+        lvgl/src/lv_objx/lv_mbox.h
+
+        lvgl/src/lv_objx/lv_bar.c
+        lvgl/src/lv_objx/lv_bar.h
+        lvgl/src/lv_objx/lv_slider.h
+        lvgl/src/lv_objx/lv_slider.c
+
+        )
+
 # include files
 list(APPEND SOURCE_FILES
         main.c
@@ -77,10 +217,15 @@ list(APPEND SOURCE_FILES
         ble/ble_ancs.c
         drivers/drv2605l.h
         drivers/drv2605l.c
+        drivers/ssd1306.h
+        drivers/ssd1306.c
         components/sensors.h
         components/sensors.c
+        components/display.h
+        components/display.c
         FreeRTOSConfig.h
         ${FREERTOS_SRC}
+        ${LVGL_SRC}
         )
 
 list(APPEND INCLUDE_DIRS
