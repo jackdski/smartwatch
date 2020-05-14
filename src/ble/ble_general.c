@@ -80,26 +80,47 @@ static char const * month_of_year[] = {
 
 
 void BLE_Manager_Task(void * arg) {
-     ble_manager_init(&ble_manager);
+    ret_code_t ret;
+    ble_manager_init(&ble_manager);
 
     while(1) {
         // Requesting Read
-        if(ble_cts_c_is_cts_discovered(&m_cts_c)) {
-            ble_manager.cts_discovered = true;
-            ble_manager.cts_request = true;
-            ble_cts_c_current_time_read(&m_cts_c);
+//        if(ble_cts_c_is_cts_discovered(&m_cts_c)) {
+    if(ble_manager.cts_discovered) {
+            if(ble_manager.cts_event == true) {
+                NRF_LOG_INFO("BLE: TIME -  %i:%i:%i", ble_manager.cts_time.hour, ble_manager.cts_time.minute, ble_manager.cts_time.second)
+                NRF_LOG_INFO("BLE: DATE -  %i/%i/%i", ble_manager.cts_time.day_of_month, ble_manager.cts_time.month, ble_manager.cts_time.year)
+                ble_manager.cts_event = false;
+            }
+            if(ble_manager.cts_request == true) {
+                ble_cts_c_current_time_read(&m_cts_c);
+                ble_manager.cts_request = false;
+            }
+    }
+    if(ble_manager.ancs_discovered) {
+        if(ble_manager.ancs_event) {
+            NRF_LOG_INFO("Last Event: %s", m_notification_latest.category_id);
         }
+    }
+//        ret = nrf_ble_ancs_c_request_attrs(&m_ancs_c, &m_notification_latest);
         vTaskDelay(5000);
     }
 }
 
 void ble_manager_init(BLE_Manager_t * p_inst) {
-    p_inst->connected       = false;
-    p_inst->cts_discovered  = false;
-    p_inst->cts_request     = false;
-    p_inst->ancs_discovered = false;
+    p_inst->connected        = false;
+    p_inst->cts_discovered   = false;
+    p_inst->cts_request      = false;
+    p_inst->cts_event        = false;
+    p_inst->ancs_discovered  = false;
+    p_inst->ancs_event       = false;
     p_inst->gatts_discovered = false;
 }
+
+void ble_manager_request_cts(void) {
+    ble_manager.cts_request = true;
+}
+
 
 /*
  * init functions
@@ -252,9 +273,6 @@ void gap_params_init(void) {
                                           strlen(DEVICE_NAME));
     APP_ERROR_CHECK(err_code);
 
-    /* YOUR_JOB: Use an appearance value matching the application's use case.
-       err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_);
-       APP_ERROR_CHECK(err_code); */
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
 
@@ -332,7 +350,7 @@ void conn_params_init(void) {
     cp_init.next_conn_params_update_delay  = NEXT_CONN_PARAMS_UPDATE_DELAY;
     cp_init.max_conn_params_update_count   = MAX_CONN_PARAMS_UPDATE_COUNT;
     cp_init.start_on_notify_cccd_handle    = BLE_GATT_HANDLE_INVALID;
-    cp_init.disconnect_on_fail             = false;
+    cp_init.disconnect_on_fail             = true;
     cp_init.evt_handler                    = on_conn_params_evt;
     cp_init.error_handler                  = conn_params_error_handler;
 
@@ -431,6 +449,7 @@ void advertising_start(void * p_erase_bonds) {
  */
 void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context) {
     ret_code_t err_code = NRF_SUCCESS;
+    pm_handler_secure_on_connection(p_ble_evt);
 
     switch (p_ble_evt->header.evt_id) {
         case BLE_GAP_EVT_CONNECTED: {
@@ -448,6 +467,9 @@ void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context) {
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
             if (p_ble_evt->evt.gap_evt.conn_handle == m_cts_c.conn_handle) {
                 m_cts_c.conn_handle = BLE_CONN_HANDLE_INVALID;
+            }
+            if (p_ble_evt->evt.gap_evt.conn_handle == m_ancs_c.conn_handle) {
+                m_ancs_c.conn_handle = BLE_CONN_HANDLE_INVALID;
             }
             ble_manager.connected = false;
             break;
@@ -493,10 +515,8 @@ void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context) {
 void gatts_c_evt_handler(nrf_ble_gatts_c_evt_t * p_evt) {
     ret_code_t ret = NRF_SUCCESS;
 
-    switch (p_evt->evt_type)
-    {
-        case NRF_BLE_GATTS_C_EVT_DISCOVERY_COMPLETE:
-        {
+    switch (p_evt->evt_type) {
+        case NRF_BLE_GATTS_C_EVT_DISCOVERY_COMPLETE: {
             NRF_LOG_DEBUG("GATT Service and Service Changed characteristic found on server.");
 
             ret = nrf_ble_gatts_c_handles_assign(&m_gatts_c,
@@ -604,6 +624,7 @@ void ancs_c_evt_handler(ble_ancs_c_evt_t * p_evt) {
             {
                 m_notif_attr_app_id_latest = p_evt->attr;
             }
+            ble_manager.ancs_event = true;
             break;
         case BLE_ANCS_C_EVT_DISCOVERY_FAILED:
             NRF_LOG_DEBUG("Apple Notification Center Service not discovered on the server.");
@@ -916,6 +937,7 @@ void on_cts_c_evt(ble_cts_c_t * p_cts, ble_cts_c_evt_t * p_evt) {
                                                 p_evt->conn_handle,
                                                 &p_evt->params.char_handles);
             APP_ERROR_CHECK(err_code);
+            ble_manager.cts_discovered = true;
             break;
 
         case BLE_CTS_C_EVT_DISCOVERY_FAILED:
@@ -938,13 +960,20 @@ void on_cts_c_evt(ble_cts_c_t * p_cts, ble_cts_c_evt_t * p_evt) {
 
         case BLE_CTS_C_EVT_CURRENT_TIME:
             NRF_LOG_INFO("Current Time received.");
-            current_time_print(p_evt);
-            ble_manager.cts_request = false;
+//            current_time_print(p_evt);
+            ble_manager.cts_time.day_of_week = (uint8_t)day_of_week[p_evt->params.current_time.exact_time_256.day_date_time.day_of_week];
+            ble_manager.cts_time.day_of_month = p_evt->params.current_time.exact_time_256.day_date_time.date_time.day;
+            ble_manager.cts_time.month = p_evt->params.current_time.exact_time_256.day_date_time.date_time.month;
+            ble_manager.cts_time.year = p_evt->params.current_time.exact_time_256.day_date_time.date_time.year;
+            ble_manager.cts_time.hour = p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours;
+            ble_manager.cts_time.minute = p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes;
+            ble_manager.cts_time.second = p_evt->params.current_time.exact_time_256.day_date_time.date_time.seconds;
+
+            ble_manager.cts_event = true;
             break;
 
         case BLE_CTS_C_EVT_INVALID_TIME:
             NRF_LOG_INFO("Invalid Time received.");
-            ble_manager.cts_request = false;
             break;
 
         default:
@@ -989,12 +1018,11 @@ void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
         }
         case BLE_ADV_EVT_WHITELIST_REQUEST: {
             ble_gap_addr_t whitelist_addrs[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
-            ble_gap_irk_t whitelist_irks[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
-            uint32_t addr_cnt = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
-            uint32_t irk_cnt = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
+            ble_gap_irk_t  whitelist_irks[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
+            uint32_t       addr_cnt = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
+            uint32_t       irk_cnt  = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
 
-            err_code = pm_whitelist_get(whitelist_addrs, &addr_cnt,
-                                        whitelist_irks, &irk_cnt);
+            err_code = pm_whitelist_get(whitelist_addrs, &addr_cnt, whitelist_irks, &irk_cnt);
             APP_ERROR_CHECK(err_code);
             NRF_LOG_DEBUG("pm_whitelist_get returns %d addr in whitelist and %d irk whitelist",
                           addr_cnt,
@@ -1002,10 +1030,10 @@ void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
 
             // Apply the whitelist.
             err_code = ble_advertising_whitelist_reply(&m_advertising,
-                                                       whitelist_addrs,
-                                                       addr_cnt,
-                                                       whitelist_irks,
-                                                       irk_cnt);
+                                                  whitelist_addrs,
+                                                  addr_cnt,
+                                                  whitelist_irks,
+                                                  irk_cnt);
             APP_ERROR_CHECK(err_code);
             break;
         }

@@ -183,22 +183,33 @@ typedef enum {
     LOOP_GAIN_VERY_HIGH = (3 << 2)
 } eDRV_Loop_Gain;
 
+typedef struct {
+    uint8_t         vbatt_reading;
+    float           vbatt_voltage;
+} DRV2605L_Vbatt_t;
+
+typedef enum {
+    DRV_No_Errors           = 0x00,
+    DRV_Over_Current        = 0x01,
+    DRV_Over_Temperature    = 0x02,
+    DRV_Over_Curr_Temp      = 0x03
+} eDRV2605L_Errors;
+
 /*
  * @brief Struct to abstract DRV2605L settings
  */
 typedef struct {
     uint8_t const   sensor_addr;
-    uint8_t         vbatt_reading;
-    float           vbatt_voltage;
-    uint32_t        en_pin;
-    uint32_t        pwm_pin;
-    uint32_t        period_us;
-    eDRV_State      state;
-    eDRV_Motor_Type motor_type;
-    eDRV_Loop_Gain  loop_gain;
-    bool            enable;
-    bool            go_bit;
-    bool            initialized;
+    DRV2605L_Vbatt_t    vbatt;
+    uint32_t            en_pin;
+    uint32_t            pwm_pin;
+    uint32_t            period_us;
+    eDRV_State          state;
+    eDRV_Motor_Type     motor_type;
+    eDRV_Loop_Gain      loop_gain;
+    eDRV2605L_Errors    errors;
+    bool                enable;
+    bool                initialized;
 } DRV2605L_t;
 
 #define DRV2605L_READ(p_reg_addr, p_buffer, byte_cnt) \
@@ -223,14 +234,7 @@ extern uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605l_vbatt_reg_addr;
 // Functions
 ret_code_t drv2605l_config(DRV2605L_t * p_inst);
 void drv2605l_pwm_config(DRV2605L_t * p_inst);
-void drv2605l_general_callback(ret_code_t result, void * p_user_data);
-void drv2605l_vbatt_callback(ret_code_t result, void * p_user_data);
-void drv2605l_vbatt_voltage_conversion(ret_code_t result, void * p_user_data);
-void set_drv_vbatt(DRV2605L_t * p_inst);
-bool get_vbatt_data_available(void);
-bool set_vbatt_data_available(bool status);
-
-void drv2605l_pwm_config(DRV2605L_t * p_inst);
 ret_code_t drv2605l_set_pwm_duty_cycle(uint8_t duty_cycle);
+void set_drv_vbatt(DRV2605L_t * p_inst);
 
 #endif //JDSMARTWATCHPROJECT_DRV2605L_H

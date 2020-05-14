@@ -56,14 +56,14 @@
 #define APP_BLE_CONN_CFG_TAG            1                       /**< A tag identifying the SoftDevice BLE configuration. */
 
 
-#define APP_ADV_FAST_INTERVAL           0x0028                                      /**< Fast advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
-#define APP_ADV_SLOW_INTERVAL           0x0C80                                      /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
+#define APP_ADV_FAST_INTERVAL           40                                      /**< Fast advertising interval (in units of 0.625 ms). The default value corresponds to 25 ms. */
+#define APP_ADV_SLOW_INTERVAL           3200                                      /**< Slow advertising interval (in units of 0.625 ms). The default value corresponds to 2 seconds. */
 
 #define APP_ADV_FAST_DURATION           3000                                        /**< The advertising duration of fast advertising in units of 10 milliseconds. */
 #define APP_ADV_SLOW_DURATION           18000                                       /**< The advertising duration of slow advertising in units of 10 milliseconds. */
 
-#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (0.1 seconds). */
-#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
+#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(500, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (0.1 seconds). */
+#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(1000, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
 #define SLAVE_LATENCY                   0                                       /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)         /**< Connection supervisory timeout (4 seconds). */
 
@@ -72,6 +72,7 @@
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000)                  /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                       /**< Number of attempts before giving up the connection parameter negotiation. */
 
+#define MESSAGE_BUFFER_SIZE            18                                     /**< Size of buffer holding optional messages in notifications. */
 #define NOTIFICATION_INTERVAL           APP_TIMER_TICKS(1000)
 
 #define SEC_PARAM_BOND                  1                                       /**< Perform bonding. */
@@ -84,17 +85,31 @@
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 
 typedef struct {
+    uint8_t     hour;
+    uint8_t     minute;
+    uint8_t     second;
+    uint8_t     day_of_week;
+    uint8_t     day_of_month;
+    uint8_t     month;
+    uint16_t    year;
+} BLE_Manager_CTS_Time_t;
+
+typedef struct {
     bool connected;
     bool cts_discovered;
     bool cts_request;
+    bool cts_event;
     bool ancs_discovered;
+    bool ancs_event;
     bool gatts_discovered;
+    BLE_Manager_CTS_Time_t  cts_time;
 } BLE_Manager_t;
 
 
 // BLE Manager Task
 void BLE_Manager_Task(void * arg);
 void ble_manager_init(BLE_Manager_t * p_inst);
+void ble_manager_request_cts(void);
 
 // init functions
 void ble_stack_init(void);

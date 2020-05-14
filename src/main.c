@@ -84,20 +84,6 @@ static void timers_init(void)
 //    APP_ERROR_CHECK(err_code);
 }
 
-
-
-
-/**@brief Function for starting timers.
- */
-static void application_timers_start(void)
-{
-    /* YOUR_JOB: Start your timers. below is an example of how to start a timer.
-       ret_code_t err_code;
-       err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
-       APP_ERROR_CHECK(err_code); */
-
-}
-
 /**@brief Function for putting the chip into sleep mode.
  *
  * @note This function will not return.
@@ -124,13 +110,14 @@ void sleep_mode_enter(void) {
  * @param[in]   event   Event generated when button is pressed.
  */
 static void bsp_event_handler(bsp_event_t event) {
-    ret_code_t err_code;
-
-    switch (event)
-    {
+//    ret_code_t err_code;
+    switch (event) {
         case BSP_EVENT_SLEEP:
             sleep_mode_enter();
             break; // BSP_EVENT_SLEEP
+        case BSP_EVENT_KEY_1:
+            ble_manager_request_cts();
+            break;
         default:
             break;
     }
@@ -148,8 +135,8 @@ static void buttons_leds_init(bool * p_erase_bonds) {
     err_code = bsp_init(BSP_INIT_LEDS | BSP_INIT_BUTTONS, bsp_event_handler);
     APP_ERROR_CHECK(err_code);
 
-    err_code = bsp_btn_ble_init(NULL, &startup_event);
-    APP_ERROR_CHECK(err_code);
+//    err_code = bsp_btn_ble_init(NULL, &startup_event);
+//    APP_ERROR_CHECK(err_code);
 
     *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
 }

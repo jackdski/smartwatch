@@ -29,8 +29,8 @@ uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605_init_ctl_two[]      = {DRV_CONTROL2_
 uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605l_go_on_reg[]     = { DRV_GO_REG, 0x01 };
 uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605l_go_stop_reg[]   = { DRV_GO_REG, 0x00 };
 
-uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605_mode_pwm_active[]       = {DRV_MODE_REG, (DRV_MODE_PWM_INPUT | DRV_MODE_STANDBY_BIT) };
-uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605_mode_standby[]          = {DRV_MODE_REG, (DRV_MODE_PWM_INPUT)};
+uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605_mode_standby[]       = {DRV_MODE_REG, (DRV_MODE_PWM_INPUT | DRV_MODE_STANDBY_BIT) };
+uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605_mode_pwm_active[]    = {DRV_MODE_REG, (DRV_MODE_PWM_INPUT)};
 
 // read-able registers
 uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND drv2605l_status_reg_addr = DRV_STATUS_REG;
@@ -71,8 +71,6 @@ nrf_twi_mngr_transfer_t const drv2605l_set_standby_transfers[2] = {
 };
 
 
-static bool vbatt_data_available = false;
-
 // Functions
 ret_code_t drv2605l_config(DRV2605L_t * p_inst) {
     if(p_inst == NULL) {
@@ -82,12 +80,12 @@ ret_code_t drv2605l_config(DRV2605L_t * p_inst) {
     p_inst->initialized = false;
     p_inst->en_pin      = DRV_EN_PIN;
     p_inst->state       = DRV_Get_Voltage; // DRV_Init;
+    p_inst->errors      = DRV_No_Errors;
     p_inst->period_us   = DRV_PERIOD_US;
     p_inst->motor_type  = LRA_MODE;
     p_inst->loop_gain   = LOOP_GAIN_MEDIUM;
     p_inst->enable      = true;
-    p_inst->go_bit      = false;
-    p_inst->vbatt_voltage = -1.0;
+    p_inst->vbatt.vbatt_voltage = -1.0;
 
     nrf_gpio_pin_write(p_inst->en_pin, 0);
     drv2605l_pwm_config(p_inst);
@@ -112,38 +110,9 @@ void drv2605l_pwm_config(DRV2605L_t * p_inst) {
     app_pwm_enable(&PWM1);
 }
 
-
-void drv2605l_general_callback(ret_code_t result, void * p_user_data) {
-    UNUSED_PARAMETER(p_user_data);
-    if (result != NRF_SUCCESS) {
-        NRF_LOG_WARNING("DRV2605L - error: %d", (int)result);
-        return;
-    }
-}
-
-void drv2605l_vbatt_callback(ret_code_t result, void * p_user_data) {
-    UNUSED_PARAMETER(p_user_data);
-    if (result != NRF_SUCCESS) {
-        NRF_LOG_WARNING("DRV2605L VBatt - error: %d", (int)result);
-        return;
-    }
-    vbatt_data_available = true;
-}
-
-
 void set_drv_vbatt(DRV2605L_t * p_inst) {
-    p_inst->vbatt_voltage = p_inst->vbatt_reading * 5.6 / 255;
-    NRF_LOG_INFO("DRV2605L Vbatt: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(p_inst->vbatt_voltage));
-    vbatt_data_available = false;
-}
-
-bool get_vbatt_data_available(void) {
-    return vbatt_data_available;
-}
-
-bool set_vbatt_data_available(bool status) {
-    vbatt_data_available = status;
-    return vbatt_data_available;
+    p_inst->vbatt.vbatt_voltage = p_inst->vbatt.vbatt_reading * 5.6 / 255;
+    NRF_LOG_INFO("DRV2605L Vbatt: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(p_inst->vbatt.vbatt_voltage));
 }
 
 ret_code_t drv2605l_set_pwm_duty_cycle(uint8_t duty_cycle) {

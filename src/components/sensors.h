@@ -30,9 +30,9 @@
 
 
 void twi_init(void);
-void haptic_buzz_callback(TimerHandle_t xTimer);
 void haptic_task(void * arg);
 ret_code_t haptic_init(DRV2605L_t * p_inst);
+
 void haptic_request_vbatt(void);
 
 
