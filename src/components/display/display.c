@@ -19,10 +19,17 @@
 #include "semphr.h"
 #include "event_groups.h"
 
+// Drivers
+#include "drivers/CST816S.h"
+
 // Display Components
 #include "display_boot_up.h"
-#include "display_home.h"
-#include "drivers/CST816S.h"
+#include "home.h"
+#include "display_common.h"
+#include "display_brightness.h"
+#include "display_heart_rate.h"
+#include "display_settings.h"
+#include "display_steps.h"
 
 LV_FONT_DECLARE(jetbrains_mono_bold_20)
 
@@ -79,9 +86,13 @@ lv_disp_drv_t lvgl_disp_drv;
  */
 
 // Screens
-lv_obj_t * active_scr;
 lv_obj_t * boot_up_scr;
 lv_obj_t * home_scr;
+lv_obj_t * brightness_scr;
+lv_obj_t * settings_scr;
+lv_obj_t * steps_scr;
+lv_obj_t * heart_rate_scr;
+
 
 /** Private Functions **/
 static void init_display(void)
@@ -129,7 +140,7 @@ static void update_brightness(void)
 
 static void display_handle_button(uint8_t button_presses)
 {
-
+    // TODO
 }
 
 
@@ -143,9 +154,14 @@ void Display_Task(void * arg)
     display_timeout_disable();
 
     // screens
-    if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE){
-        boot_up_scr = lv_obj_create(NULL, NULL);
-        home_scr = lv_obj_create(NULL, NULL);
+    if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
+    {
+        boot_up_scr = lv_obj_create(NULL, NULL);    display_boot_up();
+        home_scr = lv_obj_create(NULL, NULL);       home_screen();
+        brightness_scr = lv_obj_create(NULL, NULL); brightness_screen();
+        settings_scr = lv_obj_create(NULL, NULL);   settings_screen();
+        settings_scr = lv_obj_create(NULL, NULL);               settings_screen();
+        heart_rate_scr = lv_obj_create(NULL, NULL); heart_rate_screen();
         xSemaphoreGive(lvgl_mutex);
     }
 
@@ -174,7 +190,6 @@ void Display_Task(void * arg)
             if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE){
                 NRF_LOG_INFO("Displaying Boot Up Screen...");
                 lv_scr_load(boot_up_scr);
-                display_boot_up(boot_up_scr);
                 NRF_LOG_INFO("Load Boot Up Screen...");
                 xSemaphoreGive(lvgl_mutex);
                 NRF_LOG_INFO("Display Boot Complete")
@@ -187,6 +202,8 @@ void Display_Task(void * arg)
 //                vTaskDelay(pdMS_TO_TICKS(1000));
 //                boot_up_wait++;
 //            }
+            vTaskDelay(pdMS_TO_TICKS(5000));
+            lv_scr_load(home_scr);
             display_timeout_enable();
             display.display_state = DISPLAY_STATE_RUN;
             break;
@@ -201,8 +218,9 @@ void Display_Task(void * arg)
                 }
                 else
                 {
+                    // TODO: go up one "level"
                     lv_scr_load(home_scr);
-                    display_home("10", "15");
+//                    home_update_time();
                 }
                 display.button_pressed = false;
             }
@@ -283,10 +301,16 @@ void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * 
     lv_disp_flush_ready(disp_drv);
 }
 
-void load_screen(lv_obj_t * scr)
+
+bool display_get_charging_status(void)
 {
-    active_scr = scr;
-    lv_scr_load(active_scr);
+    return display.charging;
+}
+
+eDisplayBatteryStatus display_get_battery_status(void)
+{
+    // TODO
+    return BATTERY_FULL;
 }
 
 void display_brightness_test(void)

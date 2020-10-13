@@ -7,6 +7,6 @@
 
 #include "lvgl/lvgl.h"
 
-void display_boot_up(lv_obj_t * parent);
+void display_boot_up(void);
 
 #endif //JDSMARTWATCHPROJECT_SRC_COMPONENTS_DISPLAY_DISPLAY_BOOT_UP_H

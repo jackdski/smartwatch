@@ -29,11 +29,17 @@ nRF5_addSoftDeviceSupport()
 
 include_directories(FreeRTOS/Source/portable/GCC/ARM_CM4F)
 include_directories(FreeRTOS/Source/portable/)
-
 include_directories(FreeRTOS/Source/include)
+
+include_directories(components)
 include_directories(components/sensors/)
 include_directories(components/sensors/BMA423-Sensor-API-master)
 include_directories(components/ble)
+include_directories(components/display/)
+include_directories(components/display/brightness)
+include_directories(components/display/heart_rate)
+include_directories(components/display/settings)
+include_directories(components/display/steps)
 
 # Libraries
 #nRF5_addFreeRTOSPort()
@@ -314,12 +320,20 @@ list(APPEND SOURCE_FILES
         components/sys_task.c
         components/haptic.h
         components/haptic.c
+        components/display/brightness/display_brightness.h
+        components/display/brightness/display_brightness.c
+        components/display/heart_rate/display_heart_rate.h
+        components/display/heart_rate/display_heart_rate.c
+        components/display/settings/display_settings.h
+        components/display/settings/display_settings.c
+        components/display/steps/display_steps.h
+        components/display/steps/display_steps.c
+        components/display/display_common.h
+        components/display/display_common.c
         components/display/display_boot_up.h
         components/display/display_boot_up.c
-        components/display/display_home.h
-        components/display/display_home.c
-        components/display/screens/display_choice.h
-        components/display/screens/display_choice.c
+        components/display/home.h
+        components/display/home.c
         components/display/display.h
         components/display/display.c
         components/sensors

@@ -6,7 +6,8 @@
 #define JDSMARTWATCHPROJECT_DISPLAY_H
 
 #include "lvgl/lvgl.h"
-#include "../resources.h"
+#include "resources.h"
+#include "display_common.h"
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -45,6 +46,8 @@ void vDisplayTimeoutCallback( TimerHandle_t xTimer );
 void display_timeout_refresh(void);
 void display_timeout_enable(void);
 void display_timeout_disable(void);
+bool display_get_charging_status(void);
+eDisplayBatteryStatus display_get_battery_status(void);
 
 // Display App
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);

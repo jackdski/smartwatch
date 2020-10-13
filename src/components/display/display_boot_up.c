@@ -5,8 +5,10 @@
 #include "display_boot_up.h"
 #include "display.h"
 
+extern lv_obj_t * boot_up_scr;
 
-void display_boot_up(lv_obj_t * parent) {
+void display_boot_up(void)
+{
     /* Create the main label */
 //    lv_obj_t * main_label = lv_label_create(parent, NULL);
 //
@@ -19,7 +21,7 @@ void display_boot_up(lv_obj_t * parent) {
     lv_obj_t * text;
     lv_style_t label_style;
 
-    text = lv_textarea_create(lv_scr_act(), NULL);
+    text = lv_textarea_create(boot_up_scr, NULL);
     lv_obj_set_size(text, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     lv_obj_align(text, NULL, LV_ALIGN_CENTER, 0, 0);
 

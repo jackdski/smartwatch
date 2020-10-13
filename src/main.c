@@ -36,12 +36,12 @@
 #include "lvgl/lvgl.h"
 
 // Application files
-#include "components/resources.h"
-#include "components/ble/ble_general.h"
-#include "components/sys_task.h"
-#include "components/battery.h"
-#include "components/display/display.h"
-#include "components/common.h"
+#include "resources.h"
+#include "ble/ble_general.h"
+#include "sys_task.h"
+#include "battery.h"
+#include "display.h"
+#include "common.h"
 
 // Drivers
 #include "drivers/peripherals.h"
