@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/lvgl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/external/micro-ecc/micro-ecc" vcs="Git" />
+  </component>
+</project>

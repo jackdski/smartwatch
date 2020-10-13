@@ -1,0 +1,7 @@
+[submodule "nRF5-cmake-scripts"]
+	path = nRF5-cmake-scripts
+	url = https://github.com/NRB-Tech/nRF5-cmake-scripts
+
+[submodule "LVGL"]
+    path = lvgl
+    url = https://github.com/lvgl/lvgl

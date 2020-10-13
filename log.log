@@ -1,0 +1,587 @@
+2020-Sep-19 14:04:46  --------------------------------------------------------------------------------
+2020-Sep-19 14:04:46  nrfjprog -f NRF52 --recover --log 
+2020-Sep-19 14:04:46  nrfjprog version 10.9.0 
+2020-Sep-19 14:04:46  --------------------------------------------------------------------------------
+2020-Sep-19 14:04:46  nRF_logger_open
+2020-Sep-19 14:04:46  nRF_logger_open:	nRFJProg logger opened to callback at address 0X55B826733C60
+2020-Sep-19 14:04:46  nRF_open_dll
+2020-Sep-19 14:04:46  nRF_open_dll:	Load library at "/opt/nrfjprog/libjlinkarm_nrf52_nrfjprogdll.so".
+
+2020-Sep-19 14:04:46  . nRF52_logger_open
+2020-Sep-19 14:04:46  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X7FB253D13190
+2020-Sep-19 14:04:46  . nRF52_open
+2020-Sep-19 14:04:46  . . Segger_logger_open
+2020-Sep-19 14:04:46  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X7FB253963850
+2020-Sep-19 14:04:46  . . Segger_open_dll
+2020-Sep-19 14:04:46  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2020-Sep-19 14:04:46  . . Segger_open_dll:	Load library at "/opt/SEGGER/JLink/libjlinkarm.so".
+
+2020-Sep-19 14:04:46  . . . Segger_dll_version
+2020-Sep-19 14:04:46  nRF_enum_emu_snr
+2020-Sep-19 14:04:46  . nRF52_enum_emu_snr
+2020-Sep-19 14:04:46  . . Segger_is_connected_to_emu
+2020-Sep-19 14:04:46  . . Segger_enum_emu_snr
+2020-Sep-19 14:04:46  . . . Segger_enum_emu_snr
+2020-Sep-19 14:04:46  . . . . Segger_get_num_emus
+2020-Sep-19 14:04:47  . . Segger_is_connected_to_emu
+2020-Sep-19 14:04:47  nRF_connect_to_emu_with_snr
+2020-Sep-19 14:04:47  . nRF52_connect_to_emu_with_snr
+2020-Sep-19 14:04:47  . . Segger_is_connected_to_emu
+2020-Sep-19 14:04:47  . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:04:47  . . . Segger_is_connected_to_emu
+2020-Sep-19 14:04:47  . . . Segger_enum_emu_snr
+2020-Sep-19 14:04:47  . . . . Segger_get_num_emus
+2020-Sep-19 14:04:47  . . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:04:47  . . . . Segger_connect_to_emu_without_snr
+2020-Sep-19 14:04:47  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x140403883483488.
+
+2020-Sep-19 14:04:47  . . . . Segger_connect_to_emu_without_snr:	JLinkARM.dll Open returned error 'Cannot connect to J-Link'.
+
+2020-Sep-19 14:04:47  . . Segger_is_connected_to_emu
+2020-Sep-19 14:04:47  nRF_close_dll
+2020-Sep-19 14:04:47  . nRF52_close
+2020-Sep-19 14:04:47  . . Segger_is_connected_to_emu
+2020-Sep-19 14:04:47  . . Segger_close
+2020-Sep-19 14:04:47  . . . Segger_disconnect_from_emu
+2020-Sep-19 14:04:47  . . . . Segger_is_connected_to_emu
+2020-Sep-19 14:04:47  . . Segger_close:	Freeing Library.
+
+2020-Sep-19 14:04:47  nRF_close_dll:	Freeing Library.
+
+2020-Sep-19 14:04:58  --------------------------------------------------------------------------------
+2020-Sep-19 14:04:58  nrfjprog --log -f NRF52 --recover --log 
+2020-Sep-19 14:04:58  nrfjprog version 10.9.0 
+2020-Sep-19 14:04:58  --------------------------------------------------------------------------------
+2020-Sep-19 14:05:02  --------------------------------------------------------------------------------
+2020-Sep-19 14:05:02  nrfjprog --log -f NRF52 --recover 
+2020-Sep-19 14:05:02  nrfjprog version 10.9.0 
+2020-Sep-19 14:05:02  --------------------------------------------------------------------------------
+2020-Sep-19 14:05:02  nRF_logger_open
+2020-Sep-19 14:05:02  nRF_logger_open:	nRFJProg logger opened to callback at address 0X555C25A2FC60
+2020-Sep-19 14:05:02  nRF_open_dll
+2020-Sep-19 14:05:02  nRF_open_dll:	Load library at "/opt/nrfjprog/libjlinkarm_nrf52_nrfjprogdll.so".
+
+2020-Sep-19 14:05:02  . nRF52_logger_open
+2020-Sep-19 14:05:02  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X7F3A43FFF190
+2020-Sep-19 14:05:02  . nRF52_open
+2020-Sep-19 14:05:02  . . Segger_logger_open
+2020-Sep-19 14:05:02  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X7F3A43C4F850
+2020-Sep-19 14:05:02  . . Segger_open_dll
+2020-Sep-19 14:05:02  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2020-Sep-19 14:05:02  . . Segger_open_dll:	Load library at "/opt/SEGGER/JLink/libjlinkarm.so".
+
+2020-Sep-19 14:05:02  . . . Segger_dll_version
+2020-Sep-19 14:05:02  nRF_enum_emu_snr
+2020-Sep-19 14:05:02  . nRF52_enum_emu_snr
+2020-Sep-19 14:05:02  . . Segger_is_connected_to_emu
+2020-Sep-19 14:05:02  . . Segger_enum_emu_snr
+2020-Sep-19 14:05:02  . . . Segger_enum_emu_snr
+2020-Sep-19 14:05:02  . . . . Segger_get_num_emus
+2020-Sep-19 14:05:03  . . Segger_is_connected_to_emu
+2020-Sep-19 14:05:03  nRF_connect_to_emu_with_snr
+2020-Sep-19 14:05:03  . nRF52_connect_to_emu_with_snr
+2020-Sep-19 14:05:03  . . Segger_is_connected_to_emu
+2020-Sep-19 14:05:03  . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:05:03  . . . Segger_is_connected_to_emu
+2020-Sep-19 14:05:03  . . . Segger_enum_emu_snr
+2020-Sep-19 14:05:03  . . . . Segger_get_num_emus
+2020-Sep-19 14:05:03  . . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:05:03  . . . . Segger_connect_to_emu_without_snr
+2020-Sep-19 14:05:03  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x139888222036320.
+
+2020-Sep-19 14:05:03  . . . . Segger_connect_to_emu_without_snr:	JLinkARM.dll Open returned error 'Cannot connect to J-Link'.
+
+2020-Sep-19 14:05:03  . . Segger_is_connected_to_emu
+2020-Sep-19 14:05:03  nRF_close_dll
+2020-Sep-19 14:05:03  . nRF52_close
+2020-Sep-19 14:05:03  . . Segger_is_connected_to_emu
+2020-Sep-19 14:05:03  . . Segger_close
+2020-Sep-19 14:05:03  . . . Segger_disconnect_from_emu
+2020-Sep-19 14:05:03  . . . . Segger_is_connected_to_emu
+2020-Sep-19 14:05:03  . . Segger_close:	Freeing Library.
+
+2020-Sep-19 14:05:03  nRF_close_dll:	Freeing Library.
+
+2020-Sep-19 14:06:24  --------------------------------------------------------------------------------
+2020-Sep-19 14:06:24  nrfjprog --log -f NRF52 --recover 
+2020-Sep-19 14:06:24  nrfjprog version 10.9.0 
+2020-Sep-19 14:06:24  --------------------------------------------------------------------------------
+2020-Sep-19 14:06:24  nRF_logger_open
+2020-Sep-19 14:06:24  nRF_logger_open:	nRFJProg logger opened to callback at address 0X5600502E9C60
+2020-Sep-19 14:06:24  nRF_open_dll
+2020-Sep-19 14:06:24  nRF_open_dll:	Load library at "/opt/nrfjprog/libjlinkarm_nrf52_nrfjprogdll.so".
+
+2020-Sep-19 14:06:24  . nRF52_logger_open
+2020-Sep-19 14:06:24  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X7F0D66D9F190
+2020-Sep-19 14:06:24  . nRF52_open
+2020-Sep-19 14:06:24  . . Segger_logger_open
+2020-Sep-19 14:06:24  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X7F0D669EF850
+2020-Sep-19 14:06:24  . . Segger_open_dll
+2020-Sep-19 14:06:24  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2020-Sep-19 14:06:24  . . Segger_open_dll:	Load library at "/opt/SEGGER/JLink/libjlinkarm.so".
+
+2020-Sep-19 14:06:24  . . . Segger_dll_version
+2020-Sep-19 14:06:24  nRF_enum_emu_snr
+2020-Sep-19 14:06:24  . nRF52_enum_emu_snr
+2020-Sep-19 14:06:24  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:24  . . Segger_enum_emu_snr
+2020-Sep-19 14:06:24  . . . Segger_enum_emu_snr
+2020-Sep-19 14:06:24  . . . . Segger_get_num_emus
+2020-Sep-19 14:06:24  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:24  nRF_connect_to_emu_with_snr
+2020-Sep-19 14:06:24  . nRF52_connect_to_emu_with_snr
+2020-Sep-19 14:06:24  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:24  . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:06:24  . . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:24  . . . Segger_enum_emu_snr
+2020-Sep-19 14:06:24  . . . . Segger_get_num_emus
+2020-Sep-19 14:06:24  . . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:06:24  . . . . Segger_connect_to_emu_without_snr
+2020-Sep-19 14:06:24  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x139695533220192.
+
+2020-Sep-19 14:06:24  . . . . Segger_connect_to_emu_without_snr:	JLinkARM.dll Open returned error 'Cannot connect to J-Link'.
+
+2020-Sep-19 14:06:24  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:24  nRF_close_dll
+2020-Sep-19 14:06:24  . nRF52_close
+2020-Sep-19 14:06:24  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:24  . . Segger_close
+2020-Sep-19 14:06:24  . . . Segger_disconnect_from_emu
+2020-Sep-19 14:06:24  . . . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:24  . . Segger_close:	Freeing Library.
+
+2020-Sep-19 14:06:24  nRF_close_dll:	Freeing Library.
+
+2020-Sep-19 14:06:26  --------------------------------------------------------------------------------
+2020-Sep-19 14:06:26  nrfjprog --log -f NRF52 --recover 
+2020-Sep-19 14:06:26  nrfjprog version 10.9.0 
+2020-Sep-19 14:06:26  --------------------------------------------------------------------------------
+2020-Sep-19 14:06:26  nRF_logger_open
+2020-Sep-19 14:06:26  nRF_logger_open:	nRFJProg logger opened to callback at address 0X5560A739BC60
+2020-Sep-19 14:06:26  nRF_open_dll
+2020-Sep-19 14:06:26  nRF_open_dll:	Load library at "/opt/nrfjprog/libjlinkarm_nrf52_nrfjprogdll.so".
+
+2020-Sep-19 14:06:26  . nRF52_logger_open
+2020-Sep-19 14:06:26  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X7F4CABC9A190
+2020-Sep-19 14:06:26  . nRF52_open
+2020-Sep-19 14:06:26  . . Segger_logger_open
+2020-Sep-19 14:06:26  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X7F4CAB8EA850
+2020-Sep-19 14:06:26  . . Segger_open_dll
+2020-Sep-19 14:06:26  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2020-Sep-19 14:06:26  . . Segger_open_dll:	Load library at "/opt/SEGGER/JLink/libjlinkarm.so".
+
+2020-Sep-19 14:06:26  . . . Segger_dll_version
+2020-Sep-19 14:06:26  nRF_enum_emu_snr
+2020-Sep-19 14:06:26  . nRF52_enum_emu_snr
+2020-Sep-19 14:06:26  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:26  . . Segger_enum_emu_snr
+2020-Sep-19 14:06:26  . . . Segger_enum_emu_snr
+2020-Sep-19 14:06:26  . . . . Segger_get_num_emus
+2020-Sep-19 14:06:27  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:27  nRF_connect_to_emu_with_snr
+2020-Sep-19 14:06:27  . nRF52_connect_to_emu_with_snr
+2020-Sep-19 14:06:27  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:27  . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:06:27  . . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:27  . . . Segger_enum_emu_snr
+2020-Sep-19 14:06:27  . . . . Segger_get_num_emus
+2020-Sep-19 14:06:27  . . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:06:27  . . . . Segger_connect_to_emu_without_snr
+2020-Sep-19 14:06:27  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x139967272718688.
+
+2020-Sep-19 14:06:27  . . . . Segger_connect_to_emu_without_snr:	JLinkARM.dll Open returned error 'Cannot connect to J-Link'.
+
+2020-Sep-19 14:06:27  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:27  nRF_close_dll
+2020-Sep-19 14:06:27  . nRF52_close
+2020-Sep-19 14:06:27  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:27  . . Segger_close
+2020-Sep-19 14:06:27  . . . Segger_disconnect_from_emu
+2020-Sep-19 14:06:27  . . . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:27  . . Segger_close:	Freeing Library.
+
+2020-Sep-19 14:06:27  nRF_close_dll:	Freeing Library.
+
+2020-Sep-19 14:06:54  --------------------------------------------------------------------------------
+2020-Sep-19 14:06:54  nrfjprog --log -f NRF52 --recover 
+2020-Sep-19 14:06:54  nrfjprog version 10.9.0 
+2020-Sep-19 14:06:54  --------------------------------------------------------------------------------
+2020-Sep-19 14:06:54  nRF_logger_open
+2020-Sep-19 14:06:54  nRF_logger_open:	nRFJProg logger opened to callback at address 0X561EA11DFC60
+2020-Sep-19 14:06:54  nRF_open_dll
+2020-Sep-19 14:06:54  nRF_open_dll:	Load library at "/opt/nrfjprog/libjlinkarm_nrf52_nrfjprogdll.so".
+
+2020-Sep-19 14:06:54  . nRF52_logger_open
+2020-Sep-19 14:06:54  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X7F4745894190
+2020-Sep-19 14:06:54  . nRF52_open
+2020-Sep-19 14:06:54  . . Segger_logger_open
+2020-Sep-19 14:06:54  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X7F47454E4850
+2020-Sep-19 14:06:54  . . Segger_open_dll
+2020-Sep-19 14:06:54  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2020-Sep-19 14:06:54  . . Segger_open_dll:	Load library at "/opt/SEGGER/JLink/libjlinkarm.so".
+
+2020-Sep-19 14:06:54  . . . Segger_dll_version
+2020-Sep-19 14:06:54  nRF_enum_emu_snr
+2020-Sep-19 14:06:54  . nRF52_enum_emu_snr
+2020-Sep-19 14:06:54  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:54  . . Segger_enum_emu_snr
+2020-Sep-19 14:06:54  . . . Segger_enum_emu_snr
+2020-Sep-19 14:06:54  . . . . Segger_get_num_emus
+2020-Sep-19 14:06:55  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:55  nRF_close_dll
+2020-Sep-19 14:06:55  . nRF52_close
+2020-Sep-19 14:06:55  . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:55  . . Segger_close
+2020-Sep-19 14:06:55  . . . Segger_disconnect_from_emu
+2020-Sep-19 14:06:55  . . . . Segger_is_connected_to_emu
+2020-Sep-19 14:06:55  . . Segger_close:	Freeing Library.
+
+2020-Sep-19 14:06:55  nRF_close_dll:	Freeing Library.
+
+2020-Sep-19 14:07:03  --------------------------------------------------------------------------------
+2020-Sep-19 14:07:03  nrfjprog --log -f NRF52 --recover 
+2020-Sep-19 14:07:03  nrfjprog version 10.9.0 
+2020-Sep-19 14:07:03  --------------------------------------------------------------------------------
+2020-Sep-19 14:07:03  nRF_logger_open
+2020-Sep-19 14:07:03  nRF_logger_open:	nRFJProg logger opened to callback at address 0X5647EB638C60
+2020-Sep-19 14:07:03  nRF_open_dll
+2020-Sep-19 14:07:03  nRF_open_dll:	Load library at "/opt/nrfjprog/libjlinkarm_nrf52_nrfjprogdll.so".
+
+2020-Sep-19 14:07:03  . nRF52_logger_open
+2020-Sep-19 14:07:03  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X7FE49ADCA190
+2020-Sep-19 14:07:03  . nRF52_open
+2020-Sep-19 14:07:03  . . Segger_logger_open
+2020-Sep-19 14:07:03  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X7FE49AA1A850
+2020-Sep-19 14:07:03  . . Segger_open_dll
+2020-Sep-19 14:07:03  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2020-Sep-19 14:07:03  . . Segger_open_dll:	Load library at "/opt/SEGGER/JLink/libjlinkarm.so".
+
+2020-Sep-19 14:07:03  . . . Segger_dll_version
+2020-Sep-19 14:07:03  nRF_enum_emu_snr
+2020-Sep-19 14:07:03  . nRF52_enum_emu_snr
+2020-Sep-19 14:07:03  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:03  . . Segger_enum_emu_snr
+2020-Sep-19 14:07:03  . . . Segger_enum_emu_snr
+2020-Sep-19 14:07:03  . . . . Segger_get_num_emus
+2020-Sep-19 14:07:04  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:04  nRF_connect_to_emu_with_snr
+2020-Sep-19 14:07:04  . nRF52_connect_to_emu_with_snr
+2020-Sep-19 14:07:04  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:04  . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:07:04  . . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:04  . . . Segger_enum_emu_snr
+2020-Sep-19 14:07:04  . . . . Segger_get_num_emus
+2020-Sep-19 14:07:04  . . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:07:04  . . . . Segger_connect_to_emu_without_snr
+2020-Sep-19 14:07:04  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x140619823780192.
+
+2020-Sep-19 14:07:04  . . . . . Segger_load_core_data
+2020-Sep-19 14:07:04  . . Segger_read_debug_port_idr
+2020-Sep-19 14:07:04  . . . Segger_read_debug_port_register
+2020-Sep-19 14:07:04  . . . . Segger_read_debug_port_register
+2020-Sep-19 14:07:04  . . . . . Segger_coresight_configure
+2020-Sep-19 14:07:04  . . . . . Segger_coresight_configure:	JLink WARNING	Communication timed out: Requested 4 bytes, received 0 bytes !
+2020-Sep-19 14:07:04  . . . . Segger_read_debug_port_register:	JLinkARM.dll reported "-1", an unknown error.
+
+2020-Sep-19 14:07:04  . . . . . Segger_abort_debug_action
+2020-Sep-19 14:07:04  . . . . . Segger_abort_debug_action:	Attempting to clear any configuration errors in debug port before closing connection. 
+
+2020-Sep-19 14:07:04  . . . . . Segger_abort_debug_action:	JLinkARM.dll reported "-1707368560", an unknown error.
+
+2020-Sep-19 14:07:04  nRF_close_dll
+2020-Sep-19 14:07:04  . nRF52_close
+2020-Sep-19 14:07:04  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:04  . . Segger_close
+2020-Sep-19 14:07:04  . . . Segger_disconnect_from_emu
+2020-Sep-19 14:07:04  . . . . Segger_disconnect_from_emu
+2020-Sep-19 14:07:04  . . . . . Segger_is_connected_to_device
+2020-Sep-19 14:07:04  . . . . . Segger_is_debug_region_powered
+2020-Sep-19 14:07:04  . . . . . . Segger_read_debug_port_register
+2020-Sep-19 14:07:04  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:04  . . . . . . . Segger_write_debug_port_register:	JLink WARNING	Could not transfer JTAG data.
+2020-Sep-19 14:07:04  . . . . . . . Segger_write_debug_port_register:	JLinkARM.dll reported "-1", an unknown error.
+
+2020-Sep-19 14:07:04  . . . . . . . . Segger_abort_debug_action
+2020-Sep-19 14:07:04  . . . . . . . . Segger_abort_debug_action:	Attempting to clear any configuration errors in debug port before closing connection. 
+
+2020-Sep-19 14:07:04  . . . . . . . . Segger_abort_debug_action:	JLinkARM.dll reported "-1", an unknown error.
+
+2020-Sep-19 14:07:04  . . Segger_close:	Freeing Library.
+
+2020-Sep-19 14:07:04  nRF_close_dll:	Freeing Library.
+
+2020-Sep-19 14:07:09  --------------------------------------------------------------------------------
+2020-Sep-19 14:07:09  nrfjprog --log -f NRF52 --recover 
+2020-Sep-19 14:07:09  nrfjprog version 10.9.0 
+2020-Sep-19 14:07:09  --------------------------------------------------------------------------------
+2020-Sep-19 14:07:09  nRF_logger_open
+2020-Sep-19 14:07:09  nRF_logger_open:	nRFJProg logger opened to callback at address 0X560A997D2C60
+2020-Sep-19 14:07:09  nRF_open_dll
+2020-Sep-19 14:07:09  nRF_open_dll:	Load library at "/opt/nrfjprog/libjlinkarm_nrf52_nrfjprogdll.so".
+
+2020-Sep-19 14:07:09  . nRF52_logger_open
+2020-Sep-19 14:07:09  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X7EFDB866D190
+2020-Sep-19 14:07:09  . nRF52_open
+2020-Sep-19 14:07:09  . . Segger_logger_open
+2020-Sep-19 14:07:09  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X7EFDB82BD850
+2020-Sep-19 14:07:09  . . Segger_open_dll
+2020-Sep-19 14:07:09  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2020-Sep-19 14:07:09  . . Segger_open_dll:	Load library at "/opt/SEGGER/JLink/libjlinkarm.so".
+
+2020-Sep-19 14:07:09  . . . Segger_dll_version
+2020-Sep-19 14:07:09  nRF_enum_emu_snr
+2020-Sep-19 14:07:09  . nRF52_enum_emu_snr
+2020-Sep-19 14:07:09  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:09  . . Segger_enum_emu_snr
+2020-Sep-19 14:07:09  . . . Segger_enum_emu_snr
+2020-Sep-19 14:07:09  . . . . Segger_get_num_emus
+2020-Sep-19 14:07:09  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:09  nRF_connect_to_emu_with_snr
+2020-Sep-19 14:07:09  . nRF52_connect_to_emu_with_snr
+2020-Sep-19 14:07:09  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:09  . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:07:09  . . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:09  . . . Segger_enum_emu_snr
+2020-Sep-19 14:07:09  . . . . Segger_get_num_emus
+2020-Sep-19 14:07:09  . . . Segger_connect_to_emu_with_snr
+2020-Sep-19 14:07:10  . . . . Segger_connect_to_emu_without_snr
+2020-Sep-19 14:07:10  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x139628181930336.
+
+2020-Sep-19 14:07:10  . . . . . Segger_load_core_data
+2020-Sep-19 14:07:10  . . Segger_read_debug_port_idr
+2020-Sep-19 14:07:10  . . . Segger_read_debug_port_register
+2020-Sep-19 14:07:10  . . . . Segger_read_debug_port_register
+2020-Sep-19 14:07:10  . . . . . Segger_coresight_configure
+2020-Sep-19 14:07:10  nRF_recover
+2020-Sep-19 14:07:10  . nRF52_recover
+2020-Sep-19 14:07:10  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:10  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:10  . . nRF52_recover
+2020-Sep-19 14:07:10  . . . nRF52_is_ctrl_ap_available
+2020-Sep-19 14:07:10  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . . Segger_is_debug_region_powered
+2020-Sep-19 14:07:10  . . . . . . . Segger_read_debug_port_register
+2020-Sep-19 14:07:10  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:10  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:10  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:10  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:10  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:10  . . . Segger_write_access_port_register
+2020-Sep-19 14:07:10  . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:10  . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:10  . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:10  . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . nRF52_debug_reset
+2020-Sep-19 14:07:11  . . . . nRF52_is_ctrl_ap_available
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . nRF52_readback_status
+2020-Sep-19 14:07:11  . . . . nRF52_is_ctrl_ap_available
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . nRF52_readback_status:	Protection status read as NONE
+
+2020-Sep-19 14:07:11  . . . nRF52_debug_reset
+2020-Sep-19 14:07:11  . . . . nRF52_is_ctrl_ap_available
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_write_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . nRF52_read_device_version
+2020-Sep-19 14:07:11  . . . . nRF52_readback_status
+2020-Sep-19 14:07:11  . . . . . nRF52_is_ctrl_ap_available
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . nRF52_readback_status:	Protection status read as NONE
+
+2020-Sep-19 14:07:11  . . . . Segger_read_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . . Segger_is_connected_to_device
+2020-Sep-19 14:07:11  . . . . . . Segger_load_core_data
+2020-Sep-19 14:07:11  . . . . . Segger_read_u32
+2020-Sep-19 14:07:11  . . . . . . Segger_invalidate_cache
+2020-Sep-19 14:07:11  . . . . Segger_read_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_read_u32
+2020-Sep-19 14:07:11  . . . . . . Segger_invalidate_cache
+2020-Sep-19 14:07:11  . . . . nRF52_decode_device_version
+2020-Sep-19 14:07:11  . . . . . Segger_read_u32
+2020-Sep-19 14:07:11  . . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . . Segger_read_u32
+2020-Sep-19 14:07:11  . . . . . . . Segger_invalidate_cache
+2020-Sep-19 14:07:11  . . . Segger_halt
+2020-Sep-19 14:07:11  . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . Segger_halt
+2020-Sep-19 14:07:11  . . . Segger_sys_reset
+2020-Sep-19 14:07:11  . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . Segger_halt
+2020-Sep-19 14:07:11  . . . . Segger_sys_reset
+2020-Sep-19 14:07:11  . . . nRF52_power_ram_all
+2020-Sep-19 14:07:11  . . . . nRF52_readback_status
+2020-Sep-19 14:07:11  . . . . . nRF52_is_ctrl_ap_available
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . Segger_read_access_port_register
+2020-Sep-19 14:07:11  . . . . . . . Segger_write_debug_port_register
+2020-Sep-19 14:07:11  . . . . nRF52_readback_status:	Protection status read as NONE
+
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . nRF52_clear_resetreas
+2020-Sep-19 14:07:11  . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . . . . Segger_connect_to_device
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  nRF_close_dll
+2020-Sep-19 14:07:11  . nRF52_close
+2020-Sep-19 14:07:11  . . Segger_is_connected_to_emu
+2020-Sep-19 14:07:11  . . Segger_close
+2020-Sep-19 14:07:11  . . . Segger_disconnect_from_emu
+2020-Sep-19 14:07:11  . . . . Segger_disconnect_from_emu
+2020-Sep-19 14:07:11  . . . . . Segger_is_connected_to_device
+2020-Sep-19 14:07:11  . . . . Segger_disconnect_from_emu:	Disable trace before closing connection.
+
+2020-Sep-19 14:07:11  . . . . . Segger_write_u32
+2020-Sep-19 14:07:11  . . Segger_close:	Freeing Library.
+
+2020-Sep-19 14:07:11  nRF_close_dll:	Freeing Library.
+

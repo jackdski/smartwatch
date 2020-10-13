@@ -1,0 +1,13 @@
+//
+// Created by jack on 9/27/20.
+//
+
+#ifndef BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_DISPLAY_SCREENS_DISPLAY_CHOICE_H
+#define BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_DISPLAY_SCREENS_DISPLAY_CHOICE_H
+
+#include "lvgl/lvgl.h"
+#include <stdint.h>
+
+void display_choice(char * descriptions[], uint8_t n_choices);
+
+#endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_DISPLAY_SCREENS_DISPLAY_CHOICE_H

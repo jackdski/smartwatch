@@ -1,0 +1,11 @@
+{
+  "name": "jd_smartwatch",
+  "version": "0.1",
+  "dependencies": {
+    "microcontroller": "nRF52832",
+    "platform": "nrf52832_xxAA",
+    "SoftDevice": "s132_7.0.1",
+    "Board": "pinetime",
+    "SDK_Version": "nRF5_SDK_16.0.0_98a08e2"
+  }
+}
