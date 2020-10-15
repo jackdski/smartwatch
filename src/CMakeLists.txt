@@ -16,7 +16,7 @@ set(BOOTLOADER_VERSION 1)
 set(DFU_VERSION_STRING "${VERSION_STRING}")
 
 # Set the target name
-set(target example)
+set(target jd_smartwatch)
 
 # add the required libraries
 nRF5_addSystemNRF()
@@ -352,6 +352,7 @@ list(APPEND SOURCE_FILES
         ${FREERTOS_SRC}
         ${LVGL_SRC}
         )
+
 list(APPEND INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 nRF5_addExecutable(${target} "${SOURCE_FILES}" "${INCLUDE_DIRS}" "${NRF5_LINKER_SCRIPT}")

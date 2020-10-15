@@ -1,1 +1,4 @@
+#!/bin/bash
+
+. ../venv/bin/activate
 python build_helper.py clean

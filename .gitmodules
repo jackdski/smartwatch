@@ -5,3 +5,7 @@
 [submodule "LVGL"]
     path = lvgl
     url = https://github.com/lvgl/lvgl
+
+[submodule "Unity"]
+    path = toolchains/Unity
+    url = https://github.com/ThrowTheSwitch/Unity

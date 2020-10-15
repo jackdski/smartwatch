@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.6)
 
+# Output build type
+message("-- Build Type: ${CMAKE_BUILD_TYPE}")
+if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    set(TARGET_GROUP production CACHE STRING "Group to build")
+else()
+    set(TARGET_GROUP test CACHE STRING "Group to build")
+endif()
+
 # Adjust these parameters for your hardware platform
 # must be set as cache strings to ensure they are not overwritten in mesh SDK
 set(IC "nRF52832" CACHE STRING "IC")
@@ -27,7 +35,10 @@ include("${nRF5_cmake_path}")
 
 # project() must be called after including nRF5-cmake.cmake but before calling nRF5_setup
 # to ensure variables are set correctly
-project(BlinkyExampleProject
+#project(BlinkyExampleProject
+#        VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUGFIX}
+#        LANGUAGES NONE)
+project(jd_smartwatch
         VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUGFIX}
         LANGUAGES NONE)
 

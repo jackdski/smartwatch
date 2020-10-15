@@ -7,9 +7,14 @@ PROJECT_BASE_DIR = "jd_smartwatch"
 
 class BuildHelper:
     def __init__(self):
+        self.build_dir = "build"
+        self.target = "jd_smartwatch"
+        self.build_type = "Debug"
+
         self.cmds = [
             'build',
             'build_debug',
+            'build_release'
             'build_with_bootloader',
             'build_secure_bootloader',
             'flash',
@@ -30,11 +35,13 @@ class BuildHelper:
         self.read_config()
         print(os.environ['xIC'])
 
-    @staticmethod
-    def read_config():
+    def read_config(self):
         with open('../config.json') as f:
             config_data = json.load(f)
-            os.environ['xTARGET'] = config_data['name']
+            self.target = config_data['name']
+            self.build_type = config_data['build_type']
+            self.build_dir = os.getcwd().replace(os.getcwd().split('/')[-1], '') + '/' + config_data['build_dir'] + '_' + self.build_type.lower()
+            os.environ['xTARGET'] = self.target
             version_data = config_data['version'].split('.')
             os.environ['xVERSION_MAJOR'] = version_data[0]
             os.environ['xVERSION_MINOR'] = version_data[1]
@@ -45,20 +52,27 @@ class BuildHelper:
             os.environ['xSOFTDEVICE_VERSION'] = soft_dev_data[1]
             os.environ['xnRF5_SDK_VERSION'] = config_data['dependencies']['SDK_Version']
 
-    def build(self, target='jd_smartwatch'):
-        cmd = "cmake --build cmake-build-debug/ --target " + target
+    def build(self, target=None):
+        if self.build_type == "Debug":
+            self.build_debug()
+        elif self.build_type == "Release":
+            self.build_release()
+
+        if target is None:
+            cmd = f"cmake --build {self.build_dir} --target " + self.target
+        else:
+            cmd = f"cmake --build {self.build_dir} --target " + target
         os.chdir('..')
 
-        if not os.path.isdir('/cmake-build-debug'):
+        if not os.path.isdir(self.build_dir):
             self.build_debug()
 
-        print("Building: {}".format(target))
+        print(f"Building {self.target} in directory {self.build_dir}")
         os.system(cmd)
         print("Done.")
 
-    @staticmethod
-    def build_debug():
-        cmd = "cmake -B cmake-build-debug -G \"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Debug ."
+    def build_debug(self):
+        cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Debug ."
 
         if os.getcwd().split('/')[-1] != PROJECT_BASE_DIR:
             os.chdir('..')
@@ -66,23 +80,32 @@ class BuildHelper:
         os.system(cmd)
         print("Done.")
 
-    def build_with_bootloader(self, target='jd_smartwatch'):
-        self.build('bl_merge_' + target)
+    def build_release(self):
+        cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Release ."
 
-    def build_secure_bootloader(self, target='jd_smartwatch'):
-        self.build('secure_bootloader_' + target)
+        if os.getcwd().split('/')[-1] != PROJECT_BASE_DIR:
+            os.chdir('..')
+        print("Generating Release Build files...")
+        os.system(cmd)
+        print("Done.")
 
-    def flash(self, target='jd_smartwatch'):
-        self.build('flash_' + target)
+    def build_with_bootloader(self):
+        self.build('bl_merge_' + self.target)
 
-    def flash_bootloader(self, target='jd_smartwatch'):
-        self.build('flash_bl_merge_' + target)
+    def build_secure_bootloader(self):
+        self.build('secure_bootloader_' + self.target)
 
-    def pkg_dfu(self, target='jd_smartwatch'):
-        self.build('pkg_' + target)
+    def flash(self):
+        self.build('flash_' +  self.target)
 
-    def pkg_bl_dfu(self, target='jd_smartwatch'):
-        self.build('pkg_bl_sd_' + target)
+    def flash_bootloader(self):
+        self.build('flash_bl_merge_' + self.target)
+
+    def pkg_dfu(self):
+        self.build('pkg_' + self.target)
+
+    def pkg_bl_dfu(self):
+        self.build('pkg_bl_sd_' + self.target)
 
     @staticmethod
     def clean(directory='cmake-build-debug'):
@@ -117,8 +140,8 @@ class BuildHelper:
     def start_venv():
         os.system(". ../venv/bin/activate")
 
-    @staticmethod
-    def analyze_map(map_file='../cmake-build-debug/src/jd_smartwatch.map'):
+    def analyze_map(self):
+        map_file = f"{self.build_dir}/src/jd_smartwatch.map"
         cmd = "python analyze_map.py " + map_file
         os.system(cmd)
 
@@ -133,7 +156,7 @@ if __name__ == "__main__":
         if len(sys.argv) == 3:
             arg = sys.argv[2]
 
-        print("Arguments: {}".format(sys.argv))
+        # print("Arguments: {}".format(sys.argv))
         if arg is not None:
             getattr(bh, sys.argv[1])(arg)
         else:

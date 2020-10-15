@@ -288,7 +288,16 @@ toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/documentation
 toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/examples
 toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/external_tools
 toolchains/nRF5/nrf5SDKforMeshv400src
+toolchains/Unity
 cmake-build-*
+toolchains/Unity/auto/generate_module.rb
+toolchains/Unity/examples/example_2/src/ProductionCode.c
+toolchains/Unity/examples/example_4/src/ProductionCode.h
+toolchains/Unity/test/tests/self_assessment_utils.h
+/build_release/
+/build_debug/
+/build/
+
 /src/lvgl/lvgl.mk
 
 src/lvgl/lvgl.mk

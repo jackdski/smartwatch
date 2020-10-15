@@ -1,6 +1,8 @@
 {
   "name": "jd_smartwatch",
   "version": "0.1",
+  "build_dir": "build",
+  "build_type": "Debug",
   "dependencies": {
     "microcontroller": "nRF52832",
     "platform": "nrf52832_xxAA",
