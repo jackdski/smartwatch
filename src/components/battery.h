@@ -50,5 +50,6 @@ uint8_t estimate_soc(void);
 uint8_t get_battery_soc(void);
 uint8_t get_battery_charging(void);
 bool get_battery_low_power(void);
+bool is_battery_soc_valid(uint8_t soc);
 
 #endif //JDSMARTWATCHPROJECT_BATTERY_H

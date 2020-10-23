@@ -19,12 +19,6 @@
 
 #include "common.h"
 
-/**   HAPTIC   **/
-void haptic_pwm_config(void);
-void haptic_disable(void);
-void haptic_set_pwm_duty_cycle(uint8_t duty_cycle);
-uint8_t haptic_get_pwm_duty_cycle(void);
-
 /** GPIOTE **/
 //void config_gpio_interrupts(void);
 void gpio_interrupt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);

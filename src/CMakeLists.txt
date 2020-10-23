@@ -18,58 +18,67 @@ set(DFU_VERSION_STRING "${VERSION_STRING}")
 # Set the target name
 set(target jd_smartwatch)
 
-# add the required libraries
-nRF5_addSystemNRF()
-nRF5_addLog()
-nRF5_addSeggerRTT()
-nRF5_addAppError()
+include_directories(app)
 
-nRF5_addClock()
-nRF5_addSoftDeviceSupport()
+macro(add_app_includes)
+    include_directories(components)
+    include_directories(components/sensors/)
+    include_directories(components/sensors/BMA423-Sensor-API-master)
 
-include_directories(FreeRTOS/Source/portable/GCC/ARM_CM4F)
-include_directories(FreeRTOS/Source/portable/)
-include_directories(FreeRTOS/Source/include)
+    include_directories(app/ble)
+    include_directories(app/display/)
+    include_directories(app/display/brightness)
+    include_directories(app/display/heart_rate)
+    include_directories(app/display/settings)
+    include_directories(app/display/steps)
+endmacro()
 
-include_directories(components)
-include_directories(components/sensors/)
-include_directories(components/sensors/BMA423-Sensor-API-master)
-include_directories(components/ble)
-include_directories(components/display/)
-include_directories(components/display/brightness)
-include_directories(components/display/heart_rate)
-include_directories(components/display/settings)
-include_directories(components/display/steps)
+macro(add_freertos_includes)
+    include_directories(FreeRTOS/Source/portable/GCC/ARM_CM4F)
+    include_directories(FreeRTOS/Source/portable/)
+    include_directories(FreeRTOS/Source/include)
+endmacro()
 
-# Libraries
-#nRF5_addFreeRTOSPort()
-nRF5_addAtomic()
-nRF5_addBalloc()
-nRF5_addQueue()
-nRF5_addPowerMgmt()
-nRF5_addGPIOTE()
-nRF5_addPRS()
-nRF5_addSAADC()
-nRF5_addSPI()
-nRF5_addLegacySPI()
-nRF5_addAppTWI()
-nRF5_addLegacyPPI()
-nRF5_addAppPwm()
+macro(add_nRF_libraries)
+    # add the required libraries
+    nRF5_addSystemNRF()
+    nRF5_addLog()
+    nRF5_addSeggerRTT()
+    nRF5_addAppError()
 
-# BLE
-nRF5_addAppTimer()
-nRF5_addTimer()
-nRF5_addMutex()
-nRF5_addBLEGATT()
-nRF5_addBLEQWR()
-nRF5_addBLEAdvertising()
-nRF5_addBLEPeerManager()
-nRF5_addBLELinkCtxManager()
-nRF5_addBLEANCS()
-nRF5_addBLE_DB_Discovery()
-nRF5_addBLE_GQ()
-nRF5_addBLE_GATTS()
-nRF5_addBLEService("ble_cts_c")
+    nRF5_addClock()
+    nRF5_addSoftDeviceSupport()
+
+    # Libraries
+    #nRF5_addFreeRTOSPort()
+    nRF5_addAtomic()
+    nRF5_addBalloc()
+    nRF5_addQueue()
+    nRF5_addPowerMgmt()
+    nRF5_addGPIOTE()
+    nRF5_addPRS()
+    nRF5_addSAADC()
+    nRF5_addSPI()
+    nRF5_addLegacySPI()
+    nRF5_addAppTWI()
+    nRF5_addLegacyPPI()
+    nRF5_addAppPwm()
+
+    # BLE
+    nRF5_addAppTimer()
+    nRF5_addTimer()
+    nRF5_addMutex()
+    nRF5_addBLEGATT()
+    nRF5_addBLEQWR()
+    nRF5_addBLEAdvertising()
+    nRF5_addBLEPeerManager()
+    nRF5_addBLELinkCtxManager()
+    nRF5_addBLEANCS()
+    nRF5_addBLE_DB_Discovery()
+    nRF5_addBLE_GQ()
+    nRF5_addBLE_GATTS()
+    nRF5_addBLEService("ble_cts_c")
+endmacro()
 
 set(FREERTOS_SRC
         FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
@@ -284,23 +293,17 @@ set(LVGL_SRC
         lvgl/src/lv_widgets/lv_win.h
         )
 
-# include files
-list(APPEND SOURCE_FILES
-        main.c
-        components/ble/ble_general.h
-        components/ble/ble_general.c
-#        ble/ble_update.h
-#        ble/ble_update.c
-        components/ble/ble_ancs.h
-        components/ble/ble_ancs.c
+set(DRIVERS_SOURCE
         drivers/SGM40561.h
         drivers/SGM40561.c
+        drivers/pwm_driver.h
+        drivers/pwm_driver.c
         drivers/twi_driver.h
         drivers/twi_driver.c
         drivers/spi_driver.h
         drivers/spi_driver.c
-#        drivers/ST7735.h
-#        drivers/ST7735.c
+        #        drivers/ST7735.h
+        #        drivers/ST7735.c
         drivers/ST7789.h
         drivers/ST7789.c
         drivers/CST816S.h
@@ -309,33 +312,18 @@ list(APPEND SOURCE_FILES
         drivers/display_drv.c
         drivers/peripherals.h
         drivers/peripherals.c
+        drivers/button.h
+        drivers/button.c
+        )
+
+set(COMPONENTS_SOURCE
         components/common.h
         components/resources.h
         components/resources.c
         components/battery.h
         components/battery.c
-        drivers/button.h
-        drivers/button.c
-        components/sys_task.h
-        components/sys_task.c
         components/haptic.h
         components/haptic.c
-        components/display/brightness/display_brightness.h
-        components/display/brightness/display_brightness.c
-        components/display/heart_rate/display_heart_rate.h
-        components/display/heart_rate/display_heart_rate.c
-        components/display/settings/display_settings.h
-        components/display/settings/display_settings.c
-        components/display/steps/display_steps.h
-        components/display/steps/display_steps.c
-        components/display/display_common.h
-        components/display/display_common.c
-        components/display/display_boot_up.h
-        components/display/display_boot_up.c
-        components/display/home.h
-        components/display/home.c
-        components/display/display.h
-        components/display/display.c
         components/sensors
         components/sensors/BMA423-Sensor-API-master/bma4_defs.h
         components/sensors/BMA423-Sensor-API-master/bma4.h
@@ -346,35 +334,134 @@ list(APPEND SOURCE_FILES
         components/sensors/bma421.c
         components/sensors/HRS3300.h
         components/sensors/HRS3300.c
-        "${SDK_ROOT}/components/softdevice/common/nrf_sdh_freertos.c"
-        FreeRTOSConfig.h
-        FreeRTOS.c
-        ${FREERTOS_SRC}
-        ${LVGL_SRC}
         )
 
-list(APPEND INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
+set(APP_SRC
+        app/sys_task/sys_task.h
+        app/sys_task/sys_task.c
 
-nRF5_addExecutable(${target} "${SOURCE_FILES}" "${INCLUDE_DIRS}" "${NRF5_LINKER_SCRIPT}")
+        app/display/brightness/display_brightness.h
+        app/display/brightness/display_brightness.c
+        app/display/heart_rate/display_heart_rate.h
+        app/display/heart_rate/display_heart_rate.c
+        app/display/settings/display_settings.h
+        app/display/settings/display_settings.c
+        app/display/steps/display_steps.h
+        app/display/steps/display_steps.c
+        app/display/display_common.h
+        app/display/display_common.c
+        app/display/display_boot_up.h
+        app/display/display_boot_up.c
+        app/display/home.h
+        app/display/home.c
+        app/display/display.h
+        app/display/display.c
 
-# make sdk_config.h import app_config.h
-target_compile_definitions(${target} PRIVATE USE_APP_CONFIG)
+        utils.h
+        utils.c
+        )
 
-# Here you can set a list of user variables to be defined in the bootloader makefile (which you have modified yourself)
-set(bootloader_vars "")
+set(APP_BLE_SRC
+        app/ble/ble_general.h
+        app/ble/ble_general.c
+        #        ble/ble_update.h
+        #        ble/ble_update.c
+        app/ble/ble_ancs.h
+        app/ble/ble_ancs.c
+        )
 
-# add the secure bootloader build target
-nRF5_addSecureBootloader(${target} "${PUBLIC_KEY}" "${bootloader_vars}")
-# add the bootloader merge target
-nRF5_addBootloaderMergeTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE} ${SD_VALIDATION_TYPE} ${BOOTLOADER_VERSION})
-# add the bootloader merged flash target
-nRF5_addFlashTarget(bl_merge_${target} "${CMAKE_CURRENT_BINARY_DIR}/${target}_bl_merged.hex")
-# Add the Bootloader + SoftDevice + App package target
-nRF5_addDFU_BL_SD_APP_PkgTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE} ${SD_VALIDATION_TYPE} ${BOOTLOADER_VERSION})
-# Add the App package target
-nRF5_addDFU_APP_PkgTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE})
+# include files
+if(TARGET_GROUP STREQUAL production)
+    add_app_includes()
+    add_freertos_includes()
+    add_nRF_libraries()
 
-# print the size of consumed RAM and flash - does not yet work on Windows
-if(NOT ${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
-    nRF5_print_size(${target} ${NRF5_LINKER_SCRIPT} TRUE)
-endif()
+    list(APPEND SOURCE_FILES
+            main.c
+            ${DRIVERS_SOURCE}
+            ${COMPONENTS_SOURCE}
+            ${APP_SRC}
+            ${APP_BLE_SRC}
+
+            "${SDK_ROOT}/components/softdevice/common/nrf_sdh_freertos.c"
+            FreeRTOSConfig.h
+            FreeRTOS.c
+            ${FREERTOS_SRC}
+            ${LVGL_SRC}
+            )
+
+    list(APPEND INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
+
+    nRF5_addExecutable(${target} "${SOURCE_FILES}" "${INCLUDE_DIRS}" "${NRF5_LINKER_SCRIPT}")
+
+    # make sdk_config.h import app_config.h
+    target_compile_definitions(${target} PRIVATE USE_APP_CONFIG)
+
+    # Here you can set a list of user variables to be defined in the bootloader makefile (which you have modified yourself)
+    set(bootloader_vars "")
+
+    # add the secure bootloader build target
+    nRF5_addSecureBootloader(${target} "${PUBLIC_KEY}" "${bootloader_vars}")
+    # add the bootloader merge target
+    nRF5_addBootloaderMergeTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE} ${SD_VALIDATION_TYPE} ${BOOTLOADER_VERSION})
+    # add the bootloader merged flash target
+    nRF5_addFlashTarget(bl_merge_${target} "${CMAKE_CURRENT_BINARY_DIR}/${target}_bl_merged.hex")
+    # Add the Bootloader + SoftDevice + App package target
+    nRF5_addDFU_BL_SD_APP_PkgTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE} ${SD_VALIDATION_TYPE} ${BOOTLOADER_VERSION})
+    # Add the App package target
+    nRF5_addDFU_APP_PkgTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE})
+
+    # print the size of consumed RAM and flash - does not yet work on Windows
+    if(NOT ${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
+        nRF5_print_size(${target} ${NRF5_LINKER_SCRIPT} TRUE)
+    endif()
+elseif(TARGET_GROUP STREQUAL debug)
+    add_app_includes()
+    add_freertos_includes()
+    add_nRF_libraries()
+
+    list(APPEND SOURCE_FILES
+            main.c
+            ${DRIVERS_SOURCE}
+            ${COMPONENTS_SOURCE}
+            ${APP_SRC}
+            ${APP_BLE_SRC}
+
+            "${SDK_ROOT}/components/softdevice/common/nrf_sdh_freertos.c"
+            FreeRTOSConfig.h
+            FreeRTOS.c
+            ${FREERTOS_SRC}
+            ${LVGL_SRC}
+            )
+
+    list(APPEND INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
+
+    nRF5_addExecutable(${target} "${SOURCE_FILES}" "${INCLUDE_DIRS}" "${NRF5_LINKER_SCRIPT}")
+
+    # make sdk_config.h import app_config.h
+    target_compile_definitions(${target} PRIVATE USE_APP_CONFIG)
+
+    # Here you can set a list of user variables to be defined in the bootloader makefile (which you have modified yourself)
+    set(bootloader_vars "")
+
+    # add the secure bootloader build target
+    nRF5_addSecureBootloader(${target} "${PUBLIC_KEY}" "${bootloader_vars}")
+    # add the bootloader merge target
+    nRF5_addBootloaderMergeTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE} ${SD_VALIDATION_TYPE} ${BOOTLOADER_VERSION})
+    # add the bootloader merged flash target
+    nRF5_addFlashTarget(bl_merge_${target} "${CMAKE_CURRENT_BINARY_DIR}/${target}_bl_merged.hex")
+    # Add the Bootloader + SoftDevice + App package target
+    nRF5_addDFU_BL_SD_APP_PkgTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE} ${SD_VALIDATION_TYPE} ${BOOTLOADER_VERSION})
+    # Add the App package target
+    nRF5_addDFU_APP_PkgTarget(${target} ${DFU_VERSION_STRING} ${PRIVATE_KEY} ${PREVIOUS_SOFTDEVICES} ${APP_VALIDATION_TYPE})
+
+    # print the size of consumed RAM and flash - does not yet work on Windows
+    if(NOT ${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
+        nRF5_print_size(${target} ${NRF5_LINKER_SCRIPT} TRUE)
+    endif()
+else()
+    list(APPEND SOURCE_FILES
+            tests/test_main.c
+            ${COMPONENTS_SOURCE}
+            )
+endif ()

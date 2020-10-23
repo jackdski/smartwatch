@@ -3,7 +3,7 @@
 //
 
 #include "resources.h"
-#include "sys_task.h"
+#include "sys_task/sys_task.h"
 
 // FreeRTOS files
 #include "FreeRTOS.h"

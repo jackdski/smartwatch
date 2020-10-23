@@ -1,0 +1,11 @@
+//
+// Created by jack on 10/15/20.
+//
+
+#ifndef JD_SMARTWATCH_TESTS_BATTERY_TESTS_H
+#define JD_SMARTWATCH_TESTS_BATTERY_TESTS_H
+
+#include "Unity.h"
+
+
+#endif //JD_SMARTWATCH_TESTS_BATTERY_TESTS_H

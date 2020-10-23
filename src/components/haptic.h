@@ -31,7 +31,7 @@ typedef enum {
 typedef struct {
   eHaptic_State     state;
   eHapticStrength   strength;
-  uint16_t          period;
+  uint16_t          period_ms;
   uint8_t           pulses;
   uint8_t           duty_cycle;
   uint16_t          ticks;
@@ -45,7 +45,10 @@ typedef struct {
 // Public Functions
 void haptic_pwm_config(void);
 void haptic_disable(void);
-void haptic_timer_callback(TimerHandle_t timerx);
 void haptic_start(eHaptic_State new_state);
+uint16_t haptic_get_period_ms(void);
+uint8_t haptic_get_pulses(void);
+void haptic_pulse_run(void);
+void haptic_reset(void);
 
 #endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_HAPTIC_H

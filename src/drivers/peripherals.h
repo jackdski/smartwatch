@@ -13,6 +13,7 @@
 
 #include "spi_driver.h"
 #include "twi_driver.h"
+#include "pwm_driver.h"
 #include "button.h"
 #include "SGM40561.h"
 

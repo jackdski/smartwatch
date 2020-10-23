@@ -1,5 +1,6 @@
 /*          DEBUG          */
-#define DEBUG_PRINT                             1   // print to device screen
+#define PRINT_CONFIG								0
+#define SCREEN_PRINT
 
 
 /*          LOGGER         */

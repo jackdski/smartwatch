@@ -294,9 +294,10 @@ toolchains/Unity/auto/generate_module.rb
 toolchains/Unity/examples/example_2/src/ProductionCode.c
 toolchains/Unity/examples/example_4/src/ProductionCode.h
 toolchains/Unity/test/tests/self_assessment_utils.h
-/build_release/
-/build_debug/
-/build/
+/build_release/*
+/build_debug/*
+/build_test/*
+/build/*
 
 /src/lvgl/lvgl.mk
 

@@ -4,19 +4,10 @@
 
 #include "battery.h"
 #include "drivers/SGM40561.h"
-
-// FreeRTOS files
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
-#include "event_groups.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 #define LOW_POWER_BOUND     20  // [%]
-
-// RTOS Variables
-extern TaskHandle_t thDisplay;
-extern QueueHandle_t system_queue;
-extern EventGroupHandle_t charging_event_group;
 
 // Private Variables
 static Battery_t battery_monitor = {
@@ -110,4 +101,9 @@ void update_battery_state(void)
     {
         battery_monitor.low_power = true;
     }
+}
+
+bool is_battery_soc_valid(uint8_t soc)
+{
+    return ((soc >= 0) && (soc <= 100));
 }

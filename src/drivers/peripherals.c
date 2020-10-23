@@ -77,6 +77,7 @@ void config_peripherals(void) {
     config_spi_master();
     config_twi();
     config_button();
+    config_pwm();
 }
 
 

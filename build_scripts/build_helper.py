@@ -10,15 +10,17 @@ class BuildHelper:
         self.build_dir = "build"
         self.target = "jd_smartwatch"
         self.build_type = "Debug"
+        self.print_build_types = ["Debug", "Release"]
 
         self.cmds = [
             'build',
             'build_debug',
-            'build_release'
+            'build_release',
+            'build_test',
             'build_with_bootloader',
             'build_secure_bootloader',
             'flash',
-            'flash_bootloader',
+            'flash_bootloader', 'fb',
             'pkg_dfu',
             'pkg_bl_dfu',
             'clean',
@@ -33,7 +35,21 @@ class BuildHelper:
 
         # set Env Vars based on config.json
         self.read_config()
+
         print(os.environ['xIC'])
+        print(f"Build Type: {self.build_type}")
+        config_file = open("../src/app_config.h", "r")
+        lines  = config_file.readlines()
+        if self.build_type in self.print_build_types:
+            print("AUTOGENERATE: app_config.h --> PRINT_CONFIG = 1")
+            lines[1] = "#define PRINT_CONFIG\t\t\t\t\t\t\t\t1\n"
+        else:
+            print("AUTOGENERATE: app_config.h --> PRINT_CONFIG = 0")
+            lines[1] = "#define PRINT_CONFIG\t\t\t\t\t\t\t\t0\n"
+        config_file = open("../src/app_config.h", "w")
+        config_file.writelines(lines)
+        config_file.close()
+
 
     def read_config(self):
         with open('../config.json') as f:
@@ -57,6 +73,8 @@ class BuildHelper:
             self.build_debug()
         elif self.build_type == "Release":
             self.build_release()
+        elif self.build_type == "Test":
+            self.build_test()
 
         if target is None:
             cmd = f"cmake --build {self.build_dir} --target " + self.target
@@ -89,6 +107,15 @@ class BuildHelper:
         os.system(cmd)
         print("Done.")
 
+    def build_test(self):
+        cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Release ."
+
+        if os.getcwd().split('/')[-1] != PROJECT_BASE_DIR:
+            os.chdir('..')
+        print("Generating Test Build files...")
+        os.system(cmd)
+        print("Done.")
+
     def build_with_bootloader(self):
         self.build('bl_merge_' + self.target)
 
@@ -100,6 +127,9 @@ class BuildHelper:
 
     def flash_bootloader(self):
         self.build('flash_bl_merge_' + self.target)
+
+    def fb(self):
+        self.flash_bootloader()
 
     def pkg_dfu(self):
         self.build('pkg_' + self.target)
