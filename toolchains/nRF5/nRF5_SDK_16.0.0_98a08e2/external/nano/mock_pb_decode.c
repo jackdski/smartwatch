@@ -534,7 +534,7 @@ void pb_decode_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_re
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_CALL_INSTANCE));
   CMOCK_pb_decode_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -545,7 +545,7 @@ void pb_decode_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istream_t* st
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_CALL_INSTANCE));
   CMOCK_pb_decode_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -562,7 +562,7 @@ void pb_decode_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, pb_istr
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_CALL_INSTANCE));
   CMOCK_pb_decode_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -685,7 +685,7 @@ void pb_decode_noinit_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmoc
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_noinit_CALL_INSTANCE));
   CMOCK_pb_decode_noinit_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_noinit_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_noinit_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_noinit_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -696,7 +696,7 @@ void pb_decode_noinit_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istrea
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_noinit_CALL_INSTANCE));
   CMOCK_pb_decode_noinit_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_noinit_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_noinit_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_noinit_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -713,7 +713,7 @@ void pb_decode_noinit_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, 
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_noinit_CALL_INSTANCE));
   CMOCK_pb_decode_noinit_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_noinit_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_noinit_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_noinit_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -836,7 +836,7 @@ void pb_decode_delimited_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool c
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_delimited_CALL_INSTANCE));
   CMOCK_pb_decode_delimited_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_delimited_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_delimited_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_delimited_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -847,7 +847,7 @@ void pb_decode_delimited_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_ist
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_delimited_CALL_INSTANCE));
   CMOCK_pb_decode_delimited_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_delimited_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_delimited_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_delimited_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -864,7 +864,7 @@ void pb_decode_delimited_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_lin
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_delimited_CALL_INSTANCE));
   CMOCK_pb_decode_delimited_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_delimited_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_delimited_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_delimited_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -971,7 +971,7 @@ void pb_release_CMockExpect(UNITY_LINE_TYPE cmock_line, const pb_field_t* fields
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_release_CALL_INSTANCE));
   CMOCK_pb_release_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_release_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_release_CallInstance = CMock_Guts_MemChain(Mock.pb_release_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -987,7 +987,7 @@ void pb_release_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, pb_field_t* fie
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_release_CALL_INSTANCE));
   CMOCK_pb_release_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_release_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_release_CallInstance = CMock_Guts_MemChain(Mock.pb_release_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1068,7 +1068,7 @@ void pb_istream_from_buffer_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, pb_
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_istream_from_buffer_CALL_INSTANCE));
   CMOCK_pb_istream_from_buffer_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_istream_from_buffer_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_istream_from_buffer_CallInstance = CMock_Guts_MemChain(Mock.pb_istream_from_buffer_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -1079,7 +1079,7 @@ void pb_istream_from_buffer_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, con
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_istream_from_buffer_CALL_INSTANCE));
   CMOCK_pb_istream_from_buffer_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_istream_from_buffer_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_istream_from_buffer_CallInstance = CMock_Guts_MemChain(Mock.pb_istream_from_buffer_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1096,7 +1096,7 @@ void pb_istream_from_buffer_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_istream_from_buffer_CALL_INSTANCE));
   CMOCK_pb_istream_from_buffer_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_istream_from_buffer_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_istream_from_buffer_CallInstance = CMock_Guts_MemChain(Mock.pb_istream_from_buffer_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1193,7 +1193,7 @@ void pb_read_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_retu
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_read_CALL_INSTANCE));
   CMOCK_pb_read_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_read_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_read_CallInstance = CMock_Guts_MemChain(Mock.pb_read_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -1204,7 +1204,7 @@ void pb_read_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istream_t* stre
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_read_CALL_INSTANCE));
   CMOCK_pb_read_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_read_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_read_CallInstance = CMock_Guts_MemChain(Mock.pb_read_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1221,7 +1221,7 @@ void pb_read_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, pb_istrea
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_read_CALL_INSTANCE));
   CMOCK_pb_read_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_read_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_read_CallInstance = CMock_Guts_MemChain(Mock.pb_read_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1373,7 +1373,7 @@ void pb_decode_tag_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_t
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_tag_CALL_INSTANCE));
   CMOCK_pb_decode_tag_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_tag_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_tag_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_tag_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -1384,7 +1384,7 @@ void pb_decode_tag_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istream_t
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_tag_CALL_INSTANCE));
   CMOCK_pb_decode_tag_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_tag_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_tag_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_tag_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1401,7 +1401,7 @@ void pb_decode_tag_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, pb_
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_tag_CALL_INSTANCE));
   CMOCK_pb_decode_tag_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_tag_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_tag_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_tag_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1530,7 +1530,7 @@ void pb_skip_field_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_t
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_skip_field_CALL_INSTANCE));
   CMOCK_pb_skip_field_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_skip_field_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_skip_field_CallInstance = CMock_Guts_MemChain(Mock.pb_skip_field_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -1541,7 +1541,7 @@ void pb_skip_field_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istream_t
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_skip_field_CALL_INSTANCE));
   CMOCK_pb_skip_field_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_skip_field_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_skip_field_CallInstance = CMock_Guts_MemChain(Mock.pb_skip_field_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1558,7 +1558,7 @@ void pb_skip_field_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, pb_
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_skip_field_CALL_INSTANCE));
   CMOCK_pb_skip_field_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_skip_field_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_skip_field_CallInstance = CMock_Guts_MemChain(Mock.pb_skip_field_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1658,7 +1658,7 @@ void pb_decode_varint_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmoc
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_varint_CALL_INSTANCE));
   CMOCK_pb_decode_varint_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_varint_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_varint_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_varint_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -1669,7 +1669,7 @@ void pb_decode_varint_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istrea
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_varint_CALL_INSTANCE));
   CMOCK_pb_decode_varint_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_varint_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_varint_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_varint_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1686,7 +1686,7 @@ void pb_decode_varint_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, 
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_varint_CALL_INSTANCE));
   CMOCK_pb_decode_varint_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_varint_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_varint_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_varint_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1795,7 +1795,7 @@ void pb_decode_svarint_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmo
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_svarint_CALL_INSTANCE));
   CMOCK_pb_decode_svarint_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_svarint_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_svarint_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_svarint_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -1806,7 +1806,7 @@ void pb_decode_svarint_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istre
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_svarint_CALL_INSTANCE));
   CMOCK_pb_decode_svarint_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_svarint_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_svarint_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_svarint_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1823,7 +1823,7 @@ void pb_decode_svarint_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line,
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_svarint_CALL_INSTANCE));
   CMOCK_pb_decode_svarint_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_svarint_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_svarint_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_svarint_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1927,7 +1927,7 @@ void pb_decode_fixed32_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmo
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_fixed32_CALL_INSTANCE));
   CMOCK_pb_decode_fixed32_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_fixed32_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_fixed32_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_fixed32_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -1938,7 +1938,7 @@ void pb_decode_fixed32_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istre
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_fixed32_CALL_INSTANCE));
   CMOCK_pb_decode_fixed32_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_fixed32_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_fixed32_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_fixed32_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -1955,7 +1955,7 @@ void pb_decode_fixed32_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line,
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_fixed32_CALL_INSTANCE));
   CMOCK_pb_decode_fixed32_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_fixed32_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_fixed32_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_fixed32_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -2059,7 +2059,7 @@ void pb_decode_fixed64_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmo
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_fixed64_CALL_INSTANCE));
   CMOCK_pb_decode_fixed64_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_fixed64_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_fixed64_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_fixed64_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -2070,7 +2070,7 @@ void pb_decode_fixed64_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, pb_istre
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_fixed64_CALL_INSTANCE));
   CMOCK_pb_decode_fixed64_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_fixed64_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_fixed64_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_fixed64_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -2087,7 +2087,7 @@ void pb_decode_fixed64_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line,
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_decode_fixed64_CALL_INSTANCE));
   CMOCK_pb_decode_fixed64_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_decode_fixed64_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_decode_fixed64_CallInstance = CMock_Guts_MemChain(Mock.pb_decode_fixed64_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -2196,7 +2196,7 @@ void pb_make_string_substream_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, b
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_make_string_substream_CALL_INSTANCE));
   CMOCK_pb_make_string_substream_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_make_string_substream_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_make_string_substream_CallInstance = CMock_Guts_MemChain(Mock.pb_make_string_substream_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -2207,7 +2207,7 @@ void pb_make_string_substream_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, p
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_make_string_substream_CALL_INSTANCE));
   CMOCK_pb_make_string_substream_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_make_string_substream_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_make_string_substream_CallInstance = CMock_Guts_MemChain(Mock.pb_make_string_substream_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -2224,7 +2224,7 @@ void pb_make_string_substream_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmoc
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_make_string_substream_CALL_INSTANCE));
   CMOCK_pb_make_string_substream_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_make_string_substream_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_make_string_substream_CallInstance = CMock_Guts_MemChain(Mock.pb_make_string_substream_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -2335,7 +2335,7 @@ void pb_close_string_substream_CMockExpect(UNITY_LINE_TYPE cmock_line, pb_istrea
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_close_string_substream_CALL_INSTANCE));
   CMOCK_pb_close_string_substream_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_close_string_substream_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_close_string_substream_CallInstance = CMock_Guts_MemChain(Mock.pb_close_string_substream_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;
@@ -2351,7 +2351,7 @@ void pb_close_string_substream_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, 
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pb_close_string_substream_CALL_INSTANCE));
   CMOCK_pb_close_string_substream_CALL_INSTANCE* cmock_call_instance = (CMOCK_pb_close_string_substream_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "CMock has run out of memory. Please allocate more.");
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, "cmock has run out of memory. Please allocate more.");
   Mock.pb_close_string_substream_CallInstance = CMock_Guts_MemChain(Mock.pb_close_string_substream_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->CallOrder = ++GlobalExpectCount;

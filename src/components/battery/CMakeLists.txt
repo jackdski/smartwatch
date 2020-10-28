@@ -1,9 +1,13 @@
 add_executable(battery_suite_app
-        battery_tests.c
-    )
+        test_battery.c
+        battery.c
+        )
+
+include_directories(components/battery)
 
 target_link_libraries(battery_suite_app
         Unity
-    )
+#        CMock
+        )
 
 add_test(battery_test battery_suite_app)

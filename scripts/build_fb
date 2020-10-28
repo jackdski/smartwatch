@@ -1,0 +1,10 @@
+#!/bin/bash
+
+. ../venv/bin/activate
+
+if [ $# -eq 1 ]
+then
+  python build_helper.py $1
+else
+  python build_helper.py flash_bootloader
+fi

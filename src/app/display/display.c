@@ -3,7 +3,7 @@
 //
 
 #include "display.h"
-#include "sys_task/sys_task.h" // try not to include
+#include "sys_task.h" // try not to include
 #include "lvgl/lvgl.h"
 //#include "lvgl/src/lv_themes/"
 

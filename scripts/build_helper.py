@@ -10,7 +10,7 @@ class BuildHelper:
         self.build_dir = "build"
         self.target = "jd_smartwatch"
         self.build_type = "Debug"
-        self.print_build_types = ["Debug", "Release"]
+        self.print_build_types = ["Debug"]
 
         self.cmds = [
             'build',
@@ -71,6 +71,7 @@ class BuildHelper:
     def build(self, target=None):
         if self.build_type == "Debug":
             self.build_debug()
+            # self.build_test()
         elif self.build_type == "Release":
             self.build_release()
         elif self.build_type == "Test":
@@ -82,15 +83,19 @@ class BuildHelper:
             cmd = f"cmake --build {self.build_dir} --target " + target
         os.chdir('..')
 
-        if not os.path.isdir(self.build_dir):
-            self.build_debug()
+        # if not os.path.isdir(self.build_dir):
+        #     self.build_debug()
 
         print(f"Building {self.target} in directory {self.build_dir}")
         os.system(cmd)
         print("Done.")
 
     def build_debug(self):
-        cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Debug ."
+        cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" " \
+              f"-DBUILD_HOST=ON " \
+              f"-DUNITY_ROOT=toolchains/Unity " \
+              f"-DCMAKE_BUILD_TYPE=Debug ."
+        # f"-DCMOCK_ROOT=toolchains/CMock " \
 
         if os.getcwd().split('/')[-1] != PROJECT_BASE_DIR:
             os.chdir('..')
@@ -99,7 +104,10 @@ class BuildHelper:
         print("Done.")
 
     def build_release(self):
-        cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Release ."
+        cmd = f"cmake -B {self.build_dir} " \
+              f"-G \"Unix Makefiles\" " \
+              f"-DBUILD_HOST=OFF " \
+              f"-D CMAKE_BUILD_TYPE=Release ."
 
         if os.getcwd().split('/')[-1] != PROJECT_BASE_DIR:
             os.chdir('..')
@@ -108,13 +116,17 @@ class BuildHelper:
         print("Done.")
 
     def build_test(self):
-        cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" -D CMAKE_BUILD_TYPE=Release ."
-
-        if os.getcwd().split('/')[-1] != PROJECT_BASE_DIR:
-            os.chdir('..')
-        print("Generating Test Build files...")
-        os.system(cmd)
-        print("Done.")
+        self.build_debug()
+        # cmd = f"cmake -B {self.build_dir} -G \"Unix Makefiles\" -DBUILD_HOST=ON " \
+        #       f"-DCMOCK_ROOT=toolchains/CMock -D CMAKE_BUILD_TYPE=Test ."
+        #
+        # if os.getcwd().split('/')[-1] != PROJECT_BASE_DIR:
+        #     os.chdir('..')
+        # print("Generating Test Build files...")
+        # os.system(cmd)
+        # os.system("make")
+        # os.system("ctest")
+        # print("Done.")
 
     def build_with_bootloader(self):
         self.build('bl_merge_' + self.target)
@@ -138,11 +150,12 @@ class BuildHelper:
         self.build('pkg_bl_sd_' + self.target)
 
     @staticmethod
-    def clean(directory='cmake-build-debug'):
-        cmd = "rm -rf " + directory
+    def clean():
+        cmd = "rm -rf "
         print("Cleaning...")
         os.chdir('..')
-        os.system(cmd)
+        os.system(cmd + "build_release")
+        os.system(cmd + "build_debug")
         print("Done.")
 
     @staticmethod

@@ -54,7 +54,7 @@
 
 // Application Includes
 #include "ble_ancs.h"
-#include "sys_task/sys_task.h"
+#include "sys_task.h"
 
 // BLE settings
 #define DEVICE_NAME                     "jdski_smartwatch"    /**< Name of device. Will be included in the advertising data. */

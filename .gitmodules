@@ -9,3 +9,7 @@
 [submodule "Unity"]
     path = toolchains/Unity
     url = https://github.com/ThrowTheSwitch/Unity
+
+[submodule "CMock"]
+    path = toolchains/cmock
+    url = https://github.com/ThrowTheSwitch/CMock

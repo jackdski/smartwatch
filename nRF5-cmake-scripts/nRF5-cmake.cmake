@@ -286,7 +286,7 @@ function(nRF5_addFlashTarget targetName hexFile)
             DEPENDS ${targetName})
 endfunction()
 
-# adds a target for comiling and flashing an executable
+# adds a target for compiling and flashing an executable
 macro(nRF5_addExecutable EXECUTABLE_NAME SOURCE_FILES INCLUDE_DIRECTORIES LINKER_FILE)
     set(_SOURCE_FILES ${SOURCE_FILES})
     set(_INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES})

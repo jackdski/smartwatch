@@ -1,5 +1,5 @@
 /*          DEBUG          */
-#define PRINT_CONFIG								0
+#define PRINT_CONFIG								1
 #define SCREEN_PRINT
 
 

@@ -4,6 +4,7 @@
 
 #include "peripherals.h"
 #include "nrf_drv_gpiote.h"
+#include "pwm_driver.h"
 
 
 void config_pinout(void)

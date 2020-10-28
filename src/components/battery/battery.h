@@ -6,7 +6,7 @@
 #define JDSMARTWATCHPROJECT_BATTERY_H
 
 #include <stdint.h>
-#include "drivers/SGM40561.h"
+#include <stdbool.h>
 
 typedef enum {
   BATTERY_UNKNOWN_STATE,

@@ -305,3 +305,4 @@ src/lvgl/lvgl.mk
 src/lvgl/scripts/
 /venv/
 .idea/
+/toolchains/cmock/

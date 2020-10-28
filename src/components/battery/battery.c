@@ -3,7 +3,7 @@
 //
 
 #include "battery.h"
-#include "drivers/SGM40561.h"
+//#include "drivers/SGM40561.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -23,9 +23,9 @@ static Battery_t battery_monitor = {
     .charging_offset_mv = 300
 };
 
+
 // Private Functions
 
-// TODO: unit tests
 uint8_t estimate_soc(void)
 {
     uint8_t soc;
@@ -63,9 +63,9 @@ inline bool get_battery_low_power(void)
 
 void update_battery_state(void)
 {
-    battery_monitor.voltage_mv = battery_monitor_sample();
-    battery_monitor.power_present = SGM40561_is_power_present();
-    battery_monitor.charging = SGM40561_is_charging();
+//    battery_monitor.voltage_mv = battery_monitor_sample();
+//    battery_monitor.power_present = SGM40561_is_power_present();
+//    battery_monitor.charging = SGM40561_is_charging();
 
     if(battery_monitor.charging == true)
     {

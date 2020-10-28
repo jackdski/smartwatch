@@ -37,8 +37,8 @@
 
 // Application files
 #include "resources.h"
-#include "ble/ble_general.h"
-#include "sys_task/sys_task.h"
+#include "ble_general.h"
+#include "sys_task.h"
 #include "battery.h"
 #include "display.h"
 #include "common.h"
