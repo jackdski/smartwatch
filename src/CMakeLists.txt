@@ -24,10 +24,13 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
     include_directories(FreeRTOS/Source/portable/GCC/ARM_CM4F)
     include_directories(FreeRTOS/Source/portable/)
     include_directories(FreeRTOS/Source/include)
+    include_directories(FreeRTOS/Source)
+    include_directories(FreeRTOS)
 
     include_directories(drivers)
     include_directories(components)
     include_directories(components/battery)
+    include_directories(components/haptic)
     include_directories(components/sensors/)
     include_directories(components/sensors/BMA423-Sensor-API-master)
     include_directories(app/ble)
@@ -315,6 +318,8 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
             drivers/CST816S.c
             drivers/display_drv.h
             drivers/display_drv.c
+            drivers/button.h
+            drivers/button.c
             drivers/peripherals.h
             drivers/peripherals.c
             components/common.h
@@ -322,12 +327,20 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
             components/resources.c
             components/battery/battery.h
             components/battery/battery.c
-            drivers/button.h
-            drivers/button.c
+            components/haptic/haptic.h
+            components/haptic/haptic.c
+            components/sensors
+            components/sensors/BMA423-Sensor-API-master/bma4_defs.h
+            components/sensors/BMA423-Sensor-API-master/bma4.h
+            components/sensors/BMA423-Sensor-API-master/bma4.c
+            components/sensors/BMA423-Sensor-API-master/bma423.h
+            components/sensors/BMA423-Sensor-API-master/bma423.c
+            components/sensors/bma421.h
+            components/sensors/bma421.c
+            components/sensors/HRS3300.h
+            components/sensors/HRS3300.c
             app/sys_task/sys_task.h
             app/sys_task/sys_task.c
-            components/haptic.h
-            components/haptic.c
             app/display/brightness/display_brightness.h
             app/display/brightness/display_brightness.c
             app/display/heart_rate/display_heart_rate.h
@@ -344,16 +357,6 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
             app/display/home.c
             app/display/display.h
             app/display/display.c
-            components/sensors
-            components/sensors/BMA423-Sensor-API-master/bma4_defs.h
-            components/sensors/BMA423-Sensor-API-master/bma4.h
-            components/sensors/BMA423-Sensor-API-master/bma4.c
-            components/sensors/BMA423-Sensor-API-master/bma423.h
-            components/sensors/BMA423-Sensor-API-master/bma423.c
-            components/sensors/bma421.h
-            components/sensors/bma421.c
-            components/sensors/HRS3300.h
-            components/sensors/HRS3300.c
             "${SDK_ROOT}/components/softdevice/common/nrf_sdh_freertos.c"
             FreeRTOSConfig.h
             FreeRTOS.c

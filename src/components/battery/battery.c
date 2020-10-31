@@ -3,7 +3,8 @@
 //
 
 #include "battery.h"
-//#include "drivers/SGM40561.h"
+#include "SGM40561.h"
+//#include ""
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -25,7 +26,37 @@ static Battery_t battery_monitor = {
 
 
 // Private Functions
+inline uint8_t get_battery_soc(void)
+{
+    return battery_monitor.soc;
+}
 
+inline uint8_t get_battery_charging(void)
+{
+    return battery_monitor.charging;
+}
+
+inline bool get_battery_low_power(void)
+{
+    return battery_monitor.low_power;
+}
+
+static inline void update_battery_voltage_mv(void)
+{
+    battery_monitor.voltage_mv = battery_monitor_sample();
+}
+
+static inline void update_battery_power_present(void)
+{
+    battery_monitor.power_present = SGM40561_is_power_present();
+}
+
+static inline void update_battery_charging_state(void)
+{
+    battery_monitor.charging = SGM40561_is_charging();
+}
+
+// Public Functions
 uint8_t estimate_soc(void)
 {
     uint8_t soc;
@@ -43,29 +74,9 @@ uint8_t estimate_soc(void)
     return soc;
 }
 
-inline uint8_t get_battery_soc(void)
-{
-    return battery_monitor.soc;
-}
-
-inline uint8_t get_battery_charging(void)
-{
-    return battery_monitor.charging;
-}
-
-inline bool get_battery_low_power(void)
-{
-    return battery_monitor.low_power;
-}
-
-
-// Public Functions
-
 void update_battery_state(void)
 {
-//    battery_monitor.voltage_mv = battery_monitor_sample();
-//    battery_monitor.power_present = SGM40561_is_power_present();
-//    battery_monitor.charging = SGM40561_is_charging();
+    update_battery_voltage_mv();
 
     if(battery_monitor.charging == true)
     {

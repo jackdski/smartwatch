@@ -31,7 +31,7 @@ CST816S_Event_t * CST816S_read_touch(void)
     CST816S_Event_t * evt = {0};
     twi_read_reg(CST816S_ADDR, 0, data, 63);
 
-//    evt->numTouchPoints = data[2] & 0x0F;
+    evt->numTouchPoints = data[2] & 0x0F;
 //    uint8_t pointID = data[];
 
     return evt;
