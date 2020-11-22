@@ -27,7 +27,9 @@ class BuildHelper:
             'logger',
             'erase_flash',
             'make_venv',
-            'analyze_map'
+            'analyze_map',
+            'code_size',
+            'largest_mem'
         ]
 
         # start venv
@@ -40,15 +42,15 @@ class BuildHelper:
         print(f"Build Type: {self.build_type}")
         config_file = open("../src/app_config.h", "r")
         lines  = config_file.readlines()
-        if self.build_type in self.print_build_types:
-            print("AUTOGENERATE: app_config.h --> PRINT_CONFIG = 1")
-            lines[1] = "#define PRINT_CONFIG\t\t\t\t\t\t\t\t1\n"
-        else:
-            print("AUTOGENERATE: app_config.h --> PRINT_CONFIG = 0")
-            lines[1] = "#define PRINT_CONFIG\t\t\t\t\t\t\t\t0\n"
-        config_file = open("../src/app_config.h", "w")
-        config_file.writelines(lines)
-        config_file.close()
+        # if self.build_type in self.print_build_types:
+        #     print("AUTOGENERATE: app_config.h --> PRINT_CONFIG = 1")
+        #     lines[1] = "#define PRINT_CONFIG\t\t\t\t\t\t\t\t1\n"
+        # else:
+        #     print("AUTOGENERATE: app_config.h --> PRINT_CONFIG = 0")
+        #     lines[1] = "#define PRINT_CONFIG\t\t\t\t\t\t\t\t0\n"
+        # config_file = open("../src/app_config.h", "w")
+        # config_file.writelines(lines)
+        # config_file.close()
 
 
     def read_config(self):
@@ -188,6 +190,13 @@ class BuildHelper:
         cmd = "python analyze_map.py " + map_file
         os.system(cmd)
 
+    def code_size(self):
+        cmd = "size ../build_" + self.build_type.lower() + "/src/" + self.target + ".elf"
+        os.system(cmd)
+
+    def largest_mem(self, count=30):
+        cmd = "arm-none-eabi-nm --print-size --size-sort --radix=d ../build_release/src/jd_smartwatch.elf | tail -" + str(count)
+        os.system(cmd)
 
 if __name__ == "__main__":
     bh = BuildHelper()
