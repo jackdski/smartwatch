@@ -8,15 +8,16 @@
 
 #include "nrf52.h"
 #include "nrf_twim.h"
+//#include "nrf_drv_twi.h"
 #include "nrfx_twim.h"
 #include "nrf_gpio.h"
 
 extern SemaphoreHandle_t twi_mutex;
 
-#define USE_NRF_TWI_DRIVER
+//#define USE_NRF_TWI_DRIVER
 #ifdef USE_NRF_TWI_DRIVER
 
-//NRFX_TWIM_INSTANCE(0);
+NRFX_TWIM_INSTANCE(0);
 
 nrfx_twim_t m_twim = {
     .p_twim = SENSORS_NRF_TWIM,
@@ -65,7 +66,7 @@ void twi_disable(void)
 
 void twi_tx(uint8_t devAddr, uint8_t * buffer, uint8_t size, void * intf_ptr)
 {
-    if(xSemaphoreTake(twi_mutex, pdMS_TO_TICKS(10)) == pdPASS) {
+    if(xSemaphoreTake(twi_mutex, portMAX_DELAY) == pdPASS) {
         nrfx_twim_tx(&m_twim, devAddr, buffer, size, intf_ptr);
         xSemaphoreGive(twi_mutex);
     }
@@ -73,7 +74,7 @@ void twi_tx(uint8_t devAddr, uint8_t * buffer, uint8_t size, void * intf_ptr)
 
 void twi_rx(uint8_t devAddr, uint8_t * buffer, uint32_t size, void * intf_ptr)
 {
-    if(xSemaphoreTake(twi_mutex, pdMS_TO_TICKS(10)) == pdPASS) {
+    if(xSemaphoreTake(twi_mutex, portMAX_DELAY) == pdPASS) {
         nrfx_twim_rx(&m_twim, devAddr, buffer, size);
         xSemaphoreGive(twi_mutex);
     }
@@ -105,9 +106,8 @@ void config_twi(void)
 void twi_read_reg(uint8_t devAddr, uint8_t reg, uint8_t * buffer, uint8_t size)
 {
     xSemaphoreTake(twi_mutex, portMAX_DELAY);
-    twi_tx(devAddr, &reg, 1, false);
-
     bool stop = true;
+    twi_tx(devAddr, &reg, 1, &stop);
     twi_rx(devAddr, buffer, size, &stop);
     xSemaphoreGive(twi_mutex);
 }

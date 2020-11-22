@@ -41,6 +41,11 @@
 #include "sys_task.h"
 #include "battery.h"
 #include "display.h"
+#include "display_settings.h"
+#include "display_heart_rate.h"
+#include "home.h"
+#include "display_brightness.h"
+#include "display_boot_up.h"
 #include "common.h"
 
 // Drivers
@@ -57,7 +62,9 @@ extern TaskHandle_t thDisplay;
 
 // Queues
 extern QueueHandle_t system_queue;
+extern QueueHandle_t settings_queue;
 extern QueueHandle_t display_queue;
+extern QueueHandle_t haptic_queue;
 extern QueueHandle_t ble_action_queue;
 extern QueueHandle_t ble_response_queue;
 
@@ -76,6 +83,12 @@ extern TimerHandle_t haptic_timer;
 extern EventGroupHandle_t component_event_group;
 extern EventGroupHandle_t charging_event_group;
 
+static lv_disp_buf_t lvgl_disp_buf;
+static lv_color_t lvgl_buf[LV_HOR_RES_MAX * 10];
+//static lv_color_t lvgl_buf_two[LV_HOR_RES_MAX * 10];
+lv_disp_drv_t lvgl_disp_drv;
+lv_indev_drv_t indev_drv;
+
 //nrf_drv_wdt_channel_id m_channel_id;                    //  watchdog channel
 
 /**
@@ -88,6 +101,7 @@ void wdt_event_handler(void)
 
 void button_callback(void)
 {
+    NRF_LOG_INFO("BUTTON PRESSED");
     system_button_handler();
 }
 
@@ -153,7 +167,17 @@ static void power_management_init(void)
 
 void vApplicationIdleHook( void )
 {
+//    static uint32_t count = 0;
+//    static uint32_t tick_count = 0;
+//    count++;
+//    uint32_t new_tick_count = xTaskGetTickCount();
+//    if(new_tick_count - tick_count >= 1000)
+//    {
+//        NRF_LOG_INFO("IDLE %d ms/1000ms", count / (new_tick_count - tick_count));
+//        tick_count = new_tick_count;
+//    }
 //    nrf_pwr_mgmt_run();
+    vTaskResume(m_logger_thread);
 }
 
 void vApplicationTickHook(void)
@@ -211,7 +235,7 @@ static void debug_task(void * arg)
  * @param[in]   arg   Pointer used for passing some arbitrary information (context) from the
  *                    osThreadCreate() call to the thread.
  */
-static void logger_thread(void * arg)
+void logger_thread(void * arg)
 {
     UNUSED_PARAMETER(arg);
 
@@ -240,9 +264,6 @@ int main(void)
     NRF_LOG_DEFAULT_BACKENDS_INIT();
     NRF_LOG_INFO("Hello world");
 
-    NRF_LOG_INFO("BLE Init");
-    ble_stack_init();
-
 #if (BLINKY_TEST == 1)
     nrf_gpio_cfg_output(DISPLAY_BACKLIGHT_HIGH);
 
@@ -253,9 +274,6 @@ int main(void)
         nrf_gpio_pin_toggle(DISPLAY_BACKLIGHT_HIGH);
     }
 #else
-    config_pinout();
-    config_peripherals();
-    display_backlight_set(BACKLIGHT_OFF);
 
     // init display
     NRF_LOG_INFO("Init LV");
@@ -264,9 +282,20 @@ int main(void)
     lv_disp_drv_init(&lvgl_disp_drv);
     lvgl_disp_drv.hor_res = DISPLAY_WIDTH;
     lvgl_disp_drv.ver_res = DISPLAY_HEIGHT;
-    lvgl_disp_drv.flush_cb = my_flush_cb;
     lvgl_disp_drv.buffer = &lvgl_disp_buf;
+    lvgl_disp_drv.flush_cb = my_flush_cb;
     lv_disp_drv_register(&lvgl_disp_drv);
+
+    // init touch input
+//    NRF_LOG_INFO("Init LV Touch");
+//    lv_indev_drv_init(&indev_drv);
+//    indev_drv.type = LV_INDEV_TYPE_POINTER;
+//    indev_drv.read_cb = read_touchscreen;
+//    lv_indev_drv_register(&indev_drv);
+
+    config_pinout();
+    config_peripherals();
+    display_backlight_set(BACKLIGHT_OFF);
 
     // Create RTOS components
     NRF_LOG_INFO("Init RTOS");
@@ -277,7 +306,9 @@ int main(void)
     haptic_mutex = xSemaphoreCreateMutex();
     button_semphr = xSemaphoreCreateBinary();
 //    system_queue = xQueueCreate(10, sizeof(eMessage));
+    settings_queue = xQueueCreate(3, sizeof(ChangeSetting_t));
     display_queue = xQueueCreate(10, sizeof(uint32_t));
+    haptic_queue = xQueueCreate(3, sizeof(eHaptic_State));
     ble_action_queue = xQueueCreateCountingSemaphore(5, sizeof(BLEMsg_t));
     ble_response_queue = xQueueCreate(5, sizeof(BLEMsg_t));
     charging_event_group = xEventGroupCreate();
@@ -288,9 +319,9 @@ int main(void)
     //
     if(pdPASS != xTaskCreate(sys_task,
                      "SysTask",
-                             200,
+                             TASK_SYSTASK_STACK_SIZE,
                              NULL,
-                             3,
+                             2,
                              &thSysTask))
     {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
@@ -298,9 +329,9 @@ int main(void)
 
     if(pdPASS != xTaskCreate(Display_Task,
                      "Display",
-                             512,
+                             TASK_DISPLAY_STACK_SIZE,
                              NULL,
-                             2,
+                             3,
                              &thDisplay))
     {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
@@ -320,7 +351,7 @@ int main(void)
 #if (DEBUG_INFO_ENABLED == 1)
     if (pdPASS != xTaskCreate(debug_task,
                               "DebugInfo",
-                              configMINIMAL_STACK_SIZE,
+                              TASK_BLEGENERAL_STACK_SIZE,
                               NULL,
                               1,
                               NULL))
@@ -328,6 +359,15 @@ int main(void)
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
 #endif /* DEBUG_INFO_ENABLED */
+
+    // Activate deep sleep mode.
+    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+//    nrf_drv_wdt_channel_feed(m_channel_id);
+    uint32_t free_heap = xPortGetFreeHeapSize();
+    NRF_LOG_INFO("Heap Remaining (Bytes): %d", free_heap);
+
+    NRF_LOG_INFO("BLE Init");
+    ble_stack_init();
 
     // Init BLE
     NRF_LOG_INFO("BLE Init 2");
@@ -343,11 +383,12 @@ int main(void)
     NRF_LOG_INFO("BLE Init 3");
     nrf_sdh_freertos_init(advertising_start, NULL);
 
+    NRF_LOG_INFO("BLE Init 4");
     if(pdPASS != xTaskCreate(BLE_Manager_Task,
                              "BLEMan",
-                             128,
+                             configMINIMAL_STACK_SIZE,
                              NULL,
-                             3,
+                             2,
                              &thBLEMan))
     {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
@@ -365,15 +406,8 @@ int main(void)
     NRF_LOG_INFO("Watchdog Configured...");
 #endif
 
-      // Activate deep sleep mode.
-//    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-//    nrf_drv_wdt_channel_feed(m_channel_id);
-
-
-//    uint32_t free_heap = xPortGetFreeHeapSize();
-//    NRF_LOG_INFO("Heap Remaining (Bytes): %d", free_heap);
-
 //    config_button_event(button_callback);
+    init_display();
     NRF_LOG_INFO("Start Scheduler...");
     vTaskStartScheduler();
 
@@ -392,6 +426,7 @@ void vApplicationMallocFailedHook(void)
 
 void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 {
+    NRF_LOG_INFO("OVERFLOW TASK: %s", pcTaskName);
     ( void ) pcTaskName;
     ( void ) pxTask;
     taskDISABLE_INTERRUPTS();

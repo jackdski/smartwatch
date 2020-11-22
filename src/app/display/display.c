@@ -5,7 +5,6 @@
 #include "display.h"
 #include "sys_task.h" // try not to include
 #include "lvgl/lvgl.h"
-//#include "lvgl/src/lv_themes/"
 
 // nRF Logging includes
 #include "nrf_log_default_backends.h"
@@ -19,8 +18,11 @@
 #include "semphr.h"
 #include "event_groups.h"
 
-// Drivers
-#include "drivers/CST816S.h"
+// Drivers and Components
+#include "CST816S.h"
+#include "battery.h"
+#include "settings.h"
+#include "display_drv.h"
 
 // Display Components
 #include "display_boot_up.h"
@@ -31,7 +33,7 @@
 #include "display_settings.h"
 #include "display_steps.h"
 
-LV_FONT_DECLARE(jetbrains_mono_bold_20)
+//LV_FONT_DECLARE(jetbrains_mono_bold_20)
 
 extern TimerHandle_t display_timeout_tmr;
 extern TimerHandle_t display_lv_handler_tmr;
@@ -39,6 +41,7 @@ extern SemaphoreHandle_t lvgl_mutex;
 extern SemaphoreHandle_t button_semphr;
 extern QueueHandle_t ble_action_queue;
 extern QueueHandle_t ble_response_queue;
+extern QueueHandle_t settings_queue;
 extern EventGroupHandle_t component_event_group;
 extern EventGroupHandle_t charging_event_group;
 
@@ -69,38 +72,33 @@ static Display_Control_t display = {
 };
 
 // LVGL
-lv_disp_t * disp;
-lv_disp_buf_t lvgl_disp_buf;
-lv_color_t lvgl_buf[LV_HOR_RES_MAX * 10];
-lv_disp_drv_t lvgl_disp_drv;
-
-// TODO: Implement touch input
-/*
-    lv_indev_drv_t lvgl_indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = my_touchpad_read;
-    lv_indev_drv_register(&indev_drv);
-
-    bool my_touchpad_read();
- */
+//lv_disp_t * disp;
+//lv_disp_drv_t lvgl_disp_drv;
+//lv_indev_drv_t indev_drv;
 
 // Screens
-lv_obj_t * boot_up_scr;
-lv_obj_t * home_scr;
-lv_obj_t * brightness_scr;
-lv_obj_t * settings_scr;
-lv_obj_t * steps_scr;
-lv_obj_t * heart_rate_scr;
+lv_obj_t * main_scr;
+//lv_obj_t * boot_up_scr;
+//lv_obj_t * home_scr;
+//lv_obj_t * brightness_scr;
+//lv_obj_t * settings_scr;
+//lv_obj_t * steps_scr;
+//lv_obj_t * heart_rate_scr;
 
 
 /** Private Functions **/
-static void init_display(void)
+void init_display(void)
 {
     display_configure();
     display.active = true;
-    display_set_rotation(display.rotation_setting);
-    display_backlight_set(display.backlight_setting);
+//    display_set_rotation(display.rotation_setting);
+
+    main_scr = lv_obj_create(NULL, NULL);
+//    boot_up_scr = lv_obj_create(NULL, NULL);    display_boot_up();
+//    home_scr = lv_obj_create(NULL, NULL);       home_screen();
+//    brightness_scr = lv_obj_create(NULL, NULL); brightness_screen();
+//    settings_scr = lv_obj_create(NULL, NULL);   settings_screen();
+//    heart_rate_scr = lv_obj_create(NULL, NULL); heart_rate_screen();
 }
 
 static void update_sleep_status(void)
@@ -154,79 +152,114 @@ void Display_Task(void * arg)
     display_timeout_disable();
 
     // screens
-    if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
-    {
-        boot_up_scr = lv_obj_create(NULL, NULL);    display_boot_up();
-        home_scr = lv_obj_create(NULL, NULL);       home_screen();
-        brightness_scr = lv_obj_create(NULL, NULL); brightness_screen();
-        settings_scr = lv_obj_create(NULL, NULL);   settings_screen();
-        settings_scr = lv_obj_create(NULL, NULL);               settings_screen();
-        heart_rate_scr = lv_obj_create(NULL, NULL); heart_rate_screen();
-        xSemaphoreGive(lvgl_mutex);
-    }
+//    if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
+//    {
+////        main_scr = lv_obj_create(NULL, NULL);
+//        xSemaphoreGive(lvgl_mutex);
+//    }
 
     uint32_t button_notif = 0;
+    uint32_t update_counter = 0; // xTaskGetTickCount();
+    static lv_obj_t * text;
+    static lv_style_t label_style;
 
     while(1)
     {
-        update_brightness();
-        update_sleep_status();
-        update_charging_status();
+//        if(xTaskGetTickCount() - update_counter >= 1000)
+//        {
+//            NRF_LOG_INFO("Display Task Update");
+//            update_brightness();
+//            update_sleep_status();
+//            update_charging_status();
+//            update_counter = xTaskGetTickCount();
+//        }
 
-        if(xSemaphoreTake(button_semphr, pdMS_TO_TICKS(2)))
-        {
-            display.button_pressed = true;
-            xSemaphoreGive(button_semphr);
-        }
+//        if(xSemaphoreTake(button_semphr, pdMS_TO_TICKS(2)))
+//        {
+//            display.button_pressed = true;
+//            xSemaphoreGive(button_semphr);
+//        }
 
         switch(display.display_state)
         {
         case DISPLAY_STATE_INITIALIZATION:
             NRF_LOG_INFO("Display Case Init");
-            init_display();
             display.backlight_setting = BACKLIGHT_HIGH;
             update_brightness();
-
+//            init_display();
+//            vTaskDelay(pdMS_TO_TICKS(100));
+//            lv_task_handler();
             if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE){
                 NRF_LOG_INFO("Displaying Boot Up Screen...");
-                lv_scr_load(boot_up_scr);
-                NRF_LOG_INFO("Load Boot Up Screen...");
+//                lv_scr_load(main_scr);
+//                display_boot_up();
+//                portENTER_CRITICAL();
+//                text = lv_textarea_create(lv_scr_act(), NULL);
+//    text = lv_textarea_create(lv_scr_act(), NULL);
+//                lv_obj_set_size(text, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+//                lv_obj_align(text, NULL, LV_ALIGN_CENTER, 0, 0);
+
+//                lv_style_init(&label_style);
+//                lv_style_set_radius(&label_style, LV_STATE_DEFAULT, 10);
+////    lv_style_set_bg_opa(&label_style, LV_STATE_DEFAULT, LV_OPA_COVER);
+//                lv_style_set_bg_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+//                lv_style_set_text_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+//
+//                lv_textarea_set_text(text, "JD Smartwatch\0");    /*Set an initial text*/
+//                portEXIT_CRITICAL();
+
+//                lv_obj_clean(lv_scr_act());
+                static lv_style_t time_style;
+                lv_style_init(&time_style);
+                lv_style_set_text_font(&time_style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_30);
+
+                lv_obj_t * time_label = lv_label_create(lv_scr_act(), NULL);
+                lv_label_set_text(time_label, "16:53");
+                lv_obj_align(time_label, NULL, LV_ALIGN_CENTER, 0, -15);
+                lv_obj_add_style(time_label, LV_LABEL_PART_MAIN, &time_style);
+
+                NRF_LOG_INFO("Loaded Boot Up Screen...");
                 xSemaphoreGive(lvgl_mutex);
                 NRF_LOG_INFO("Display Boot Complete")
             }
 
-            uint8_t boot_up_wait = 0;
-//            while(dev_not_initialized)
-            // wait for SysTask to get init EventBits
+//            uint16_t i;
+//            for(i = 0; i < 500; i++)
 //            {
-//                vTaskDelay(pdMS_TO_TICKS(1000));
-//                boot_up_wait++;
+//                // update graphics
+//                if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
+//                    lv_task_handler();
+//                    xSemaphoreGive(lvgl_mutex);
+//                }
+//                vTaskDelay(pdMS_TO_TICKS(10));
 //            }
-            vTaskDelay(pdMS_TO_TICKS(5000));
-            lv_scr_load(home_scr);
-            display_timeout_enable();
+//            lv_scr_load(home_scr);
+//            display_timeout_enable();
+//            home_screen();
             display.display_state = DISPLAY_STATE_RUN;
             break;
 
         case DISPLAY_STATE_RUN:
             // select graphics based on current info
-            if(display.button_pressed == true)
-            {
-                if(lv_scr_act() == home_scr)
-                {
-                    display.display_state = DISPLAY_STATE_GO_TO_SLEEP;
-                }
-                else
-                {
-                    // TODO: go up one "level"
-                    lv_scr_load(home_scr);
+//            display.backlight_setting = BACKLIGHT_MID; // TODO remove
+//            if(display.button_pressed == true)
+//            {
+//                if(lv_scr_act() == home_scr)
+//                {
+//                    display.display_state = DISPLAY_STATE_GO_TO_SLEEP;
+//                }
+//                else
+//                {
+//                    // TODO: go up one "level"
+//                    lv_scr_load(home_scr);
 //                    home_update_time();
-                }
-                display.button_pressed = false;
-            }
+//                }
+//                display.button_pressed = false;
+//            }
 
             // update graphics
             if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
+//                home_screen();
                 lv_task_handler();
                 xSemaphoreGive(lvgl_mutex);
             }
@@ -288,6 +321,12 @@ void display_timeout_disable(void)
 
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
+//    int16_t width, height = 0;
+//    width = (area->x2 - area->x1);
+//    height = (area->y2 - area->y1);
+//    display_set_address_window(area->x1, area->x2, area->y1, area->y2);
+//    display_write_data((uint8_t *) color_p, width * height * 2);
+
     int32_t x, y;
     for(y = area->y1; y <= area->y2; y++)
     {
@@ -333,4 +372,45 @@ void display_color_fill_test(void)
     for(color = 0; color < sizeof(colors); color++) {
         NRF_LOG_INFO("Displaying: %d", colors[color]);
     }
+}
+
+/** Touchscreen **/
+bool read_touchscreen(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+{
+    static uint16_t x_last;
+    static uint16_t y_last;
+    uint16_t x;
+    uint16_t y;
+
+    if(CST816S_read_touch(&x, &y))
+    {
+        x_last = x;
+        y_last = y;
+    }
+    else
+    {
+        x = x_last;
+        y = y_last;
+    }
+
+    data->point.x = x;
+    data->point.y = y;
+
+    if(CST816S_isTouchActive())
+    {
+        data->state = LV_INDEV_STATE_PR;
+    }
+    else {
+        data->state = LV_INDEV_STATE_REL;
+    }
+
+    return false;
+}
+
+// Shared Data
+void display_setting_changed(eSetting setting)
+{
+    ChangeSetting_t new_setting;
+    new_setting.setting = setting;
+    xQueueSend(settings_queue, &new_setting, 0);
 }

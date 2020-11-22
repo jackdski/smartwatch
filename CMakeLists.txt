@@ -29,7 +29,7 @@ set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUGFIX}${VERSION
 set(CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR} CACHE STRING "" FORCE)
 
 
-if(TARGET_GROUP STREQUAL production)
+#if(TARGET_GROUP STREQUAL production)
     message("Building Release")
     # Modify this to set the correct path relative to this file.
     set(nRF5_cmake_path "${CMAKE_SOURCE_DIR}/nRF5-cmake-scripts/nRF5-cmake.cmake")
@@ -52,23 +52,23 @@ if(TARGET_GROUP STREQUAL production)
     if(NOT TARGET download)
         add_subdirectory("src")
     endif()
-elseif(TARGET_GROUP STREQUAL debug)
-    message("Building Debug/Unit Tests")
-    project(jd_smartwatch
-            VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUGFIX}
-            LANGUAGES NONE)
-
-    message(STATUS "Configuring CMake for nRF5 SDK for ${PROJECT_NAME} ${VERSION_STRING}")
-
-    set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-    enable_language(C ASM)
-    set(CMAKE_C_COMPILER "/usr/bin/gcc")
-    include(CTest)
-    enable_testing()
-
-    add_subdirectory("src")
-    add_subdirectory("toolchains")
-    add_subdirectory(src/components/battery)
-else()
-    message(FATAL_ERROR "Invalid TARGET_GROUP")
-endif()
+#elseif(TARGET_GROUP STREQUAL debug)
+#    message("Building Debug/Unit Tests")
+#    project(jd_smartwatch
+#            VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUGFIX}
+#            LANGUAGES NONE)
+#
+#    message(STATUS "Configuring CMake for nRF5 SDK for ${PROJECT_NAME} ${VERSION_STRING}")
+#
+#    set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+#    enable_language(C ASM)
+#    set(CMAKE_C_COMPILER "/usr/bin/gcc")
+#    include(CTest)
+#    enable_testing()
+#
+#    add_subdirectory("src")
+#    add_subdirectory("toolchains")
+#    add_subdirectory(src/components/battery)
+#else()
+#    message(FATAL_ERROR "Invalid TARGET_GROUP")
+#endif()

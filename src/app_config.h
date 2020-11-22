@@ -1,13 +1,19 @@
 /*          DEBUG          */
-#define PRINT_CONFIG								0
-#define SCREEN_PRINT
+//#define PRINT_CONFIG								0
+//#define SCREEN_PRINT
+
+/*          RTOS           */
+#define TASK_SYSTASK_STACK_SIZE                 128U
+#define TASK_DISPLAY_STACK_SIZE                 512U
+#define TASK_BLEGENERAL_STACK_SIZE              128U
+#define TASK_TIMER_STACK_SIZE                   256U
 
 
 /*          LOGGER         */
 #define NRF_LOG_BACKEND_RTT_ENABLED             1   // enable rtt
 #define NRF_LOG_BACKEND_UART_ENABLED            0   // disable uart
 #define NRF_LOG_DEFERRED                        0   // flush logs immediately
-#define NRF_LOG_ALLOW_OVERFLOW                  1   // no overflow
+#define NRF_LOG_ALLOW_OVERFLOW                  1
 #define SEGGER_RTT_CONFIG_DEFAULT_MODE          0   // trim
 //#define NRF_PWR_MGMT_CONFIG_CPU_USAGE_MONITOR_ENABLED 1 // log CPU usage at 1Hz
 
@@ -22,7 +28,7 @@
 
 /*          BLE         */
 #define FREERTOS      // Needed to use FreeRTOS with SoftDevice
-#define SOFTDEVICE_PRESENT                       1
+#define SOFTDEVICE_PRESENT                      1
 #define USE_BLE                                 1
 #define USE_PEER_MANAGER                        1
 #define BLE_STACK_SUPPORT_REQD                  1
@@ -69,8 +75,8 @@
 #define SPI1_USE_EASY_DMA				1
 
 #define USING_240X240
-#define DISPLAY_HEIGHT                  320
-#define DISPLAY_WIDTH                   240
+#define DISPLAY_HEIGHT                  240U
+#define DISPLAY_WIDTH                   240U
 
 #define DISPLAY_BACKLIGHT_LOW           NRF_GPIO_PIN_MAP(0, 14)
 #define DISPLAY_BACKLIGHT_MID           NRF_GPIO_PIN_MAP(0, 22)
@@ -95,7 +101,7 @@
 #define POWER_PRESENCE_PIN              NRF_GPIO_PIN_MAP(0, 19)
 #define VCC_POWER_CONTROL_PIN           NRF_GPIO_PIN_MAP(0, 24)
 #define BATTERY_VOLTAGE_PIN             NRF_GPIO_PIN_MAP(0, 31)
-#define BATTERY_VOLTAGE_SAADC_CH        7
+#define BATTERY_VOLTAGE_SAADC_CH        0 // 7
 
 
 /*          HAPTIC          */

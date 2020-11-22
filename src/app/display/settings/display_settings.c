@@ -5,11 +5,9 @@
 #include "display_common.h"
 #include "lvgl/lvgl.h"
 #include "display_settings.h"
+#include "display.h"
+#include "common.h"
 
-//extern lv_obj_t home_scr;
-extern lv_obj_t * settings_scr;
-
-//static void event_handler(lv_obj_t * obj, lv_event_t event);
 
 #define NUM_SETTINGS				7
 #define Y_OFFSET_LABEL_FROM_TITLE	55
@@ -17,8 +15,81 @@ extern lv_obj_t * settings_scr;
 #define X_OFFSET_LABEL_TO_BORDER	10
 #define X_OFFSET_SWITCH_TO_BORDER	170
 
+//extern lv_obj_t home_scr;
+//extern lv_obj_t * settings_scr;
+
+bool settings_values[NUM_SETTINGS] = {0};
+
+
+static void military_time_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    UNUSED_PARAMETER(obj);
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+        display_setting_changed(SETTING_MILITARY_TIME);
+    }
+}
+
+static void date_format_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    UNUSED_PARAMETER(obj);
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+        display_setting_changed(SETTING_DATE_FORMAT);
+    }
+}
+
+static void right_hand_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    UNUSED_PARAMETER(obj);
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+        display_setting_changed(SETTING_RIGHT_HAND);
+    }
+}
+
+static void show_texts_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    UNUSED_PARAMETER(obj);
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+        display_setting_changed(SETTING_SHOW_TEXTS);
+    }
+}
+
+static void show_emails_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    UNUSED_PARAMETER(obj);
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+        display_setting_changed(SETTING_SHOW_EMAILS);
+    }
+}
+
+static void show_calls_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    UNUSED_PARAMETER(obj);
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+        display_setting_changed(SETTING_SHOW_CALLS);
+    }
+}
+
+static void show_news_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    UNUSED_PARAMETER(obj);
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+    display_setting_changed(SETTING_SHOW_NEWS);
+    }
+}
+
+
 void settings_screen(void)
 {
+    lv_obj_clean(lv_scr_act());
+    lv_obj_t * settings_scr = lv_scr_act();
+
     display_battery_layer(settings_scr);
     display_screen_title(settings_scr, "Settings");
 
@@ -33,8 +104,8 @@ void settings_screen(void)
     lv_obj_t * selector[NUM_SETTINGS];
     char * label_strings[NUM_SETTINGS] = {
         "24-Hour",
-        "Data Format",
-        "Left-Hand",
+        "Date Format",
+        "Right-Hand",
         "Show Texts",
         "Show Calls",
         "Show Email",
@@ -51,7 +122,15 @@ void settings_screen(void)
         SETTING_SWITCH
     };
 
-//    void * event_handlers[NUM_SETTINGS] = {};
+    void * event_handlers[NUM_SETTINGS] = {
+        military_time_event_handler,
+        date_format_event_handler,
+        right_hand_event_handler,
+        show_texts_event_handler,
+        show_emails_event_handler,
+        show_calls_event_handler,
+        show_news_event_handler
+    };
 
     uint8_t i;
     for(i = 0; i < NUM_SETTINGS; i++)
@@ -79,7 +158,7 @@ void settings_screen(void)
                            X_OFFSET_SWITCH_TO_BORDER,
                            (Y_OFFSET_LABEL_FROM_TITLE + (Y_OFFSET_SWITCH_TO_SWITCH * i)) - 5);
         }
-        //    lv_obj_set_event_cb(sw1, event_handlers[i]);
+        lv_obj_set_event_cb(labels[i], event_handlers[i]);
     }
 }
 

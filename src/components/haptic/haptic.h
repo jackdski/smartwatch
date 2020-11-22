@@ -14,11 +14,15 @@
 typedef enum {
   HAPTIC_PULSE_NONE,
   HAPTIC_PULSE_INITIALIZATION,
+
+  // Sorted according to priority
+  HAPTIC_PULSE_LOW_BATTERY,
+  HAPTIC_PULSE_START_STOP_CHARGING,
   HAPTIC_PULSE_TEXT_MSG,
   HAPTIC_PULSE_CALL,
   HAPTIC_PULSE_ALARM,
-  HAPTIC_PULSE_LOW_BATTERY,
-  HAPTIC_PULSE_START_STOP_CHARGING,
+
+  HAPTIC_PULSE_COUNT
 } eHaptic_State;
 
 typedef enum {
@@ -30,6 +34,7 @@ typedef enum {
 
 typedef struct {
   eHaptic_State     state;
+  eHaptic_State     request;
   eHapticStrength   strength;
   uint16_t          period_ms;
   uint8_t           pulses;
@@ -37,10 +42,11 @@ typedef struct {
   uint16_t          ticks;
 } Haptic_t;
 
+// App
+void run_haptic_app(void);
+void haptic_timer_callback(TimerHandle_t timerx);
+void haptic_init(void);
 
-// Private Functions
-//static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle);
-//static uint8_t haptic_get_pwm_duty_cycle(void);
 
 // Public Functions
 void haptic_pwm_config(void);

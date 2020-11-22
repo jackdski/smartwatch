@@ -11,7 +11,7 @@
 
 //extern lv_obj_t home_scr;
 //extern lv_obj_t * settings_scr;
-extern lv_obj_t * brightness_scr;
+//extern lv_obj_t * brightness_scr;
 static lv_obj_t * slider_label;
 
 int16_t brightness_value = 0;
@@ -30,6 +30,8 @@ static void slider_event_cb(lv_obj_t * slider, lv_event_t event)
 
 void brightness_screen(void)
 {
+    lv_obj_clean(lv_scr_act());
+    lv_obj_t * brightness_scr = lv_scr_act();
     display_battery_layer(brightness_scr);
     display_screen_title(brightness_scr, "Brightness");
 

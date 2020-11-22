@@ -20,12 +20,12 @@
 static nrf_saadc_value_t battery_adc_result[BATTERY_SAADC_BUFFER_SIZE];
 static uint32_t adc_evt_counter = 0;
 
-const nrf_saadc_channel_config_t battery_saadc_channel_config = {
+nrf_saadc_channel_config_t battery_saadc_channel_config = {
     .resistor_p = NRF_SAADC_RESISTOR_DISABLED,
     .resistor_n = NRF_SAADC_RESISTOR_DISABLED,
     .gain = NRF_SAADC_GAIN1_5,
     .reference = NRF_SAADC_REFERENCE_INTERNAL,
-    .acq_time = NRF_SAADC_ACQTIME_40US,
+    .acq_time = NRF_SAADC_ACQTIME_3US,
     .mode = NRF_SAADC_MODE_SINGLE_ENDED,
     .burst = NRF_SAADC_BURST_DISABLED,
     .pin_p = NRF_SAADC_INPUT_AIN7,
@@ -97,8 +97,8 @@ void config_SGM40561(void)
     nrf_saadc_channel_init(BATTERY_VOLTAGE_SAADC_CH,
                            &battery_saadc_channel_config);
 
-    err_code = nrf_drv_saadc_buffer_convert(battery_adc_result, BATTERY_SAADC_BUFFER_SIZE);
-    APP_ERROR_CHECK(err_code);
+//    err_code = nrf_drv_saadc_buffer_convert(battery_adc_result, BATTERY_SAADC_BUFFER_SIZE);
+//    APP_ERROR_CHECK(err_code);
 }
 
 bool SGM40561_is_power_present(void)
@@ -130,10 +130,10 @@ uint16_t SGM40561_sample_battery_voltage(void)
 //    avg = (avg / BATTERY_SAADC_BUFFER_SIZE);
 //    NRF_LOG_INFO("Battery ADC Avg: %d", avg);
 //    return ((avg * 2000) / 1241);
-    nrf_saadc_value_t value;
+    nrf_saadc_value_t value = 0;
     nrfx_saadc_sample_convert(BATTERY_VOLTAGE_SAADC_CH, &value);
     NRF_LOG_INFO("Battery ADC Value: %d", value);
-    return (value * 2000) / 1241;
+    return (value * 2) / (1024 / 3);
 }
 
 uint16_t battery_monitor_sample(void)

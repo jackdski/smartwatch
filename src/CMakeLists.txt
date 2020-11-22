@@ -1,4 +1,4 @@
-if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+#if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
     message("Building Release src/CMakeLists.txt")
 
     set(NRF5_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/gcc_${NRF_FAMILY})
@@ -29,6 +29,7 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
     include_directories(drivers)
     include_directories(components)
+    include_directories(components/settings)
     include_directories(components/battery)
     include_directories(components/haptic)
     include_directories(components/sensors/)
@@ -40,6 +41,8 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
     include_directories(app/display/settings)
     include_directories(app/display/steps)
     include_directories(app/sys_task)
+
+    include_directories(lvgl/src/lv_themes)
 
     # add the required libraries
     nRF5_addSystemNRF()
@@ -136,8 +139,9 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
             lvgl/src/lv_draw/lv_img_decoder.c
             lvgl/src/lv_draw/lv_img_decoder.h
 
-            lvgl/src/lv_font/lv_font.c
             lvgl/src/lv_font/lv_font.h
+            lvgl/src/lv_font/lv_font.c
+            lvgl/src/lv_font/lv_symbol_def.h
             lvgl/src/lv_font/lv_font_dejavu_16_persian_hebrew.c
             lvgl/src/lv_font/lv_font_fmt_txt.c
             lvgl/src/lv_font/lv_font_fmt_txt.h
@@ -164,7 +168,6 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
             lvgl/src/lv_font/lv_font_montserrat_48.c
             lvgl/src/lv_font/lv_font_simsun_16_cjk.c
             lvgl/src/lv_font/lv_font_unscii_8.c
-            lvgl/src/lv_font/lv_symbol_def.h
 
             lvgl/src/lv_hal/lv_hal.h
             lvgl/src/lv_hal/lv_hal_disp.c
@@ -214,14 +217,14 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
             lvgl/src/lv_themes/lv_theme.c
             lvgl/src/lv_themes/lv_theme.h
-    #        lvgl/src/lv_themes/lv_theme_empty.c
-    #        lvgl/src/lv_themes/lv_theme_empty.h
-    #        lvgl/src/lv_themes/lv_theme_material.c
-    #        lvgl/src/lv_themes/lv_theme_material.h
+            lvgl/src/lv_themes/lv_theme_empty.c
+            lvgl/src/lv_themes/lv_theme_empty.h
+            lvgl/src/lv_themes/lv_theme_material.c
+            lvgl/src/lv_themes/lv_theme_material.h
             lvgl/src/lv_themes/lv_theme_mono.c
             lvgl/src/lv_themes/lv_theme_mono.h
-    #        lvgl/src/lv_themes/lv_theme_template.c
-    #        lvgl/src/lv_themes/lv_theme_template.h
+            lvgl/src/lv_themes/lv_theme_template.c
+            lvgl/src/lv_themes/lv_theme_template.h
 
             lvgl/src/lv_widgets/lv_arc.c
             lvgl/src/lv_widgets/lv_arc.h
@@ -323,6 +326,8 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
             drivers/peripherals.h
             drivers/peripherals.c
             components/common.h
+            components/settings/settings.h
+            components/settings/settings.c
             components/resources.h
             components/resources.c
             components/battery/battery.h
@@ -341,6 +346,12 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
             components/sensors/HRS3300.c
             app/sys_task/sys_task.h
             app/sys_task/sys_task.c
+            app/sys_task/app_settings.h
+            app/sys_task/app_settings.c
+            app/sys_task/app_battery.h
+            app/sys_task/app_battery.c
+            app/sys_task/app_sensors.h
+            app/sys_task/app_sensors.c
             app/display/brightness/display_brightness.h
             app/display/brightness/display_brightness.c
             app/display/heart_rate/display_heart_rate.h
@@ -388,6 +399,6 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
     if(NOT ${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
         nRF5_print_size(${target} ${NRF5_LINKER_SCRIPT} TRUE)
     endif()
-else()
-    message("Nothing in src/CMakeLists.txt!")
-endif()
+#else()
+#    message("Nothing in src/CMakeLists.txt!")
+#endif()

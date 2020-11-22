@@ -61,9 +61,9 @@
 #define configCPU_CLOCK_HZ                                                        ( SystemCoreClock )
 #define configTICK_RATE_HZ                                                        1024
 #define configMAX_PRIORITIES                                                      ( 5 )
-#define configMINIMAL_STACK_SIZE                                                  ( 64 )
-#define configTOTAL_HEAP_SIZE                                                     ( 1024 * 14 )
-#define configMAX_TASK_NAME_LEN                                                   ( 4 )
+#define configMINIMAL_STACK_SIZE                                                  ( 128 )
+#define configTOTAL_HEAP_SIZE                                                     ( 1024 * 15 )
+#define configMAX_TASK_NAME_LEN                                                   ( 6 )
 #define configUSE_16_BIT_TICKS                                                    0
 #define configIDLE_SHOULD_YIELD                                                   1
 #define configUSE_MUTEXES                                                         1
@@ -79,10 +79,11 @@
 #define configMESSAGE_BUFFER_LENGTH_TYPE                                          size_t//uint8_t
 
 /* Hook function related definitions. */
-#define configUSE_IDLE_HOOK                                                       1
+// Why does setting these to 0 enable them?
+#define configUSE_IDLE_HOOK                                                       0
 #define configUSE_TICK_HOOK                                                       0
 #define configCHECK_FOR_STACK_OVERFLOW                                            2
-#define configUSE_MALLOC_FAILED_HOOK                                              1
+#define configUSE_MALLOC_FAILED_HOOK                                              0
 
 /* Run time and task stats gathering related definitions. */
 #define configGENERATE_RUN_TIME_STATS                                             0
@@ -97,7 +98,7 @@
 #define configUSE_TIMERS                                                          1
 #define configTIMER_TASK_PRIORITY                                                 ( 3 )
 #define configTIMER_QUEUE_LENGTH                                                  32
-#define configTIMER_TASK_STACK_DEPTH                                              ( 256 )
+#define configTIMER_TASK_STACK_DEPTH                                              ( 360 )
 
 /* Tickless Idle configuration. */
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP                                     10

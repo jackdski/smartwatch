@@ -25,14 +25,6 @@
 //  BUTTON_PRESSED
 //} eMessage;
 
-typedef enum {
-  BATTERY_DISCHARGE           = (1 << 0),
-  BATTERY_CHARGING            = (1 << 1),
-  BATTERY_CHARGING_STARTED    = (1 << 2),
-  BATTERY_CHARGING_STOPPED    = (1 << 3),
-  BATTERY_CHARGING_COMPLETE   = (1 << 4),
-  BATTERY_LOW_POWER           = (1 << 5)
-} eBatteryEvent;
 
 typedef enum {
   DISPLAY_NO_MSG,
@@ -48,12 +40,7 @@ typedef struct {
   bool      initialized;
   bool      sleep;
   bool      wakeup;
-  bool      charging;
-  bool      prev_charging;
   bool      display_active;
-  uint8_t   soc;
-  uint16_t  battery_voltage;
-  uint32_t  step_count;
 } System_t;
 
 void sys_task(void * arg);

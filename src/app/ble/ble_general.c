@@ -101,17 +101,17 @@ static char const * month_of_year[] = {
 
 void BLE_Manager_Task(void * arg)
 {
-
     while(1)
     {
         // Requesting Read
-//        if(ble_cts_c_is_cts_discovered(&m_cts_c)) {
 //        if(ble_manager.cts_discovered)
+//        if(ble_cts_c_is_cts_discovered(&m_cts_c))
 //        {
 //                if(ble_manager.cts_event == true)
 //                {
 //                    NRF_LOG_INFO("BLE: TIME -  %i:%i:%i", ble_manager.cts_time.hour, ble_manager.cts_time.minute, ble_manager.cts_time.second)
 //                    NRF_LOG_INFO("BLE: DATE -  %i/%i/%i", ble_manager.cts_time.day_of_month, ble_manager.cts_time.month, ble_manager.cts_time.year)
+//                    update_system_time(ble_manager.cts_time);
 //                    ble_manager.cts_event = false;
 //                }
 //                if(ble_manager.cts_request == true)
@@ -131,6 +131,7 @@ void BLE_Manager_Task(void * arg)
 //                    if(m_notification_latest.evt_flags.positive_action || m_notification_latest.evt_flags.negative_action)
 //                    {
 //                        // notify display task
+//                        NRF_LOG_INFO("ANCS notification needs input");
 //                    }
 //                }
 //            }
@@ -976,8 +977,6 @@ void on_cts_c_evt(ble_cts_c_t * p_cts, ble_cts_c_evt_t * p_evt)
             ble_manager.cts_time.hour = p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours;
             ble_manager.cts_time.minute = p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes;
             ble_manager.cts_time.second = p_evt->params.current_time.exact_time_256.day_date_time.date_time.seconds;
-
-            update_system_time(ble_manager.cts_time);
             ble_manager.cts_event = true;
             break;
 
@@ -1005,6 +1004,7 @@ void on_adv_evt(ble_adv_evt_t ble_adv_evt)
         case BLE_ADV_EVT_FAST: {
             NRF_LOG_INFO("Fast advertising.");
             APP_ERROR_CHECK(err_code);
+            NRF_LOG_INFO("Fast advertising err check passed");
             break;
         }
         case BLE_ADV_EVT_SLOW: {

@@ -3,10 +3,18 @@
 //
 
 #include "sys_task.h"
+#include "nrf52.h"
+
+// app includes
+#include "app_settings.h"
+#include "app_battery.h"
+#include "app_sensors.h"
+
+// component includes
 #include "bma421.h"
 #include "HRS3300.h"
 #include "battery.h"
-#include "nrf52.h"
+#include "nrf_temp.h"
 
 // nRF Logging includes
 #include "nrf_log_default_backends.h"
@@ -24,80 +32,36 @@
 #include "haptic.h"
 
 // RTOS Variables
-extern QueueHandle_t system_queue;
 extern SemaphoreHandle_t twi_semphr;
 extern SemaphoreHandle_t button_semphr;
 extern TaskHandle_t thDisplay;
 extern TaskHandle_t thSysTask;
 extern EventGroupHandle_t component_event_group;
 extern EventGroupHandle_t charging_event_group;
-extern SemaphoreHandle_t haptic_mutex;
-extern TimerHandle_t haptic_timer;
 
 // System State Variables
 System_t sys = {
     .initialized = false,
     .sleep = false,
     .wakeup = false,
-    .charging = false,
-    .soc = 0,
-    .step_count = 0,
-    .battery_voltage = 0
 };
 
 
 /** Private Functions **/
-
-static void run_battery_app(void)
+static void init_temp_measurement(void)
 {
-//    update_battery_state();
-    sys.soc = get_battery_soc();
-    sys.charging = get_battery_charging();
-
-    if(sys.charging == true)
-    {
-        EventBits_t set_charging_bits = BATTERY_CHARGING;
-        if(sys.prev_charging == false)
-        {
-            set_charging_bits |= BATTERY_CHARGING_STARTED;
-            if(xSemaphoreTake(haptic_mutex, pdMS_TO_TICKS(0)))
-            {
-                haptic_start(HAPTIC_PULSE_START_STOP_CHARGING);
-                xTimerChangePeriod(haptic_timer, haptic_get_period_ms(), 10);
-                xTimerStart(haptic_timer, 10);
-                xSemaphoreGive(haptic_mutex);
-            }
-        }
-        xEventGroupClearBits(charging_event_group, BATTERY_DISCHARGE);
-        xEventGroupSetBits(charging_event_group, set_charging_bits);
-    }
-    else
-    {
-        EventBits_t set_charging_bits = BATTERY_DISCHARGE;
-        if(sys.prev_charging == true)
-        {
-            set_charging_bits |= BATTERY_CHARGING_STOPPED;
-            if(xSemaphoreTake(haptic_mutex, pdMS_TO_TICKS(0)))
-            {
-                haptic_start(HAPTIC_PULSE_START_STOP_CHARGING);
-                xTimerChangePeriod(haptic_timer, haptic_get_period_ms(), 10);
-                xTimerStart(haptic_timer, 10);
-                xSemaphoreGive(haptic_mutex);
-            }
-        }
-        xEventGroupClearBits(charging_event_group, (BATTERY_CHARGING | BATTERY_CHARGING_STARTED));
-        xEventGroupSetBits(charging_event_group, set_charging_bits);
-    }
-
-    sys.prev_charging = sys.charging;
-    NRF_LOG_INFO("SOC: %d", sys.soc);
-    NRF_LOG_INFO("Voltage: %d", sys.battery_voltage);
-    NRF_LOG_INFO("Charging: %d", sys.charging);
+    nrf_temp_init();
 }
 
-static void get_system_update_results(void)
+static int32_t read_temp(void)
 {
-    sys.step_count = get_step_count();
+    NRF_TEMP->TASKS_START = 1;
+    while(NRF_TEMP->EVENTS_DATARDY == 0);
+    NRF_TEMP->EVENTS_DATARDY = 0;
+    volatile int32_t temp = (nrf_temp_read() / 4);
+    NRF_TEMP->TASKS_STOP = 1;
+    NRF_LOG_INFO("Temp: %d", temp);
+    return temp;
 }
 
 static bool init_system_startup(void)
@@ -105,53 +69,41 @@ static bool init_system_startup(void)
     bool bma_initialized = false, HRS3300_initialized = false;
     EventBits_t set_bits = xEventGroupGetBits(component_event_group);
 
-    bma_initialized = init_bma();
+    bma_initialized = bma_init();
     HRS3300_initialized = HRS3300_init();
 
-    if(xSemaphoreTake(haptic_mutex, pdMS_TO_TICKS(0)))
-    {
-        haptic_pwm_config();
-        haptic_start(HAPTIC_PULSE_INITIALIZATION);
-        xTimerChangePeriod(haptic_timer, haptic_get_period_ms(), 10);
-        xTimerStart(haptic_timer, 10);
-        xSemaphoreGive(haptic_mutex);
-    }
+    haptic_init();
 
-    set_bits |= COMPONENT_HAPTIC;
+//    set_bits |= COMPONENT_HAPTIC;
 
-    if(bma_initialized == true)
-    {
-        set_bits |= COMPONENT_SENSOR_IMU;
-    }
-    if(HRS3300_initialized == true)
-    {
-        set_bits |= COMPONENT_SENSOR_HRS;
-    }
+//    if(bma_initialized == true)
+//    {
+//        set_bits |= COMPONENT_SENSOR_IMU;
+//    }
+//    if(HRS3300_initialized == true)
+//    {
+//        set_bits |= COMPONENT_SENSOR_HRS;
+//    }
 
-    update_battery_state();
-    sys.soc = get_battery_soc();
-    sys.charging = get_battery_charging();
-    if(is_battery_soc_valid(sys.soc))
-    {
-        set_bits |= COMPONENT_BATTERY_MONITOR;
-    }
+//    update_battery_state();
+//    set_bits |= COMPONENT_BATTERY_MONITOR;
 
     // set bits and wait up to 10s for remaining bits to be set before performing a system reset
-    bool ret = false;
-    xEventGroupSetBits(component_event_group, set_bits);
-    EventBits_t returned_bits;
-    returned_bits = xEventGroupWaitBits(component_event_group,
-                                        COMPONENT_LIST_ALL,
-                                        pdTRUE,
-                                        pdTRUE,
-                                        pdMS_TO_TICKS(10000));
-
-    if((returned_bits & COMPONENT_LIST_ALL) == COMPONENT_LIST_ALL)
-    {
-        ret = true;
-    }
-    return ret;
-//    return true;
+//    bool ret = false;
+//    xEventGroupSetBits(component_event_group, set_bits);
+//    EventBits_t returned_bits;
+//    returned_bits = xEventGroupWaitBits(component_event_group,
+//                                        COMPONENT_LIST_ALL,
+//                                        pdTRUE,
+//                                        pdTRUE,
+//                                        pdMS_TO_TICKS(10000));
+//
+//    if((returned_bits & COMPONENT_LIST_ALL) == COMPONENT_LIST_ALL)
+//    {
+//        ret = true;
+//    }
+//    return ret;
+    return true;
 }
 
 
@@ -161,40 +113,28 @@ void sys_task(void * arg)
     NRF_LOG_INFO("Init SystemTask");
     UNUSED_PARAMETER(arg);
 
-    // Task Local Variables
-    // static eMessage message = NO_MSG;
+    haptic_init();
+    init_temp_measurement();
 
-    // System Startup
-//    sys.initialized = init_system_startup();
-//    if(sys.initialized == false)
-//    {
-//        EventBits_t initialized_components;
-//        initialized_components = xEventGroupGetBits(component_event_group);
-//        uint8_t i;
-//        for(i = 0; i < NUM_COMPONENTS; i++)
-//        {
-//            if(!(initialized_components & (1 >> i)))
-//            {
-//                NRF_LOG_INFO("Component[%d] not initialized", i);
-//            }
-//        }
-//        NRF_LOG_INFO("Some Components were not initialized. Resetting device...");
-//        NVIC_SystemReset();
-//    }
-//    else
-//    {
-//        // clear bits for later use (sleep)
-        xEventGroupClearBits(component_event_group, COMPONENT_LIST_ALL);
-//    }
+    bma423_get_device_id();
+    HRS3300_enable();
+    HRS3300_get_device_id();
+
+    bma_init();
+    HRS3300_init();
+    sys.initialized = true;
     NRF_LOG_INFO("SysTask Init'd");
+    volatile int32_t temperature = 0;
 
     while(1)
     {
-//        run_battery_app();
-        // run_imu_app();
-        // update_step_count();
-        // run_heart_rate_app();
-        NRF_LOG_INFO("Steps: %d", sys.step_count);
+        run_battery_app();
+        run_accel_app();
+//        run_heart_rate_app();
+        run_settings_app();
+        run_haptic_app();
+//        run_sensor_update_display();
+//        read_temp();
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -214,23 +154,3 @@ void system_button_handler(void)
     xSemaphoreGive(button_semphr);
 }
 
-void haptic_timer_callback(TimerHandle_t timerx)
-{
-    UNUSED_PARAMETER(timerx);
-
-    if(xSemaphoreTake(haptic_mutex, pdMS_TO_TICKS(5000)) == pdPASS) {
-        if (haptic_get_pulses() > 1)
-        {
-            haptic_pulse_run();
-            xTimerStart(haptic_timer, 5);
-        }
-        else
-        {
-            // reset haptic
-            haptic_reset();
-            haptic_disable();
-            xTimerStop(haptic_timer, pdMS_TO_TICKS(100));
-        }
-        xSemaphoreGive(haptic_mutex);
-    }
-}

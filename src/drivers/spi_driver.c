@@ -58,16 +58,17 @@ void config_spi_master(void)
 
 bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
 {
-    // Package SPIM xfer
-    nrfx_spim_xfer_desc_t xfer = {
-        .p_tx_buffer = data,
-        .tx_length = size,
-        .p_rx_buffer = NULL,
-        .rx_length = 0
-    };
-
     if(xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(500)) == pdTRUE)
     {
+        // Package SPIM xfer
+    //    uint8_t spi_data[size];
+    //    memcpy(spi_data, data, size);
+        nrfx_spim_xfer_desc_t xfer = {
+            .p_tx_buffer = data,
+            .tx_length = size,
+            .p_rx_buffer = NULL,
+            .rx_length = 0
+        };
         current_cs_pin = cs_pin;
         nrf_gpio_pin_clear(current_cs_pin);
         spi_xfer_done = false;

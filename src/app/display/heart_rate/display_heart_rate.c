@@ -7,7 +7,7 @@
 #include "lvgl/lvgl.h"
 #include "display_common.h"
 
-extern lv_obj_t * heart_rate_scr;
+//extern lv_obj_t * heart_rate_scr;
 
 lv_obj_t * heart_rate_count_label;
 lv_obj_t * bpm_label;
@@ -37,6 +37,8 @@ void update_heart_rate_text(void)
 
 void heart_rate_screen(void)
 {
+    lv_obj_clean(lv_scr_act());
+    lv_obj_t * heart_rate_scr = lv_scr_act();
     display_battery_layer(heart_rate_scr);
     display_screen_title(heart_rate_scr, "Heart Rate");
 

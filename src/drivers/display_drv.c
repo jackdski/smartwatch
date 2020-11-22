@@ -114,16 +114,18 @@ void display_set_rotation(eDisplayRotation rotation)
 void display_configure(void)
 {
     // hardware reset
+    NRF_LOG_INFO("Display HW reset");
     display_reset_set();
     display_reset_clear();
-    vTaskDelay(pdMS_TO_TICKS(10));
-//    nrf_delay_ms(10);
+//    vTaskDelay(pdMS_TO_TICKS(10));
+    nrf_delay_ms(10);
     display_reset_set();
+    NRF_LOG_INFO("Display reset");
 
     // software reset
     display_write_command(ST7789_SWRESET);
-    vTaskDelay(pdMS_TO_TICKS(150));
-//    nrf_delay_ms(150);
+//    vTaskDelay(pdMS_TO_TICKS(150));
+    nrf_delay_ms(150);
 
     // SleepOut
     display_write_command(ST7789_SLPOUT);
@@ -133,8 +135,8 @@ void display_configure(void)
     // ColMod
     display_write_command(ST7789_COLMOD);
     display_write_byte(ST7789_COLOR_MODE_16bit);
-    vTaskDelay(pdMS_TO_TICKS(10));
-//    nrf_delay_ms(10);
+//    vTaskDelay(pdMS_TO_TICKS(10));
+    nrf_delay_ms(10);
 
     // MemDataAccessCtl
     display_write_command(ST7789_MADCTL);
@@ -158,12 +160,12 @@ void display_configure(void)
 
     // inversion
     display_write_command(ST7789_INVON);
-    vTaskDelay(pdMS_TO_TICKS(10));
-//    nrf_delay_ms(10);
+//    vTaskDelay(pdMS_TO_TICKS(10));
+    nrf_delay_ms(10);
 
     display_write_command(ST7789_NORON);
-    vTaskDelay(pdMS_TO_TICKS(10));
-//    nrf_delay_ms(10);
+//    vTaskDelay(pdMS_TO_TICKS(10));
+    nrf_delay_ms(10);
 
     // Display On
     display_on();

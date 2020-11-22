@@ -5,7 +5,10 @@
 #include "display_boot_up.h"
 #include "display.h"
 
-extern lv_obj_t * boot_up_scr;
+//extern lv_obj_t * boot_up_scr;
+
+static lv_obj_t * text;
+static lv_style_t label_style;
 
 void display_boot_up(void)
 {
@@ -18,18 +21,17 @@ void display_boot_up(void)
 //    lv_obj_set_width(main_label, 200);
 //    lv_obj_align(main_label, parent, LV_ALIGN_CENTER, 0, -120);
 
-    lv_obj_t * text;
-    lv_style_t label_style;
-
-    text = lv_textarea_create(boot_up_scr, NULL);
+//    lv_obj_clean(lv_scr_act());
+    text = lv_textarea_create(lv_scr_act(), NULL);
+//    text = lv_textarea_create(lv_scr_act(), NULL);
     lv_obj_set_size(text, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     lv_obj_align(text, NULL, LV_ALIGN_CENTER, 0, 0);
 
     lv_style_init(&label_style);
     lv_style_set_radius(&label_style, LV_STATE_DEFAULT, 10);
-    lv_style_set_bg_opa(&label_style, LV_STATE_DEFAULT, LV_OPA_COVER);
+//    lv_style_set_bg_opa(&label_style, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_style_set_text_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
-    lv_textarea_set_text(text, "JD Smartwatch");    /*Set an initial text*/
+    lv_textarea_set_text(text, "JD Smartwatch\0");    /*Set an initial text*/
 }

@@ -25,7 +25,9 @@ TimerHandle_t haptic_timer;
 
 /** QUEUES **/
 QueueHandle_t system_queue;
+QueueHandle_t settings_queue;
 QueueHandle_t display_queue;
+QueueHandle_t haptic_queue;
 QueueHandle_t ble_action_queue;
 QueueHandle_t ble_response_queue;
 

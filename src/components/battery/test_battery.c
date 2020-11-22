@@ -22,10 +22,10 @@ void tearDown(void)
 
 
 // helper functions
-uint16_t battery_monitor_sample(void)
-{
-    return 1668 ;
-}
+//uint16_t battery_monitor_sample(void)
+//{
+//    return 1668 ;
+//}
 
 
 //tests

@@ -9,8 +9,6 @@
 
 #if 1 /*Set it to "1" to enable content*/
 
-#include "FreeRTOS.h"
-
 #ifndef LV_CONF_H
 #define LV_CONF_H
 /* clang-format off */
@@ -21,13 +19,15 @@
 #include "FreeRTOS.h"
 #include "portable.h"
 
+//#include "lv_theme_material.h"
+
 /*====================
    Graphical settings
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
 #define LV_HOR_RES_MAX          (240)
-#define LV_VER_RES_MAX          (320)
+#define LV_VER_RES_MAX          (240)
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -54,11 +54,7 @@
 
 /* Default display refresh period.
  * Can be changed in the display driver (`lv_disp_drv_t`).*/
-#if (DISPLAY_DRIVER == ST7789_ENABLED)
 #define LV_DISP_DEF_REFR_PERIOD      30      /*[ms]*/
-#elif (DISPLAY_DRIVER == ST7735_ENABLED)
-#define LV_DISP_DEF_REFR_PERIOD      50      /*[ms]*/
-#endif
 
 /* Dot Per Inch: used to initialize default sizes.
  * E.g. a button with width = LV_DPI / 2 -> half inch wide
@@ -87,10 +83,10 @@ typedef int16_t lv_coord_t;
  * The graphical objects and other related data are stored here. */
 
 /* 1: use custom malloc/free, 0: use the built-in `lv_mem_alloc` and `lv_mem_free` */
-#define LV_MEM_CUSTOM      1
+#define LV_MEM_CUSTOM      0 // TODO needed?
 #if LV_MEM_CUSTOM == 0
 /* Size of the memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
-#  define LV_MEM_SIZE    (4U * 1024U)
+#  define LV_MEM_SIZE    (8U * 1024U)
 
 /* Complier prefix for a big array declaration */
 #  define LV_MEM_ATTR
@@ -342,7 +338,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_USE_ASSERT_OBJ       0
 
 /*Check if the styles are properly initialized. (Fast)*/
-#define LV_USE_ASSERT_STYLE     0
+#define LV_USE_ASSERT_STYLE     1
 
 #endif /*LV_USE_DEBUG*/
 
@@ -428,24 +424,25 @@ typedef void * lv_font_user_data_t;
  * Flags:
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
  * LV_THEME_MATERIAL_FLAG_DARK: dark theme*/
- #define LV_USE_THEME_MATERIAL    0
+ #define LV_USE_THEME_MATERIAL    1
 
 /* Mono-color theme for monochrome displays.
  * If LV_THEME_DEFAULT_COLOR_PRIMARY is LV_COLOR_BLACK the
  * texts and borders will be black and the background will be
  * white. Else the colors are inverted.
  * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
- #define LV_USE_THEME_MONO        1
+ #define LV_USE_THEME_MONO        0
 
 #define LV_THEME_DEFAULT_INCLUDE            <stdint.h>      /*Include a header for the init. function*/
-#define LV_THEME_DEFAULT_INIT               lv_theme_mono_init
-#define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_WHITE
-#define LV_THEME_DEFAULT_COLOR_SECONDARY    LV_COLOR_BLACK
-#define LV_THEME_DEFAULT_FLAG               0
-#define LV_THEME_DEFAULT_FONT_SMALL         LV_FONT_MONTSERRAT_12
-#define LV_THEME_DEFAULT_FONT_NORMAL        LV_FONT_MONTSERRAT_14
-#define LV_THEME_DEFAULT_FONT_SUBTITLE      LV_FONT_MONTSERRAT_16
-#define LV_THEME_DEFAULT_FONT_TITLE         LV_FONT_MONTSERRAT_18
+#define LV_THEME_DEFAULT_INIT               lv_theme_material_init
+#define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_BLACK // lv_color_hex(0x000000) // COLOR_MAKE(0x00, 0x00, 0x00)
+#define LV_THEME_DEFAULT_COLOR_SECONDARY    LV_COLOR_WHITE // lv_color_hex(0xFFFFFF) // COLOR_MAKE(0xf2, 0xf2, 0xf2)
+#define LV_THEME_DEFAULT_FLAG               LV_THEME_MATERIAL_FLAG_DARK
+#define LV_THEME_DEFAULT_FONT_SMALL         LV_FONT_MONTSERRAT_14
+#define LV_THEME_DEFAULT_FONT_NORMAL        LV_FONT_MONTSERRAT_16
+#define LV_THEME_DEFAULT_FONT_SUBTITLE      LV_FONT_MONTSERRAT_20
+#define LV_THEME_DEFAULT_FONT_TITLE         LV_FONT_MONTSERRAT_28
+
 /*=================
  *  Text settings
  *=================*/

@@ -32,8 +32,8 @@
 #define HRS_C1DATAM_REG         0x08
 #define HRS_C1DATAL_REG         0x0E
 
-#define HRS_C0DATAH_REG         0x0A
-#define HRS_C0DATAM_REG         0x09
+#define HRS_C0DATAH_REG         0x09
+#define HRS_C0DATAM_REG         0x0A
 #define HRS_C0DATAL_REG         0x0F
 
 #define HRS_PDRIVER_REG         0x0C
@@ -60,8 +60,10 @@ typedef enum {
 
 bool HRS3300_init(void);
 void HRS3300_enable(void);
+bool HRS3300_get_device_id(void);
 void HRS3300_low_power(void);
 void HRS3300_change_sample_rate(uint8_t rate);
+uint32_t HRS3300_get_sample(bool channel);
 void HRS3300_set_pdrive_current(ePDriveCurrent current);
 
 #endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_SENSORS_HRS3300_H

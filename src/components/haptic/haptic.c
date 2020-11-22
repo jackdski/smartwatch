@@ -10,15 +10,66 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 
+// FreeRTOS files
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
+extern QueueHandle_t haptic_queue;
+extern TimerHandle_t haptic_timer;
+
+static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle);
+static uint8_t haptic_get_pwm_duty_cycle(void);
+
 // Private Variables
 static Haptic_t haptic = {
     .state      = HAPTIC_PULSE_NONE,
+    .request    = HAPTIC_PULSE_NONE,
     .strength   = HAPTIC_STRENGTH_INACTIVE,
-    .period_ms     = 0,
+    .period_ms  = 0,
     .pulses     = 0,
     .duty_cycle = 0,
     .ticks      = 0
 };
+
+// App
+void run_haptic_app(void)
+{
+    if(xQueueReceive(haptic_queue, &haptic.request, pdMS_TO_TICKS(0)))
+    {
+        // start if haptic is inactive or request is higher priority
+        if((haptic.state != HAPTIC_PULSE_NONE) || (haptic.request > haptic.state))
+        {
+            haptic_start(haptic.request);
+            xTimerChangePeriod(haptic_timer, haptic.period_ms, 10);
+            xTimerStart(haptic_timer, 10);
+        }
+    }
+}
+
+void haptic_timer_callback(TimerHandle_t timerx)
+{
+    UNUSED_PARAMETER(timerx);
+
+    if (haptic_get_pulses() > 1)
+    {
+        haptic_pulse_run();
+        xTimerStart(haptic_timer, 5);
+    }
+    else
+    {
+        haptic_reset();
+        haptic_disable();
+        xTimerStop(haptic_timer, pdMS_TO_TICKS(100));
+    }
+}
+
+void haptic_init(void)
+{
+//    haptic_pwm_config();
+    haptic_start(HAPTIC_PULSE_INITIALIZATION);
+}
 
 
 // Private Functions

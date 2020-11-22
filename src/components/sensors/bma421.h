@@ -15,7 +15,10 @@ typedef enum {
   SENSORS_WAKEUP
 } eSensorsState;
 
-bool init_bma(void);
+bool bma_init(void);
+bool bma423_get_device_id(void);
+bool bma423_set_interrupt_source(uint8_t source);
+bool bma423_get_interrupt_status();
 void update_step_count(void);
 uint32_t get_step_count(void);
 void delay(uint32_t period_us, void * intf_ptr);

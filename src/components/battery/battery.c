@@ -4,11 +4,11 @@
 
 #include "battery.h"
 #include "SGM40561.h"
-//#include ""
 #include <stdint.h>
 #include <stdbool.h>
 
-#define LOW_POWER_BOUND     20  // [%]
+
+#define LOW_POWER_BOUND_PERCENTAGE      20  // [%]
 
 // Private Variables
 static Battery_t battery_monitor = {
@@ -16,6 +16,7 @@ static Battery_t battery_monitor = {
     .low_power = false,
     .power_present = false,
     .charging = false,
+    .prev_charging = false,
     .soc = 0,
     .voltage_mv = 0,
     .full_voltage_mv = 3900,
@@ -31,9 +32,24 @@ inline uint8_t get_battery_soc(void)
     return battery_monitor.soc;
 }
 
-inline uint8_t get_battery_charging(void)
+inline uint8_t get_battery_voltage_mv(void)
+{
+    return battery_monitor.voltage_mv;
+}
+
+inline bool is_battery_charging(void)
 {
     return battery_monitor.charging;
+}
+
+inline void set_battery_prev_charging(bool prev_charging)
+{
+    battery_monitor.prev_charging = prev_charging;
+}
+
+inline bool get_battery_prev_charging(void)
+{
+    return battery_monitor.prev_charging;
 }
 
 inline bool get_battery_low_power(void)
@@ -77,6 +93,7 @@ uint8_t estimate_soc(void)
 void update_battery_state(void)
 {
     update_battery_voltage_mv();
+    update_battery_charging_state();
 
     if(battery_monitor.charging == true)
     {
@@ -90,7 +107,6 @@ void update_battery_state(void)
     }
     else
     {
-        // TODO: write unit test for this case
         if((battery_monitor.state == CHARGING) && (battery_monitor.soc == 100))
         {
             battery_monitor.full_voltage_mv = battery_monitor.voltage_mv;
@@ -99,16 +115,15 @@ void update_battery_state(void)
         battery_monitor.state = DISCHARGE;
 
         // keep updating how low the voltage can go
-        // TODO: write unit test
         if(battery_monitor.empty_voltage_mv < battery_monitor.voltage_mv)
         {
             battery_monitor.empty_voltage_mv = battery_monitor.voltage_mv;
         }
     }
 
-    // SOC - TODO: unit test
+    // SOC
     battery_monitor.soc = estimate_soc();
-    if(battery_monitor.soc < LOW_POWER_BOUND)
+    if(battery_monitor.soc < LOW_POWER_BOUND_PERCENTAGE)
     {
         battery_monitor.low_power = true;
     }
