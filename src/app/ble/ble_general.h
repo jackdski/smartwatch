@@ -55,6 +55,7 @@
 // Application Includes
 #include "ble_ancs.h"
 #include "sys_task.h"
+#include "components/time/time.h"
 
 // BLE settings
 #define DEVICE_NAME                     "jdski_smartwatch"    /**< Name of device. Will be included in the advertising data. */
@@ -94,14 +95,14 @@
 
 
 typedef struct {
-    bool connected;
-    bool wait_for_input;
-    bool cts_discovered;
-    bool cts_request;
-    bool cts_event;
-    bool ancs_discovered;
-    bool ancs_event;
-    bool gatts_discovered;
+    bool    connected;
+    bool    wait_for_input;
+    bool    cts_discovered;
+    bool    cts_request;
+    bool    cts_event;
+    bool    ancs_discovered;
+    bool    ancs_event;
+    bool    gatts_discovered;
     Time_t  cts_time;
 } BLE_Manager_t;
 

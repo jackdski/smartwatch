@@ -20,17 +20,8 @@ extern TimerHandle_t haptic_timer;
 // FreeRTOS Variables
 extern QueueHandle_t system_queue;
 
-static Time_t time = {
-    .hour = 0,
-    .minute = 0,
-    .second = 0,
-    .day_of_week = 0,
-    .month = 0,
-    .year = 0
-};
 
 /** GPIOTE **/
-
 void gpio_interrupt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
 //    eMessage msg = BUTTON_PRESSED;
@@ -43,11 +34,6 @@ void gpio_interrupt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t acti
     }
 }
 
-/** TIME **/
-void update_system_time(Time_t new_time)
-{
-    memcpy(&time, &new_time, sizeof(Time_t));
-}
 
 /** FreeRTOS Functions **/
 void stop_rtos_timers(void)

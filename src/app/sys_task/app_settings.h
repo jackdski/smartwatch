@@ -8,5 +8,6 @@
 #include "settings.h"
 
 void run_settings_app(void);
+bool is_military_time(void);
 
 #endif //JD_SMARTWATCH_SRC_APP_SYS_TASK_APP_SETTINGS_H

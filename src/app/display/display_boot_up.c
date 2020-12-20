@@ -7,31 +7,23 @@
 
 //extern lv_obj_t * boot_up_scr;
 
-static lv_obj_t * text;
-static lv_style_t label_style;
-
 void display_boot_up(void)
-{
+{    lv_obj_t * main_label = lv_label_create(lv_scr_act(), NULL);
+
+    static lv_style_t boot_style;
+    lv_style_copy(&boot_style, &lv_style_plain);
+    boot_style.body.main_color = LV_COLOR_BLACK;
+    boot_style.body.radius = 3;
+    boot_style.text.color = lv_color_hex3(0x000);   // white text
+    boot_style.text.font = &lv_font_roboto_22;
+
+    lv_label_set_style(main_label, LV_LABEL_STYLE_MAIN, &boot_style);
     /* Create the main label */
-//    lv_obj_t * main_label = lv_label_create(parent, NULL);
-//
-//    /* Position the main label */
-//    lv_label_set_align(main_label, LV_LABEL_ALIGN_CENTER);
-//    lv_label_set_text(main_label, "JD");
-//    lv_obj_set_width(main_label, 200);
-//    lv_obj_align(main_label, parent, LV_ALIGN_CENTER, 0, -120);
 
-//    lv_obj_clean(lv_scr_act());
-    text = lv_textarea_create(lv_scr_act(), NULL);
-//    text = lv_textarea_create(lv_scr_act(), NULL);
-    lv_obj_set_size(text, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    lv_obj_align(text, NULL, LV_ALIGN_CENTER, 0, 0);
-
-    lv_style_init(&label_style);
-    lv_style_set_radius(&label_style, LV_STATE_DEFAULT, 10);
-//    lv_style_set_bg_opa(&label_style, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_text_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    lv_textarea_set_text(text, "JD Smartwatch\0");    /*Set an initial text*/
+    /* Position the main label */
+    lv_label_set_align(main_label, LV_LABEL_ALIGN_CENTER);
+    lv_label_set_text(main_label, "JD");
+    lv_obj_set_width(main_label, 200);
+    lv_obj_align(main_label, lv_scr_act(), LV_ALIGN_CENTER, 0, 0);
+    lv_label_set_text(main_label, "JD Smartwatch");
 }

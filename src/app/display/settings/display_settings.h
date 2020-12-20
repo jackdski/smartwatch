@@ -10,6 +10,6 @@ typedef enum {
   SETTING_SWITCH
 } eDisplaySettingSelector;
 
-void settings_screen(void);
+void display_settings_screen(void);
 
 #endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_DISPLAY_SETTINGS_DISPLAY_SETTINGS_H

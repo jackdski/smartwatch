@@ -23,6 +23,7 @@
 #include "battery.h"
 #include "settings.h"
 #include "display_drv.h"
+#include "components/time/time.h"
 
 // Display Components
 #include "display_boot_up.h"
@@ -71,6 +72,7 @@ static Display_Control_t display = {
     .rotation_setting = DISPLAY_ROTATION_0  // TODO: retrieve from non-volatile memory
 };
 
+
 // LVGL
 //lv_disp_t * disp;
 //lv_disp_drv_t lvgl_disp_drv;
@@ -78,12 +80,6 @@ static Display_Control_t display = {
 
 // Screens
 lv_obj_t * main_scr;
-//lv_obj_t * boot_up_scr;
-//lv_obj_t * home_scr;
-//lv_obj_t * brightness_scr;
-//lv_obj_t * settings_scr;
-//lv_obj_t * steps_scr;
-//lv_obj_t * heart_rate_scr;
 
 
 /** Private Functions **/
@@ -92,13 +88,6 @@ void init_display(void)
     display_configure();
     display.active = true;
 //    display_set_rotation(display.rotation_setting);
-
-    main_scr = lv_obj_create(NULL, NULL);
-//    boot_up_scr = lv_obj_create(NULL, NULL);    display_boot_up();
-//    home_scr = lv_obj_create(NULL, NULL);       home_screen();
-//    brightness_scr = lv_obj_create(NULL, NULL); brightness_screen();
-//    settings_scr = lv_obj_create(NULL, NULL);   settings_screen();
-//    heart_rate_scr = lv_obj_create(NULL, NULL); heart_rate_screen();
 }
 
 static void update_sleep_status(void)
@@ -151,26 +140,25 @@ void Display_Task(void * arg)
     NRF_LOG_INFO("Init Display Task");
     display_timeout_disable();
 
-    // screens
-//    if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
-//    {
-////        main_scr = lv_obj_create(NULL, NULL);
-//        xSemaphoreGive(lvgl_mutex);
-//    }
-
     uint32_t button_notif = 0;
     uint32_t update_counter = 0; // xTaskGetTickCount();
+    bool update_time = 0;
+    static uint8_t minute_update_cmp = 0;
     static lv_obj_t * text;
     static lv_style_t label_style;
 
-    while(1)
-    {
+    while(1) {
 //        if(xTaskGetTickCount() - update_counter >= 1000)
 //        {
 //            NRF_LOG_INFO("Display Task Update");
 //            update_brightness();
 //            update_sleep_status();
 //            update_charging_status();
+//            if(get_minute() != minute_update_cmp)
+//            {
+//                update_time = true;
+//                minute_update_cmp = get_minute();
+//            }
 //            update_counter = xTaskGetTickCount();
 //        }
 
@@ -186,80 +174,56 @@ void Display_Task(void * arg)
             NRF_LOG_INFO("Display Case Init");
             display.backlight_setting = BACKLIGHT_HIGH;
             update_brightness();
-//            init_display();
-//            vTaskDelay(pdMS_TO_TICKS(100));
-//            lv_task_handler();
+            init_display();
+
             if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE){
                 NRF_LOG_INFO("Displaying Boot Up Screen...");
-//                lv_scr_load(main_scr);
-//                display_boot_up();
-//                portENTER_CRITICAL();
-//                text = lv_textarea_create(lv_scr_act(), NULL);
-//    text = lv_textarea_create(lv_scr_act(), NULL);
-//                lv_obj_set_size(text, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-//                lv_obj_align(text, NULL, LV_ALIGN_CENTER, 0, 0);
-
-//                lv_style_init(&label_style);
-//                lv_style_set_radius(&label_style, LV_STATE_DEFAULT, 10);
-////    lv_style_set_bg_opa(&label_style, LV_STATE_DEFAULT, LV_OPA_COVER);
-//                lv_style_set_bg_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-//                lv_style_set_text_color(&label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-//
-//                lv_textarea_set_text(text, "JD Smartwatch\0");    /*Set an initial text*/
-//                portEXIT_CRITICAL();
-
-//                lv_obj_clean(lv_scr_act());
-                static lv_style_t time_style;
-                lv_style_init(&time_style);
-                lv_style_set_text_font(&time_style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_30);
-
-                lv_obj_t * time_label = lv_label_create(lv_scr_act(), NULL);
-                lv_label_set_text(time_label, "16:53");
-                lv_obj_align(time_label, NULL, LV_ALIGN_CENTER, 0, -15);
-                lv_obj_add_style(time_label, LV_LABEL_PART_MAIN, &time_style);
-
+                display_boot_up();
+                display.screen = DISPLAY_SCREEN_INITIALIZATION;
                 NRF_LOG_INFO("Loaded Boot Up Screen...");
                 xSemaphoreGive(lvgl_mutex);
                 NRF_LOG_INFO("Display Boot Complete")
             }
 
-//            uint16_t i;
-//            for(i = 0; i < 500; i++)
-//            {
-//                // update graphics
-//                if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
-//                    lv_task_handler();
-//                    xSemaphoreGive(lvgl_mutex);
-//                }
-//                vTaskDelay(pdMS_TO_TICKS(10));
-//            }
-//            lv_scr_load(home_scr);
-//            display_timeout_enable();
-//            home_screen();
+            TickType_t start = xTaskGetTickCount();
+            while(xTaskGetTickCount() - start < 5000)
+            {
+                if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
+                    lv_task_handler();
+                    xSemaphoreGive(lvgl_mutex);
+                }
+                vTaskDelay(pdMS_TO_TICKS(10));
+            }
+
+            display_timeout_enable();
+            home_screen();
+            display.screen = DISPLAY_SCREEN_HOME;
             display.display_state = DISPLAY_STATE_RUN;
             break;
 
         case DISPLAY_STATE_RUN:
+            display_show_screen();
+
             // select graphics based on current info
-//            display.backlight_setting = BACKLIGHT_MID; // TODO remove
-//            if(display.button_pressed == true)
-//            {
-//                if(lv_scr_act() == home_scr)
-//                {
-//                    display.display_state = DISPLAY_STATE_GO_TO_SLEEP;
-//                }
-//                else
-//                {
-//                    // TODO: go up one "level"
-//                    lv_scr_load(home_scr);
-//                    home_update_time();
-//                }
-//                display.button_pressed = false;
-//            }
+            if(display.button_pressed == true)
+            {
+                if(display.screen == DISPLAY_SCREEN_HOME)
+                {
+                    display.display_state = DISPLAY_STATE_GO_TO_SLEEP;
+                }
+                else
+                {
+                    // TODO: go up one "level"
+                }
+                display.button_pressed = false;
+            }
 
             // update graphics
             if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
-//                home_screen();
+                if(update_time)
+                {
+                    home_screen();
+                }
                 lv_task_handler();
                 xSemaphoreGive(lvgl_mutex);
             }
@@ -340,6 +304,42 @@ void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * 
     lv_disp_flush_ready(disp_drv);
 }
 
+void display_set_screen(Display_Screens_E screen)
+{
+    display.screen = screen;
+}
+
+void display_show_screen(void)
+{
+    const Display_Screens_E screen = display.screen;
+    switch(screen) {
+        case DISPLAY_SCREEN_INITIALIZATION:     display_boot_up(); break;
+        case DISPLAY_SCREEN_HOME:               home_screen(); break;
+        case DISPLAY_SCREEN_SETTINGS:           display_settings_screen(); break;
+        case DISPLAY_SCREEN_BRIGHTNESS:         /* display_brightness_screen(); */ break;
+        case DISPLAY_SCREEN_STEPS:              /* display_steps_screen(); */ break;
+        case DISPLAY_SCREEN_HEART_RATE:         /* display_heart_rate_screen(); */ break;
+        case DISPLAY_SCREEN_TEXT_MESSAGE:       /* display_text_message_screen(); */ break;
+        case DISPLAY_SCREEN_PHONE_NOTIFICATION: /* display_phone_notification_screen(); */ break;
+    }
+}
+
+Display_Screens_E display_get_parent_screen(Display_Screens_E screen)
+{
+    switch(screen) {
+        case DISPLAY_SCREEN_INITIALIZATION:
+            return DISPLAY_SCREEN_INITIALIZATION;
+        case DISPLAY_SCREEN_HOME:
+        case DISPLAY_SCREEN_SETTINGS:
+        case DISPLAY_SCREEN_BRIGHTNESS:
+        case DISPLAY_SCREEN_STEPS:
+        case DISPLAY_SCREEN_HEART_RATE:
+        case DISPLAY_SCREEN_TEXT_MESSAGE:
+        case DISPLAY_SCREEN_PHONE_NOTIFICATION:
+        default:
+            return DISPLAY_SCREEN_HOME;
+    }
+}
 
 bool display_get_charging_status(void)
 {

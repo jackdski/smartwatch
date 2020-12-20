@@ -16,7 +16,7 @@
 #define X_OFFSET_SWITCH_TO_BORDER	170
 
 //extern lv_obj_t home_scr;
-//extern lv_obj_t * settings_scr;
+//extern lv_obj_t * lv_scr_act();
 
 bool settings_values[NUM_SETTINGS] = {0};
 
@@ -85,20 +85,20 @@ static void show_news_event_handler(lv_obj_t * obj, lv_event_t event)
 }
 
 
-void settings_screen(void)
+void display_settings_screen(void)
 {
     lv_obj_clean(lv_scr_act());
-    lv_obj_t * settings_scr = lv_scr_act();
 
-    display_battery_layer(settings_scr);
-    display_screen_title(settings_scr, "Settings");
+    display_battery_layer(lv_scr_act());
+    display_screen_title(lv_scr_act(), "Settings");
 
     /** SWITCHES **/
 
     // Switches text style
     static lv_style_t switches_style;
-    lv_style_init(&switches_style);
-    lv_style_set_text_font(&switches_style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_14);
+//    lv_style_set_text_font(&switches_style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_14);
+    switches_style.text.font = &lv_font_roboto_12;
+
 
     lv_obj_t * labels[NUM_SETTINGS];
     lv_obj_t * selector[NUM_SETTINGS];
@@ -135,23 +135,23 @@ void settings_screen(void)
     uint8_t i;
     for(i = 0; i < NUM_SETTINGS; i++)
     {
-        labels[i] = lv_label_create(settings_scr, NULL);
+        labels[i] = lv_label_create(lv_scr_act(), NULL);
         lv_label_set_text(labels[i], label_strings[i]);
-        lv_obj_add_style(labels[i], LV_LABEL_PART_MAIN, &switches_style);
+        lv_label_set_style(labels[i], LV_LABEL_STYLE_MAIN, &switches_style);
         lv_obj_set_pos(labels[i],
                        X_OFFSET_LABEL_TO_BORDER,
                        (Y_OFFSET_LABEL_FROM_TITLE + (Y_OFFSET_SWITCH_TO_SWITCH * i)));
 
         if(setting_type[i] == SETTING_SWITCH)
         {
-            selector[i] = lv_switch_create(settings_scr, NULL);
+            selector[i] = lv_sw_create(lv_scr_act(), NULL);
             lv_obj_set_pos(selector[i],
                            X_OFFSET_SWITCH_TO_BORDER,
                            (Y_OFFSET_LABEL_FROM_TITLE + (Y_OFFSET_SWITCH_TO_SWITCH * i)) - 5);
         }
         else if(setting_type[i] == SETTING_BUTTON)
         {
-            selector[i] = lv_btn_create(settings_scr, NULL);
+            selector[i] = lv_btn_create(lv_scr_act(), NULL);
             lv_obj_t * lbl = lv_label_create(selector[i], NULL);
             lv_label_set_text(lbl, LV_SYMBOL_RIGHT);
             lv_obj_set_pos(selector[i],

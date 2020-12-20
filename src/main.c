@@ -84,7 +84,7 @@ extern EventGroupHandle_t component_event_group;
 extern EventGroupHandle_t charging_event_group;
 
 static lv_disp_buf_t lvgl_disp_buf;
-static lv_color_t lvgl_buf[LV_HOR_RES_MAX * 10];
+static lv_color_t lvgl_buf[LV_HOR_RES_MAX * 4];
 //static lv_color_t lvgl_buf_two[LV_HOR_RES_MAX * 10];
 lv_disp_drv_t lvgl_disp_drv;
 lv_indev_drv_t indev_drv;
@@ -278,7 +278,7 @@ int main(void)
     // init display
     NRF_LOG_INFO("Init LV");
     lv_init();
-    lv_disp_buf_init(&lvgl_disp_buf, lvgl_buf, NULL, LV_HOR_RES_MAX * 10);
+    lv_disp_buf_init(&lvgl_disp_buf, lvgl_buf, NULL, LV_HOR_RES_MAX * 4);
     lv_disp_drv_init(&lvgl_disp_drv);
     lvgl_disp_drv.hor_res = DISPLAY_WIDTH;
     lvgl_disp_drv.ver_res = DISPLAY_HEIGHT;
@@ -305,7 +305,6 @@ int main(void)
     lvgl_mutex = xSemaphoreCreateMutex();
     haptic_mutex = xSemaphoreCreateMutex();
     button_semphr = xSemaphoreCreateBinary();
-//    system_queue = xQueueCreate(10, sizeof(eMessage));
     settings_queue = xQueueCreate(3, sizeof(ChangeSetting_t));
     display_queue = xQueueCreate(10, sizeof(uint32_t));
     haptic_queue = xQueueCreate(3, sizeof(eHaptic_State));

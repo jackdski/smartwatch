@@ -70,7 +70,7 @@ __WEAK void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
             NRF_LOG_ERROR("SOFTDEVICE: ASSERTION FAILED");
             break;
         case NRF_FAULT_ID_APP_MEMACC:
-            NRF_LOG_ERROR("SOFTDEVICE: INVALID MEMORY ACCESS");
+            NRF_LOG_ERROR("SOFTDEVICE: INVALID MEMORY ACCESS. Info: 0x%x", info);
             break;
 #endif
         case NRF_FAULT_ID_SDK_ASSERT:

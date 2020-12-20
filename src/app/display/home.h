@@ -10,7 +10,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-void home_update_time(Time_t updated_time);
 void home_screen(void);
 
 #endif //JDSMARTWATCHPROJECT_SRC_COMPONENTS_DISPLAY_DISPLAY_TIME_H

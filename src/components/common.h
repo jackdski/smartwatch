@@ -29,16 +29,6 @@ typedef enum {
   COMPONENT_EXT_FLASH       = (1 << 12)
 } eComponentList;
 
-typedef struct {
-  uint8_t     second;
-  uint8_t     minute;
-  uint8_t     hour;
-  uint8_t     day_of_week;
-  uint8_t     day_of_month;
-  uint8_t     month;
-  uint16_t    year;
-} Time_t;
-
 typedef enum {
   DISPLAY_BLE_MSG_NONE,
   DISPLAY_BLE_MSG_CONFIRM,

@@ -14,6 +14,8 @@
 #include "bma421.h"
 #include "HRS3300.h"
 #include "battery.h"
+#include "button.h"
+
 #include "nrf_temp.h"
 
 // nRF Logging includes
@@ -48,21 +50,21 @@ System_t sys = {
 
 
 /** Private Functions **/
-static void init_temp_measurement(void)
-{
-    nrf_temp_init();
-}
-
-static int32_t read_temp(void)
-{
-    NRF_TEMP->TASKS_START = 1;
-    while(NRF_TEMP->EVENTS_DATARDY == 0);
-    NRF_TEMP->EVENTS_DATARDY = 0;
-    volatile int32_t temp = (nrf_temp_read() / 4);
-    NRF_TEMP->TASKS_STOP = 1;
-    NRF_LOG_INFO("Temp: %d", temp);
-    return temp;
-}
+//static void init_temp_measurement(void)
+//{
+//    nrf_temp_init();
+//}
+//
+//static int32_t read_temp(void)
+//{
+//    NRF_TEMP->TASKS_START = 1;
+//    while(NRF_TEMP->EVENTS_DATARDY == 0);
+//    NRF_TEMP->EVENTS_DATARDY = 0;
+//    volatile int32_t temp = (nrf_temp_read() / 4);
+//    NRF_TEMP->TASKS_STOP = 1;
+//    NRF_LOG_INFO("Temp: %d", temp);
+//    return temp;
+//}
 
 static bool init_system_startup(void)
 {
@@ -114,7 +116,7 @@ void sys_task(void * arg)
     UNUSED_PARAMETER(arg);
 
     haptic_init();
-    init_temp_measurement();
+//    init_temp_measurement();
 
     bma423_get_device_id();
     HRS3300_enable();
@@ -122,16 +124,18 @@ void sys_task(void * arg)
 
     bma_init();
     HRS3300_init();
+    config_button(system_button_handler);
+
     sys.initialized = true;
     NRF_LOG_INFO("SysTask Init'd");
     volatile int32_t temperature = 0;
 
     while(1)
     {
-        run_battery_app();
-        run_accel_app();
+//        run_battery_app();
+//        run_accel_app();
 //        run_heart_rate_app();
-        run_settings_app();
+//        run_settings_app();
         run_haptic_app();
 //        run_sensor_update_display();
 //        read_temp();

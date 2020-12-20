@@ -32,3 +32,8 @@ void run_settings_app(void)
         // TODO: on change save to flash
     }
 }
+
+bool is_military_time(void)
+{
+    return settings.military_time;
+}

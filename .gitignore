@@ -299,10 +299,7 @@ toolchains/Unity/test/tests/self_assessment_utils.h
 /build_test/*
 /build/*
 
-/src/lvgl/lvgl.mk
 
-src/lvgl/lvgl.mk
-src/lvgl/scripts/
 /venv/
 .idea/
 /toolchains/cmock/

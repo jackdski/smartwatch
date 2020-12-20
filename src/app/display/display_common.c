@@ -50,28 +50,26 @@ void display_screen_title(lv_obj_t * par, char * title)
 {
     // Style text
     static lv_style_t style;
-    lv_style_init(&style);
-    lv_style_set_text_font(&style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_20);  /*Set a larger font*/
+    style.text.font = &lv_font_roboto_22;
 
     // Label
     lv_obj_t * label = lv_label_create(par, NULL);
-    lv_obj_add_style(label, LV_LABEL_PART_MAIN, &style);
+    lv_label_set_style(label, LV_LABEL_STYLE_MAIN, &style);
     lv_label_set_text(label, title);
     lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_LEFT, 5, 10);
 
     // line
     static lv_point_t line_points[] = { {5, 25}, {LV_HOR_RES_MAX - 5, 25} };
     static lv_style_t style_line;
-    lv_style_init(&style_line);
-    lv_style_set_line_width(&style_line, LV_STATE_DEFAULT, 1);
-    lv_style_set_line_color(&style_line, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_line_rounded(&style_line, LV_STATE_DEFAULT, true);
+    style_line.line.width = 1;
+    style_line.line.color = LV_COLOR_WHITE;
+    style_line.line.rounded = 1;
 
     /*Create a line */
     lv_obj_t * line1;
     line1 = lv_line_create(par, NULL);
     lv_line_set_points(line1, line_points, 2);
-    lv_obj_add_style(line1, LV_LINE_PART_MAIN, &style_line);
+    lv_line_set_style(line1, LV_LINE_STYLE_MAIN, &style_line);
     lv_obj_set_pos(line1, 0, 15);
 
 }

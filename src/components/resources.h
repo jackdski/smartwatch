@@ -23,7 +23,6 @@
 //void config_gpio_interrupts(void);
 void gpio_interrupt_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 
-void update_system_time(Time_t new_time);
 void stop_rtos_timers(void);
 
 #endif //JDSMARTWATCHPROJECT_RESOURCES_H
