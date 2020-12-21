@@ -3,10 +3,14 @@
 //
 
 #include "display_drv.h"
-#include "components/resources.h"
 #include "drivers/spi_driver.h"
 
 #include "nrf_delay.h"
+
+// nRF Logging includes
+#include "nrf_log_default_backends.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -223,16 +227,12 @@ void display_backlight_set(eBacklightSetting setting)
         nrf_gpio_pin_write(DISPLAY_BACKLIGHT_MID, 1);
         nrf_gpio_pin_write(DISPLAY_BACKLIGHT_HIGH, 1);
         break;
-    case BACKLIGHT_MID:
-        nrf_gpio_pin_write(DISPLAY_BACKLIGHT_LOW, 1);
-        nrf_gpio_pin_write(DISPLAY_BACKLIGHT_MID, 0);
-        nrf_gpio_pin_write(DISPLAY_BACKLIGHT_HIGH, 1);
-        break;
     case BACKLIGHT_HIGH:
         nrf_gpio_pin_write(DISPLAY_BACKLIGHT_LOW, 1);
         nrf_gpio_pin_write(DISPLAY_BACKLIGHT_MID, 1);
         nrf_gpio_pin_write(DISPLAY_BACKLIGHT_HIGH, 0);
         break;
+    case BACKLIGHT_MID:
     default:
         nrf_gpio_pin_write(DISPLAY_BACKLIGHT_LOW, 1);
         nrf_gpio_pin_write(DISPLAY_BACKLIGHT_MID, 0);

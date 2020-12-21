@@ -20,10 +20,13 @@
 #include "nrf_log_default_backends.h"
 #include "nrf_log.h"
 
+BMA4_INTF_RET_TYPE twi_bus_read(uint8_t reg_addr, uint8_t *read_data, uint32_t len, void *intf_ptr);
+BMA4_INTF_RET_TYPE twi_bus_write(uint8_t reg_addr, const uint8_t *read_data, uint32_t len, void *intf_ptr);
+
 static struct bma4_dev bma = {
     .intf = BMA4_I2C_INTF,
-    .bus_read = (bma4_read_fptr_t)twi_rx,
-    .bus_write = (bma4_write_fptr_t)twi_tx,
+    .bus_read = twi_bus_read,
+    .bus_write = twi_bus_write,
     .variant = BMA42X_VARIANT,
     .read_write_len = 8,
     .delay_us = delay
@@ -69,6 +72,16 @@ bool bma_init(void)
     {
         return true;
     }
+}
+
+BMA4_INTF_RET_TYPE twi_bus_read(uint8_t reg_addr, uint8_t *read_data, uint32_t len, void *intf_ptr)
+{
+    twi_read_reg(BMA4_I2C_ADDR_PRIMARY, reg_addr, read_data, len);
+}
+
+BMA4_INTF_RET_TYPE twi_bus_write(uint8_t reg_addr, const uint8_t *read_data, uint32_t len, void *intf_ptr)
+{
+    twi_read_reg(BMA4_I2C_ADDR_PRIMARY, reg_addr, read_data, len);
 }
 
 bool bma423_get_device_id(void)

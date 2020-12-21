@@ -18,6 +18,7 @@ TaskHandle_t thDisplay;
 /** EVENT GROUPS **/
 EventGroupHandle_t component_event_group;
 EventGroupHandle_t charging_event_group;
+EventGroupHandle_t error_event_group;
 
 /** TIMER HANDLES **/
 TimerHandle_t display_timeout_tmr;

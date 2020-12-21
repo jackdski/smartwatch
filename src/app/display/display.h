@@ -6,7 +6,6 @@
 #define JDSMARTWATCHPROJECT_DISPLAY_H
 
 #include "lvgl/lvgl.h"
-#include "resources.h"
 #include "display_common.h"
 #include "settings.h"
 

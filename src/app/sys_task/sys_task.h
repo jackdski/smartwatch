@@ -5,7 +5,6 @@
 #ifndef JDSMARTWATCHPROJECT_SRC_COMPONENTS_SYS_TASK_H
 #define JDSMARTWATCHPROJECT_SRC_COMPONENTS_SYS_TASK_H
 
-#include "resources.h"
 #include "haptic.h"
 
 // FreeRTOS files

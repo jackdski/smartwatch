@@ -387,8 +387,6 @@
             components/common.h
             components/settings/settings.h
             components/settings/settings.c
-            components/resources.h
-            components/resources.c
             components/battery/battery.h
             components/battery/battery.c
             components/haptic/haptic.h

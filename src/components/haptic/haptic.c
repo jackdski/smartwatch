@@ -20,7 +20,7 @@ extern QueueHandle_t haptic_queue;
 extern TimerHandle_t haptic_timer;
 
 static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle);
-static uint8_t haptic_get_pwm_duty_cycle(void);
+//static uint8_t haptic_get_pwm_duty_cycle(void);
 
 // Private Variables
 static Haptic_t haptic = {
@@ -80,10 +80,10 @@ static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle)
     pwm_set_duty_cycle(HAPTIC_PWM_INDEX, haptic.duty_cycle);
 }
 
-static uint8_t haptic_get_pwm_duty_cycle(void)
-{
-    return haptic.duty_cycle;
-}
+//static uint8_t haptic_get_pwm_duty_cycle(void)
+//{
+//    return haptic.duty_cycle;
+//}
 
 
 // Public Functions

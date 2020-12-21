@@ -125,10 +125,10 @@ static void update_brightness(void)
     display_backlight_set(display.backlight_setting);
 }
 
-static void display_handle_button(uint8_t button_presses)
-{
-    // TODO
-}
+//static void display_handle_button(uint8_t button_presses)
+//{
+//    // TODO
+//}
 
 
 /** Public Functions **/
@@ -140,12 +140,7 @@ void Display_Task(void * arg)
     NRF_LOG_INFO("Init Display Task");
     display_timeout_disable();
 
-    uint32_t button_notif = 0;
-    uint32_t update_counter = 0; // xTaskGetTickCount();
     bool update_time = 0;
-    static uint8_t minute_update_cmp = 0;
-    static lv_obj_t * text;
-    static lv_style_t label_style;
 
     while(1) {
 //        if(xTaskGetTickCount() - update_counter >= 1000)
@@ -234,6 +229,7 @@ void Display_Task(void * arg)
             display.backlight_setting = BACKLIGHT_OFF;
             display_backlight_set(display.backlight_setting);
             display_off();
+            display_go_to_sleep();
             display.active = false;
             display.display_state = DISPLAY_STATE_SLEEP;
             vTaskSuspend(xTaskGetCurrentTaskHandle());

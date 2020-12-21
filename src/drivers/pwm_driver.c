@@ -10,19 +10,27 @@ APP_PWM_INSTANCE(HAPTIC_PWM, 1);  // Setup a PWM instance with TIMER 1
 // Private Functions
 static const app_pwm_t * pwm_get_pwm_instance(ePWM_INDEX index)
 {
+    const app_pwm_t * ret = NULL;
     switch (index) {
     case HAPTIC_PWM_INDEX:
-        return &HAPTIC_PWM;
+        ret = &HAPTIC_PWM;
     }
+    return ret;
 }
 
 NRF_PWM_Type * pwm_get_pwm_base(ePWM_INDEX index)
 {
+    NRF_PWM_Type * ret = NULL;
+
     switch(index)
     {
     case HAPTIC_PWM_INDEX:
-        return HAPTIC_PWM_BASE;
+        ret = HAPTIC_PWM_BASE;
+        break;
+    default:
+        ret = NULL;
     }
+    return ret;
 }
 
 

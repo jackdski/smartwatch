@@ -48,8 +48,8 @@ static uint8_t m_attr_disp_name[ATTR_DATA_SIZE];                              /*
 
 
 static ble_uuid_t   m_adv_uuids[] = {
-        { BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE }
-//        { ANCS_UUID_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN }
+        { BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE },
+        { ANCS_UUID_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN }
     };
 
 static BLE_Manager_t ble_manager = {
@@ -182,7 +182,9 @@ void ble_stack_init(void)
 }
 
 
-/**@brief Function for initializing services that will be used by the application.
+/**
+ * @brief Function for initializing services that will be used by the application.
+ * TODO: Add ble_hrs_init_t and ble_bas_init
  */
 void services_init(void)
 {
@@ -191,7 +193,6 @@ void services_init(void)
     nrf_ble_gatts_c_init_t  gatts_c_init;
     ble_cts_c_init_t        cts_init = {0};
     nrf_ble_qwr_init_t      qwr_init = {0};
-//    ble_dfu_buttonless_init_t dfus_init = {0};
 
     // Initialize Queued Write Module.
     qwr_init.error_handler = nrf_qwr_error_handler;
@@ -207,11 +208,12 @@ void services_init(void)
     err_code = nrf_ble_gatts_c_init(&m_gatts_c, &gatts_c_init);
     APP_ERROR_CHECK(err_code);
 
-//    // Init the DFU Service client module
-//    dfus_init.evt_handler = ble_dfu_evt_handler;
-//
-//    err_code = ble_dfu_buttonless_init(&dfus_init);
-//    APP_ERROR_CHECK(err_code);
+    // Initialize CTS.
+    cts_init.evt_handler   = on_cts_c_evt;
+    cts_init.error_handler = current_time_error_handler;
+    cts_init.p_gatt_queue  = &m_ble_gatt_queue;
+    err_code               = ble_cts_c_init(&m_cts_c, &cts_init);
+    APP_ERROR_CHECK(err_code);
 
     // Init the Apple Notification Center Service client module.
     memset(&ancs_c_init, 0, sizeof(ancs_c_init));
@@ -275,13 +277,6 @@ void services_init(void)
     ancs_c_init.p_gatt_queue  = &m_ble_gatt_queue;
 
     err_code = ble_ancs_c_init(&m_ancs_c, &ancs_c_init);
-    APP_ERROR_CHECK(err_code);
-
-    // Initialize CTS.
-    cts_init.evt_handler   = on_cts_c_evt;
-    cts_init.error_handler = current_time_error_handler;
-    cts_init.p_gatt_queue  = &m_ble_gatt_queue;
-    err_code               = ble_cts_c_init(&m_cts_c, &cts_init);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -454,7 +449,9 @@ void advertising_start(void * p_erase_bonds)
     if (erase_bonds) {
         delete_bonds();
         // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
-    } else {
+    }
+    else
+    {
         ret_code_t ret;
 
         memset(m_whitelist_peers, PM_PEER_ID_INVALID, sizeof(m_whitelist_peers));

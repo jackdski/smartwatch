@@ -75,5 +75,5 @@ void CST816S_sleep(void)
     nrf_gpio_pin_set(TP_RESET_PIN);
     vTaskDelay(pdMS_TO_TICKS(50));
     uint8_t msg[] = {CST816S_POWER_MODE_ADDR, CST816S_POWER_MODE_SLEEP};
-    twi_tx(CST816S_ADDR, msg, sizeof(msg), NULL);
+    twi_tx(CST816S_ADDR, msg, sizeof(msg));
 }

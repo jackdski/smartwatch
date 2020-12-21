@@ -36,7 +36,6 @@
 #include "lvgl/lvgl.h"
 
 // Application files
-#include "resources.h"
 #include "ble_general.h"
 #include "sys_task.h"
 #include "battery.h"
@@ -82,6 +81,7 @@ extern TimerHandle_t haptic_timer;
 // Event Groups
 extern EventGroupHandle_t component_event_group;
 extern EventGroupHandle_t charging_event_group;
+extern EventGroupHandle_t error_event_group;
 
 static lv_disp_buf_t lvgl_disp_buf;
 static lv_color_t lvgl_buf[LV_HOR_RES_MAX * 4];
@@ -200,6 +200,7 @@ static void clock_init(void)
 //    NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
 }
 
+#if(DEBUG_INFO_ENABLED == 1)
 static void debug_task(void * arg)
 {
     UNUSED_PARAMETER(arg);
@@ -225,6 +226,7 @@ static void debug_task(void * arg)
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
+#endif
 
 //#if NRF_LOG_ENABLED
 /**@brief Thread for handling the logger.
@@ -312,6 +314,7 @@ int main(void)
     ble_response_queue = xQueueCreate(5, sizeof(BLEMsg_t));
     charging_event_group = xEventGroupCreate();
     component_event_group = xEventGroupCreate();
+    error_event_group = xEventGroupCreate();
 
     //
     // Create tasks

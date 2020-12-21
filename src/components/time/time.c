@@ -144,6 +144,7 @@ char * get_month_str(void)
     case NOVEMBER: return "November";
     case DECEMBER: return "December";
     }
+    return "ERR";
 //    return month_of_year[time.month];
 }
 
@@ -158,6 +159,7 @@ char * get_weekday_str(void)
     case SATURDAY: return "Saturday";
     case SUNDAY: return "Sunday";
     }
+    return "ERR";
 //    return day_of_week[time.day_of_week];
 }
 

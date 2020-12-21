@@ -15,31 +15,29 @@
 
 bool HRS3300_init(void)
 {
-    bool stop = true;
     HRS3300_enable();
 
     {
         uint8_t data[] = {HRS_RES_REG, HRS_RES_16BIT};
-        twi_tx(HRS_ADDRESS, data, sizeof(data), &stop);
+        twi_tx(HRS_ADDRESS, data, sizeof(data));
     }
 
     {
         uint8_t data[] = {HRS_HGAIN_REG, HRS_HGAIN_DOUBLE};
-        twi_tx(HRS_ADDRESS, data, sizeof(data), &stop);
+        twi_tx(HRS_ADDRESS, data, sizeof(data));
     }
 
     {
         uint8_t data[] = {HRS_PDRIVER_REG, (HRS_PDRIVER_PON | (1 << 6))};
-        twi_tx(HRS_ADDRESS, data, sizeof(data), &stop);
+        twi_tx(HRS_ADDRESS, data, sizeof(data));
     }
     return true;
 }
 
 void HRS3300_enable(void)
 {
-    bool stop = true;
     uint8_t data[] = {HRS_ENABLE_REG, (HRS_ENABLE_HEN | HRS_ENABLE_DEFAULT)};
-    twi_tx(HRS_ADDRESS, data, sizeof(data), &stop);
+    twi_tx(HRS_ADDRESS, data, sizeof(data));
 }
 
 bool HRS3300_get_device_id(void)
@@ -57,9 +55,8 @@ bool HRS3300_get_device_id(void)
 
 void HRS3300_low_power(void)
 {
-    bool stop = true;
     uint8_t data[] = {HRS_PDRIVER_REG, HRS_PDRIVER_PON};
-    twi_tx(HRS_ADDRESS, data, sizeof(data), &stop);
+    twi_tx(HRS_ADDRESS, data, sizeof(data));
 }
 
 void HRS3300_change_sample_rate(uint8_t rate)
@@ -88,7 +85,6 @@ uint32_t HRS3300_get_sample(bool channel)
 
 void HRS3300_set_pdrive_current(ePDriveCurrent current)
 {
-    bool stop = true;
-    uint8_t data[] = {HRS_PDRIVER_REG, (HRS_TWELVE_MILLIAMP_LED_DRIVE << HRS_PDRIVER_CURRENT_OFF) | HRS_PDRIVER_PON};
-    twi_tx(HRS_ADDRESS, data, sizeof(data), &stop);
+    uint8_t data[] = {HRS_PDRIVER_REG, (HRS_TWELVE_MILLIAMP_LED_DRIVE | 6) | HRS_PDRIVER_PON};
+    twi_tx(HRS_ADDRESS, data, sizeof(data));
 }
