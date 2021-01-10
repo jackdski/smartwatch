@@ -69,7 +69,7 @@ void set_battery_status(uint8_t soc)
 
     if(soc <= BATTERY_SOC_LOW)
     {
-        xEventGroupClearBits(charging_event_group, status_mask ^ BATTERY_STATUS_LOW);
+        xEventGroupClearBits(charging_event_group, status_mask ^ BATTERY_STATUS_LOW); // clear battery status bits
         xEventGroupSetBits(charging_event_group, BATTERY_STATUS_LOW);
     }
     else if(soc <= BATTERY_SOC_MED)
@@ -86,5 +86,9 @@ void set_battery_status(uint8_t soc)
     {
         xEventGroupClearBits(charging_event_group, status_mask ^ BATTERY_STATUS_HIGH);
         xEventGroupSetBits(charging_event_group, BATTERY_STATUS_FULL);
+    }
+    else
+    {
+        // nothing
     }
 }

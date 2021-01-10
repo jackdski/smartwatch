@@ -42,9 +42,9 @@
 #include "display.h"
 #include "display_settings.h"
 #include "display_heart_rate.h"
-#include "home.h"
+#include "home/home.h"
 #include "display_brightness.h"
-#include "display_boot_up.h"
+#include "boot_up/display_boot_up.h"
 #include "common.h"
 
 // Drivers
@@ -60,9 +60,7 @@ extern TaskHandle_t thBLEMan;
 extern TaskHandle_t thDisplay;
 
 // Queues
-extern QueueHandle_t system_queue;
 extern QueueHandle_t settings_queue;
-extern QueueHandle_t display_queue;
 extern QueueHandle_t haptic_queue;
 extern QueueHandle_t ble_action_queue;
 extern QueueHandle_t ble_response_queue;
@@ -71,11 +69,11 @@ extern QueueHandle_t ble_response_queue;
 extern SemaphoreHandle_t twi_mutex;
 extern SemaphoreHandle_t spi_mutex;
 extern SemaphoreHandle_t lvgl_mutex;
-extern SemaphoreHandle_t haptic_mutex;
 extern SemaphoreHandle_t button_semphr;
 
 // Timers
 extern TimerHandle_t display_timeout_tmr;
+extern TimerHandle_t display_update_timer;
 extern TimerHandle_t haptic_timer;
 
 // Event Groups
@@ -85,7 +83,6 @@ extern EventGroupHandle_t error_event_group;
 
 static lv_disp_buf_t lvgl_disp_buf;
 static lv_color_t lvgl_buf[LV_HOR_RES_MAX * 4];
-//static lv_color_t lvgl_buf_two[LV_HOR_RES_MAX * 10];
 lv_disp_drv_t lvgl_disp_drv;
 lv_indev_drv_t indev_drv;
 
@@ -134,6 +131,12 @@ static void rtos_timers_init(void)
                                        (void *)0,
                                        vDisplayTimeoutCallback);
 
+    display_update_timer = xTimerCreate("DisplayUpdate",
+                                        pdMS_TO_TICKS(1000),
+                                        pdFALSE,
+                                        (void *)0,
+                                        vDisplayUpdateCallback);
+
     haptic_timer = xTimerCreate("HapticTimer",
                                 pdMS_TO_TICKS(100),  // Changes in SysTask
                                 pdFALSE,
@@ -167,16 +170,6 @@ static void power_management_init(void)
 
 void vApplicationIdleHook( void )
 {
-//    static uint32_t count = 0;
-//    static uint32_t tick_count = 0;
-//    count++;
-//    uint32_t new_tick_count = xTaskGetTickCount();
-//    if(new_tick_count - tick_count >= 1000)
-//    {
-//        NRF_LOG_INFO("IDLE %d ms/1000ms", count / (new_tick_count - tick_count));
-//        tick_count = new_tick_count;
-//    }
-//    nrf_pwr_mgmt_run();
     vTaskResume(m_logger_thread);
 }
 
@@ -288,13 +281,6 @@ int main(void)
     lvgl_disp_drv.flush_cb = my_flush_cb;
     lv_disp_drv_register(&lvgl_disp_drv);
 
-    // init touch input
-//    NRF_LOG_INFO("Init LV Touch");
-//    lv_indev_drv_init(&indev_drv);
-//    indev_drv.type = LV_INDEV_TYPE_POINTER;
-//    indev_drv.read_cb = read_touchscreen;
-//    lv_indev_drv_register(&indev_drv);
-
     config_pinout();
     config_peripherals();
     display_backlight_set(BACKLIGHT_OFF);
@@ -305,10 +291,8 @@ int main(void)
     twi_mutex = xSemaphoreCreateMutex();
     spi_mutex = xSemaphoreCreateMutex();
     lvgl_mutex = xSemaphoreCreateMutex();
-    haptic_mutex = xSemaphoreCreateMutex();
     button_semphr = xSemaphoreCreateBinary();
     settings_queue = xQueueCreate(3, sizeof(ChangeSetting_t));
-    display_queue = xQueueCreate(10, sizeof(uint32_t));
     haptic_queue = xQueueCreate(3, sizeof(eHaptic_State));
     ble_action_queue = xQueueCreateCountingSemaphore(5, sizeof(BLEMsg_t));
     ble_response_queue = xQueueCreate(5, sizeof(BLEMsg_t));
@@ -368,33 +352,33 @@ int main(void)
     uint32_t free_heap = xPortGetFreeHeapSize();
     NRF_LOG_INFO("Heap Remaining (Bytes): %d", free_heap);
 
-    NRF_LOG_INFO("BLE Init");
-    ble_stack_init();
-
-    // Init BLE
-    NRF_LOG_INFO("BLE Init 2");
-    power_management_init();
-    gap_params_init();
-    gatt_init();
-    db_discovery_init();
-    services_init();
-    advertising_init();
-    peer_manager_init();
-    conn_params_init();
-
-    NRF_LOG_INFO("BLE Init 3");
-    nrf_sdh_freertos_init(advertising_start, NULL);
-
-    NRF_LOG_INFO("BLE Init 4");
-    if(pdPASS != xTaskCreate(BLE_Manager_Task,
-                             "BLEMan",
-                             configMINIMAL_STACK_SIZE,
-                             NULL,
-                             2,
-                             &thBLEMan))
-    {
-        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
-    }
+//    NRF_LOG_INFO("BLE Init");
+//    ble_stack_init();
+//
+//    // Init BLE
+//    NRF_LOG_INFO("BLE Init 2");
+//    power_management_init();
+//    gap_params_init();
+//    gatt_init();
+//    db_discovery_init();
+//    services_init();
+//    advertising_init();
+//    peer_manager_init();
+//    conn_params_init();
+//
+//    NRF_LOG_INFO("BLE Init 3");
+//    nrf_sdh_freertos_init(advertising_start, NULL);
+//
+//    NRF_LOG_INFO("BLE Init 4");
+//    if(pdPASS != xTaskCreate(BLE_Manager_Task,
+//                             "BLEMan",
+//                             configMINIMAL_STACK_SIZE,
+//                             NULL,
+//                             2,
+//                             &thBLEMan))
+//    {
+//        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+//    }
 
 #if (WATCHDOG_ENABLED == 1)
     //Configure WDT. TODO: move to separate file
@@ -409,7 +393,7 @@ int main(void)
 #endif
 
 //    config_button_event(button_callback);
-    init_display();
+//    init_display();
     NRF_LOG_INFO("Start Scheduler...");
     vTaskStartScheduler();
 

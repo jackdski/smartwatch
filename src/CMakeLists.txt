@@ -411,20 +411,20 @@
             app/sys_task/app_battery.c
             app/sys_task/app_sensors.h
             app/sys_task/app_sensors.c
-#            app/display/brightness/display_brightness.h
-#            app/display/brightness/display_brightness.c
-#            app/display/heart_rate/display_heart_rate.h
-#            app/display/heart_rate/display_heart_rate.c
+            app/display/brightness/display_brightness.h
+            app/display/brightness/display_brightness.c
+            app/display/heart_rate/display_heart_rate.h
+            app/display/heart_rate/display_heart_rate.c
             app/display/settings/display_settings.h
             app/display/settings/display_settings.c
-#            app/display/steps/display_steps.h
-#            app/display/steps/display_steps.c
+            app/display/steps/display_steps.h
+            app/display/steps/display_steps.c
             app/display/display_common.h
             app/display/display_common.c
-            app/display/display_boot_up.h
-            app/display/display_boot_up.c
-            app/display/home.h
-            app/display/home.c
+            app/display/boot_up/display_boot_up.h
+            app/display/boot_up/display_boot_up.c
+            app/display/home/home.h
+            app/display/home/home.c
             app/display/display.h
             app/display/display.c
             "${SDK_ROOT}/components/softdevice/common/nrf_sdh_freertos.c"

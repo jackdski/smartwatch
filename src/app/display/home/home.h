@@ -6,7 +6,7 @@
 #define JDSMARTWATCHPROJECT_SRC_COMPONENTS_DISPLAY_DISPLAY_HOME_H
 
 #include "lvgl/lvgl.h"
-#include "../common.h"
+#include "common.h"
 #include "FreeRTOS.h"
 #include "task.h"
 

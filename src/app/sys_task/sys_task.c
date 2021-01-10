@@ -34,7 +34,6 @@
 #include "haptic.h"
 
 // RTOS Variables
-extern SemaphoreHandle_t twi_semphr;
 extern SemaphoreHandle_t button_semphr;
 extern TaskHandle_t thDisplay;
 extern TaskHandle_t thSysTask;
@@ -57,14 +56,16 @@ static bool init_system_startup(void)
 
     if(!bma_init())
     {
+        bma423_get_device_id();
         set_bits |= COMPONENT_SENSOR_IMU;
     }
     if(!HRS3300_init())
     {
+        HRS3300_get_device_id();
         set_bits |= COMPONENT_SENSOR_HRS;
     }
     haptic_init();
-//    update_battery_state();
+    update_battery_state();
     return true;
 }
 
@@ -75,14 +76,7 @@ void sys_task(void * arg)
     NRF_LOG_INFO("Init SystemTask");
     UNUSED_PARAMETER(arg);
 
-    haptic_init();
-
-    bma423_get_device_id();
-    HRS3300_enable();
-    HRS3300_get_device_id();
-
-    bma_init();
-    HRS3300_init();
+    init_system_startup();
     config_button(system_button_handler);
 
     sys.initialized = true;
@@ -112,6 +106,8 @@ void system_button_handler(void)
     {
         vTaskResume(thDisplay);
     }
-    xSemaphoreGive(button_semphr);
+
+    // Notify display task
+    xTaskNotify(thDisplay, 1, eNoAction);
 }
 

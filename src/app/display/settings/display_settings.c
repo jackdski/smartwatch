@@ -15,11 +15,6 @@
 #define X_OFFSET_LABEL_TO_BORDER	10
 #define X_OFFSET_SWITCH_TO_BORDER	170
 
-//extern lv_obj_t home_scr;
-//extern lv_obj_t * lv_scr_act();
-
-bool settings_values[NUM_SETTINGS] = {0};
-
 
 static void military_time_event_handler(lv_obj_t * obj, lv_event_t event)
 {
@@ -80,7 +75,7 @@ static void show_news_event_handler(lv_obj_t * obj, lv_event_t event)
     UNUSED_PARAMETER(obj);
     if(event == LV_EVENT_VALUE_CHANGED)
     {
-    display_setting_changed(SETTING_SHOW_NEWS);
+        display_setting_changed(SETTING_SHOW_NEWS);
     }
 }
 
@@ -96,6 +91,7 @@ void display_settings_screen(void)
 
     // Switches text style
     static lv_style_t switches_style;
+    lv_style_copy(&switches_style, &lv_style_plain);
 //    lv_style_set_text_font(&switches_style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_14);
     switches_style.text.font = &lv_font_roboto_12;
 
@@ -136,8 +132,8 @@ void display_settings_screen(void)
     for(i = 0; i < NUM_SETTINGS; i++)
     {
         labels[i] = lv_label_create(lv_scr_act(), NULL);
-        lv_label_set_text(labels[i], label_strings[i]);
         lv_label_set_style(labels[i], LV_LABEL_STYLE_MAIN, &switches_style);
+        lv_label_set_text(labels[i], label_strings[i]);
         lv_obj_set_pos(labels[i],
                        X_OFFSET_LABEL_TO_BORDER,
                        (Y_OFFSET_LABEL_FROM_TITLE + (Y_OFFSET_SWITCH_TO_SWITCH * i)));

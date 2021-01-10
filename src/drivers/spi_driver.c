@@ -60,9 +60,6 @@ bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
 {
     if(xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(500)) == pdTRUE)
     {
-        // Package SPIM xfer
-    //    uint8_t spi_data[size];
-    //    memcpy(spi_data, data, size);
         nrfx_spim_xfer_desc_t xfer = {
             .p_tx_buffer = data,
             .tx_length = size,
@@ -76,9 +73,6 @@ bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
         while(!spi_xfer_done);
         nrf_gpio_pin_set(current_cs_pin);
         xSemaphoreGive(spi_mutex);
-//        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-//        xSemaphoreGiveFromISR(spi_mutex, &xHigherPriorityTaskWoken);
-//        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
     else
     {

@@ -25,13 +25,12 @@ void update_heart_rate(uint16_t new_heart_rate)
     }
     heart_rate = hr_data[hr_index];
     hr_index++;
-//	heart_rate = new_heart_rate;
 }
 
 void update_heart_rate_text(void)
 {
     static char buf[4];
-    snprintf(buf, 4, "%u", heart_rate);
+//    snprintf(buf, 4, "%u", heart_rate);
     lv_label_set_text(heart_rate_count_label, buf);
 }
 
@@ -45,21 +44,21 @@ void heart_rate_screen(void)
     // TODO: heart graphic
 
     static lv_style_t steps_count_style;
-    lv_style_init(&steps_count_style);
-    lv_style_set_text_font(&steps_count_style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_40);
+    lv_style_copy(&steps_count_style, &lv_style_plain);
+    steps_count_style.text.font = &lv_font_roboto_28;
 
     // Style bpm text
     static lv_style_t bpm_label_style;
-    lv_style_init(&bpm_label_style);
-    lv_style_set_text_font(&bpm_label_style, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_30);
+    lv_style_copy(&bpm_label_style, &lv_style_plain);
+    steps_count_style.text.font = &lv_font_roboto_22;
 
     heart_rate_count_label = lv_label_create(heart_rate_scr, NULL);
+    lv_label_set_style(heart_rate_scr, LV_LABEL_STYLE_MAIN, &steps_count_style);
     lv_label_set_text(heart_rate_count_label, "60");
     lv_obj_set_pos(heart_rate_count_label, (LV_HOR_RES_MAX / 2) - 45, 100);
-    lv_obj_add_style(heart_rate_count_label, LV_LABEL_PART_MAIN, &steps_count_style);
 
     bpm_label = lv_label_create(heart_rate_scr, NULL);
+    lv_label_set_style(bpm_label, LV_LABEL_STYLE_MAIN, &bpm_label_style);
     lv_label_set_text(bpm_label, "bpm");
     lv_obj_set_pos(bpm_label, (LV_HOR_RES_MAX / 2) + 10, 110);
-    lv_obj_add_style(bpm_label, LV_LABEL_PART_MAIN, &bpm_label_style);
 }

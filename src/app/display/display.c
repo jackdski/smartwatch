@@ -26,8 +26,8 @@
 #include "components/time/time.h"
 
 // Display Components
-#include "display_boot_up.h"
-#include "home.h"
+#include "boot_up/display_boot_up.h"
+#include "home/home.h"
 #include "display_common.h"
 #include "display_brightness.h"
 #include "display_heart_rate.h"
@@ -54,22 +54,28 @@ typedef struct {
   bool                debug:1;
   bool                charging:1;
   bool                button_pressed:1;
-  Display_States_E    display_state;
+  eBatteryEvent       battery_events;
+  eDisplayBatteryStatus battery_status;
+  Display_States_E    state;
   Display_Screens_E   screen;
   eBacklightSetting   backlight_setting;
   eDisplayRotation    rotation_setting;
+  uint8_t             soc;
 } Display_Control_t;
 
 static Display_Control_t display = {
-    .initialized = false,
-    .active = true,
-    .always_on = true,
-    .debug = true,
-    .charging = false,
-    .button_pressed = false,
-    .display_state = DISPLAY_STATE_INITIALIZATION,
-    .backlight_setting = BACKLIGHT_HIGH,
-    .rotation_setting = DISPLAY_ROTATION_0  // TODO: retrieve from non-volatile memory
+    .initialized        = false,
+    .active             = true,
+    .always_on          = true,
+    .debug              = true,
+    .charging           = false,
+    .button_pressed     = false,
+    .battery_events     = BATTERY_LOW_POWER,
+    .battery_status     = BATTERY_EMPTY,
+    .state              = DISPLAY_STATE_INITIALIZATION,
+    .backlight_setting  = BACKLIGHT_HIGH,
+    .rotation_setting   = DISPLAY_ROTATION_0,  // TODO: retrieve from non-volatile memory
+    .soc                = 0
 };
 
 
@@ -77,9 +83,6 @@ static Display_Control_t display = {
 //lv_disp_t * disp;
 //lv_disp_drv_t lvgl_disp_drv;
 //lv_indev_drv_t indev_drv;
-
-// Screens
-lv_obj_t * main_scr;
 
 
 /** Private Functions **/
@@ -92,7 +95,7 @@ void init_display(void)
 
 static void update_sleep_status(void)
 {
-    if(display.display_state == DISPLAY_STATE_SLEEP)
+    if(display.state == DISPLAY_STATE_SLEEP)
     {
         xEventGroupSetBits(component_event_group, COMPONENT_DISPLAY);
         vTaskSuspend(xTaskGetCurrentTaskHandle());
@@ -103,12 +106,15 @@ static void update_sleep_status(void)
     }
 }
 
-static void update_charging_status(void)
+static void update_battery_info(void)
 {
-    if(xEventGroupGetBits(charging_event_group) & BATTERY_CHARGING)
+    display.battery_events = xEventGroupGetBits(charging_event_group);
+
+    // Update charging info
+    if(display.battery_events & BATTERY_CHARGING)
     {
         display.charging = true;
-        if(xEventGroupGetBits(charging_event_group) & BATTERY_CHARGING_STARTED)
+        if(display.battery_events & BATTERY_CHARGING_STARTED)
         {
             // charging is started - update screen
             xEventGroupClearBits(charging_event_group, BATTERY_CHARGING_STARTED);
@@ -118,6 +124,37 @@ static void update_charging_status(void)
     {
         display.charging = false;
     }
+
+    // Update battery status info
+    if(display.battery_events & BATTERY_LOW_POWER)
+    {
+        display.battery_status = BATTERY_EMPTY;
+    }
+    else
+    {
+        uint32_t battery_status_mask = (BATTERY_STATUS_FULL | BATTERY_STATUS_HIGH | BATTERY_STATUS_MEDIUM | BATTERY_STATUS_LOW);
+        uint32_t status = (display.battery_events & battery_status_mask);
+
+        switch(status)
+        {
+        case BATTERY_STATUS_FULL:
+            display.battery_status = BATTERY_FULL;
+            break;
+        case BATTERY_STATUS_HIGH:
+            display.battery_status = BATTERY_ALMOST_FULL;
+            break;
+        case BATTERY_STATUS_MEDIUM:
+            display.battery_status = BATTERY_HALF_FULL;
+            break;
+        case BATTERY_STATUS_LOW:
+        default:
+            display.battery_status = BATTERY_LOW;
+            break;
+        }
+    }
+
+    // Update SOC
+    display.soc = get_battery_soc();
 }
 
 static void update_brightness(void)
@@ -125,10 +162,35 @@ static void update_brightness(void)
     display_backlight_set(display.backlight_setting);
 }
 
-//static void display_handle_button(uint8_t button_presses)
-//{
-//    // TODO
-//}
+static void display_handle_button(void)
+{
+    Display_Screens_E screen;
+    switch(display.state)
+    {
+        case DISPLAY_STATE_RUN:
+            if(display.screen == DISPLAY_SCREEN_HOME)
+            {
+                display.state = DISPLAY_STATE_GO_TO_SLEEP;
+            }
+            else
+            {
+                screen = display_get_parent_screen(display.screen);
+                display_change_screen(screen);
+            }
+            break;
+        case DISPLAY_STATE_GO_TO_SLEEP:
+            display.state = DISPLAY_STATE_RUN;
+            screen = display_get_parent_screen(display.screen);
+            display_change_screen(screen);
+            break;
+        case DISPLAY_STATE_INITIALIZATION:
+        case DISPLAY_STATE_SLEEP:
+        case DISPLAY_STATE_ERROR:
+        default:
+            break;
+    }
+    display_timeout_refresh();
+}
 
 
 /** Public Functions **/
@@ -140,30 +202,9 @@ void Display_Task(void * arg)
     NRF_LOG_INFO("Init Display Task");
     display_timeout_disable();
 
-    bool update_time = 0;
-
-    while(1) {
-//        if(xTaskGetTickCount() - update_counter >= 1000)
-//        {
-//            NRF_LOG_INFO("Display Task Update");
-//            update_brightness();
-//            update_sleep_status();
-//            update_charging_status();
-//            if(get_minute() != minute_update_cmp)
-//            {
-//                update_time = true;
-//                minute_update_cmp = get_minute();
-//            }
-//            update_counter = xTaskGetTickCount();
-//        }
-
-//        if(xSemaphoreTake(button_semphr, pdMS_TO_TICKS(2)))
-//        {
-//            display.button_pressed = true;
-//            xSemaphoreGive(button_semphr);
-//        }
-
-        switch(display.display_state)
+    while(1)
+    {
+        switch(display.state)
         {
         case DISPLAY_STATE_INITIALIZATION:
             NRF_LOG_INFO("Display Case Init");
@@ -171,7 +212,15 @@ void Display_Task(void * arg)
             update_brightness();
             init_display();
 
-            if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE){
+            // init touch input
+            NRF_LOG_INFO("Init LV Touch");
+            lv_indev_drv_init(&indev_drv);
+            indev_drv.type = LV_INDEV_TYPE_POINTER;
+            indev_drv.read_cb = read_touchscreen;
+            lv_indev_drv_register(&indev_drv);
+
+            if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
+            {
                 NRF_LOG_INFO("Displaying Boot Up Screen...");
                 display_boot_up();
                 display.screen = DISPLAY_SCREEN_INITIALIZATION;
@@ -180,10 +229,12 @@ void Display_Task(void * arg)
                 NRF_LOG_INFO("Display Boot Complete")
             }
 
-            TickType_t start = xTaskGetTickCount();
-            while(xTaskGetTickCount() - start < 5000)
+            // show boot screen for brief period
+            TickType_t start_tick_count = xTaskGetTickCount();
+            while(xTaskGetTickCount() - start_tick_count < 5000)
             {
-                if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
+                if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
+                {
                     lv_task_handler();
                     xSemaphoreGive(lvgl_mutex);
                 }
@@ -191,34 +242,21 @@ void Display_Task(void * arg)
             }
 
             display_timeout_enable();
-            home_screen();
-            display.screen = DISPLAY_SCREEN_HOME;
-            display.display_state = DISPLAY_STATE_RUN;
+            display_change_screen(DISPLAY_SCREEN_HOME);
+            display.state = DISPLAY_STATE_RUN;
             break;
 
         case DISPLAY_STATE_RUN:
-            display_show_screen();
-
             // select graphics based on current info
             if(display.button_pressed == true)
             {
-                if(display.screen == DISPLAY_SCREEN_HOME)
-                {
-                    display.display_state = DISPLAY_STATE_GO_TO_SLEEP;
-                }
-                else
-                {
-                    // TODO: go up one "level"
-                }
+                display_handle_button();
                 display.button_pressed = false;
             }
 
             // update graphics
-            if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
-                if(update_time)
-                {
-                    home_screen();
-                }
+            if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
+            {
                 lv_task_handler();
                 xSemaphoreGive(lvgl_mutex);
             }
@@ -231,14 +269,15 @@ void Display_Task(void * arg)
             display_off();
             display_go_to_sleep();
             display.active = false;
-            display.display_state = DISPLAY_STATE_SLEEP;
+            display.state = DISPLAY_STATE_SLEEP;
             vTaskSuspend(xTaskGetCurrentTaskHandle());
             break;
 
         case DISPLAY_STATE_SLEEP:
             if(display.initialized == true)
             {
-                display.display_state = DISPLAY_STATE_RUN;
+                display.state = DISPLAY_STATE_RUN;
+                display_timeout_enable();
             }
             break;
 
@@ -257,15 +296,36 @@ void vDisplayTimeoutCallback(TimerHandle_t xTimer)
         display.backlight_setting = BACKLIGHT_OFF;
         update_brightness();
         display.active = false;
-        display.display_state = DISPLAY_STATE_GO_TO_SLEEP;
+        display.state = DISPLAY_STATE_GO_TO_SLEEP;
     }
+}
+
+void vDisplayUpdateCallback(TimerHandle_t xTimer)
+{
+    UNUSED_PARAMETER(xTimer);
+    NRF_LOG_INFO("Display Task Update");
+    update_brightness();
+    update_sleep_status();
+    update_battery_info();
+
+    // button
+    if(xSemaphoreTake(button_semphr, pdMS_TO_TICKS(0)))
+    {
+        display.button_pressed = true;
+        xSemaphoreGive(button_semphr);
+    }
+
+//    if(get_minute() != minute_update_cmp)
+//    {
+//        minute_update_cmp = get_minute();
+//    }
 }
 
 void display_timeout_refresh(void)
 {
     if(xTimerReset(display_timeout_tmr, pdMS_TO_TICKS(100)) == pdPASS) {
         display.active = true;
-        display.display_state = DISPLAY_STATE_RUN;
+        display.state = DISPLAY_STATE_RUN;
     }
 }
 
@@ -281,12 +341,29 @@ void display_timeout_disable(void)
 
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-//    int16_t width, height = 0;
-//    width = (area->x2 - area->x1);
-//    height = (area->y2 - area->y1);
-//    display_set_address_window(area->x1, area->x2, area->y1, area->y2);
-//    display_write_data((uint8_t *) color_p, width * height * 2);
+#define USE_UPDATED_FLASH_CB    0
+#if (USE_UPDATED_FLASH_CB == 1)
+    // TODO: try out updating 100 pixels at a time instead of 1 pixel to avoid taking/releasing semaphore all the time
+    int16_t width = (area->x2 - area->x1);
+    int16_t height = (area->y2 - area->y1);
+    uint32_t area_size = width * height;
+    display_set_address_window(area->x1, area->x2, area->y1, area->y2);
+//    display_write_data(color_p, width * height * 2);
 
+    while(area_size > 0)
+    {
+        uint8_t size = area_size ? (area_size < 100): 100;
+        uint8_t rgb[size * 2];
+        uint8_t i;
+        for(i = 0; i < size; i++)
+        {
+            rgb[i] = ((color_p->full >> 8) & 0xFF), (color_p->full & 0xFF);
+            color_p++;
+        }
+        display_write_data(rgb, sizeof(rgb));
+        area_size -= size;
+    }
+#else
     int32_t x, y;
     for(y = area->y1; y <= area->y2; y++)
     {
@@ -296,6 +373,7 @@ void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * 
             color_p++;
         }
     }
+#endif
 
     lv_disp_flush_ready(disp_drv);
 }
@@ -305,18 +383,21 @@ void display_set_screen(Display_Screens_E screen)
     display.screen = screen;
 }
 
-void display_show_screen(void)
+void display_change_screen(Display_Screens_E screen)
 {
-    const Display_Screens_E screen = display.screen;
+    display.screen = screen;
     switch(screen) {
         case DISPLAY_SCREEN_INITIALIZATION:     display_boot_up(); break;
-        case DISPLAY_SCREEN_HOME:               home_screen(); break;
         case DISPLAY_SCREEN_SETTINGS:           display_settings_screen(); break;
-        case DISPLAY_SCREEN_BRIGHTNESS:         /* display_brightness_screen(); */ break;
-        case DISPLAY_SCREEN_STEPS:              /* display_steps_screen(); */ break;
-        case DISPLAY_SCREEN_HEART_RATE:         /* display_heart_rate_screen(); */ break;
-        case DISPLAY_SCREEN_TEXT_MESSAGE:       /* display_text_message_screen(); */ break;
-        case DISPLAY_SCREEN_PHONE_NOTIFICATION: /* display_phone_notification_screen(); */ break;
+        case DISPLAY_SCREEN_BRIGHTNESS:         brightness_screen(); break;
+        case DISPLAY_SCREEN_STEPS:              steps_screen(); break;
+        case DISPLAY_SCREEN_HEART_RATE:         heart_rate_screen(); break;
+        case DISPLAY_SCREEN_TEXT_MESSAGE:       /*text_message_screen();*/ break;
+        case DISPLAY_SCREEN_PHONE_NOTIFICATION: /*phone_notification_screen();*/ break;
+        case DISPLAY_SCREEN_HOME: 
+        default:
+            home_screen();
+            break;
     }
 }
 
@@ -344,8 +425,7 @@ bool display_get_charging_status(void)
 
 eDisplayBatteryStatus display_get_battery_status(void)
 {
-    // TODO
-    return BATTERY_FULL;
+    return display.battery_status;
 }
 
 void display_brightness_test(void)

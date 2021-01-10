@@ -48,8 +48,8 @@ static uint8_t m_attr_disp_name[ATTR_DATA_SIZE];                              /*
 
 
 static ble_uuid_t   m_adv_uuids[] = {
-        { BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE },
-        { ANCS_UUID_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN }
+        { BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE }
+//        { ANCS_UUID_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN }
     };
 
 static BLE_Manager_t ble_manager = {
@@ -102,25 +102,26 @@ static char const * month_of_year[] = {
 void BLE_Manager_Task(void * arg)
 {
 //    rtc_config(rtc_handler);
+    NRF_LOG_INFO("BLEMan Task Init");
     while(1)
     {
         // Requesting Read
 //        if(ble_manager.cts_discovered)
-        if(ble_cts_c_is_cts_discovered(&m_cts_c))
-        {
-                if(ble_manager.cts_event == true)
-                {
-                    NRF_LOG_INFO("BLE: TIME -  %i:%i:%i", ble_manager.cts_time.hour, ble_manager.cts_time.minute, ble_manager.cts_time.second)
-                    NRF_LOG_INFO("BLE: DATE -  %i/%i/%i", ble_manager.cts_time.day_of_month, ble_manager.cts_time.month, ble_manager.cts_time.year)
-                    update_time(ble_manager.cts_time);
-                    ble_manager.cts_event = false;
-                }
+//        if(ble_cts_c_is_cts_discovered(&m_cts_c))
+//        {
+//                if(ble_manager.cts_event == true)
+//                {
+//                    NRF_LOG_INFO("BLE: TIME -  %i:%i:%i", ble_manager.cts_time.hour, ble_manager.cts_time.minute, ble_manager.cts_time.second)
+//                    NRF_LOG_INFO("BLE: DATE -  %i/%i/%i", ble_manager.cts_time.day_of_month, ble_manager.cts_time.month, ble_manager.cts_time.year)
+//                    update_time(ble_manager.cts_time);
+//                    ble_manager.cts_event = false;
+//                }
 //                if(ble_manager.cts_request == true)
 //                {
 //                    ble_cts_c_current_time_read(&m_cts_c);
 //                    ble_manager.cts_request = false;
 //                }
-        }
+//        }
 //        if(ble_manager.ancs_discovered)
 //        {
 //            BLEMsg_t ble_msg;

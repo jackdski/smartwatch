@@ -16,12 +16,12 @@ typedef enum {
 } eBattery_State;
 
 typedef enum {
-  BATTERY_DISCHARGE           = (1 << 0),
-  BATTERY_CHARGING            = (1 << 1),
-  BATTERY_CHARGING_STARTED    = (1 << 2),
-  BATTERY_CHARGING_STOPPED    = (1 << 3),
-  BATTERY_CHARGING_COMPLETE   = (1 << 4),
-  BATTERY_LOW_POWER           = (1 << 5),
+  BATTERY_LOW_POWER           = (1 << 0),
+  BATTERY_DISCHARGE           = (1 << 1),
+  BATTERY_CHARGING            = (1 << 2),
+  BATTERY_CHARGING_STARTED    = (1 << 3),
+  BATTERY_CHARGING_STOPPED    = (1 << 4),
+  BATTERY_CHARGING_COMPLETE   = (1 << 5),
   BATTERY_STATUS_LOW          = (1 << 6),
   BATTERY_STATUS_MEDIUM       = (1 << 7),
   BATTERY_STATUS_HIGH         = (1 << 8),

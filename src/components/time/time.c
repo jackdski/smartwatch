@@ -38,6 +38,8 @@ static Time_t time = {
 void update_time(Time_t new_time)
 {
     memcpy(&time, &new_time, sizeof(Time_t));
+//    update_time_month(new_time.month);
+//    update_time_weekday(new_time.day_of_week);
 }
 
 void update_time_month(eMonth month)

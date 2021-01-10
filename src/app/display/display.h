@@ -44,17 +44,18 @@ typedef enum {
 void init_display(void);
 void Display_Task(void * arg);
 void vDisplayTimeoutCallback( TimerHandle_t xTimer );
+void vDisplayUpdateCallback(TimerHandle_t xTimer);
 void display_timeout_refresh(void);
 void display_timeout_enable(void);
 void display_timeout_disable(void);
 void display_set_screen(Display_Screens_E screen);
-void display_show_screen(void);
+void display_change_screen(Display_Screens_E screen);
+Display_Screens_E display_get_parent_screen(Display_Screens_E screen);
 bool display_get_charging_status(void);
 eDisplayBatteryStatus display_get_battery_status(void);
 
 // Display App
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
-void load_screen(lv_obj_t * scr);
 
 // Display Bringup Test Functions
 void display_brightness_test(void);

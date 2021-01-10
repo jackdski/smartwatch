@@ -22,6 +22,7 @@ EventGroupHandle_t error_event_group;
 
 /** TIMER HANDLES **/
 TimerHandle_t display_timeout_tmr;
+TimerHandle_t display_update_timer;
 TimerHandle_t haptic_timer;
 
 /** QUEUES **/
