@@ -11,29 +11,58 @@
 
 #define NUM_HOME_BUTTONS	4
 
+static lv_obj_t * time_label;
+static lv_obj_t * date_label;
+
+static void time_update_event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    if(event == LV_EVENT_VALUE_CHANGED)
+    {
+        char time_str[10];
+        if(is_military_time())
+        {
+            format_time_military(time_str);
+        }
+        else
+        {
+            format_time_standard(time_str);
+        }
+        lv_label_set_text(obj, time_str);
+    }
+}
 
 static void settings_event_handler(lv_obj_t * obj, lv_event_t event)
 {
+    UNUSED_PARAMETER(obj);
+    UNUSED_PARAMETER(event);
     display_set_screen(DISPLAY_SCREEN_SETTINGS);
 }
 
 static void brightness_event_handler(lv_obj_t * obj, lv_event_t event)
 {
+    UNUSED_PARAMETER(obj);
+    UNUSED_PARAMETER(event);
     display_set_screen(DISPLAY_SCREEN_BRIGHTNESS);
 }
 
 static void steps_event_handler(lv_obj_t * obj, lv_event_t event)
 {
+    UNUSED_PARAMETER(obj);
+    UNUSED_PARAMETER(event);
     display_set_screen(DISPLAY_SCREEN_STEPS);
 }
 
 static void heart_rate_event_handler(lv_obj_t * obj, lv_event_t event)
 {
+    UNUSED_PARAMETER(obj);
+    UNUSED_PARAMETER(event);
     display_set_screen(DISPLAY_SCREEN_HEART_RATE);
 }
 
 static void stopwatch_event_handler(lv_obj_t * obj, lv_event_t event)
 {
+    UNUSED_PARAMETER(obj);
+    UNUSED_PARAMETER(event);
     display_set_screen(DISPLAY_SCREEN_SETTINGS);
 }
 
@@ -55,14 +84,14 @@ void home_screen(void)
 
     // Tileview
     lv_point_t valid_pos[] = {{0,0}, {0, 1}, {1,1}};
-    lv_obj_t *tileview;
+    lv_obj_t * tileview;
     tileview = lv_tileview_create(lv_scr_act(), NULL);
 
     lv_obj_t * tile1 = lv_obj_create(tileview, NULL);
-    lv_obj_t * time_label = lv_label_create(tile1, NULL);
+    time_label = lv_label_create(tile1, NULL);
     lv_label_set_style(time_label, LV_LABEL_STYLE_MAIN, &time_style);
 
-    lv_obj_t * date_label = lv_label_create(tile1, NULL);
+    date_label = lv_label_create(tile1, NULL);
     lv_label_set_style(date_label, LV_LABEL_STYLE_MAIN, &date_style);
 
     lv_obj_t * list = lv_list_create(tileview, NULL);
@@ -92,6 +121,7 @@ void home_screen(void)
     // Set time text
     lv_label_set_text(time_label, time_str);
     lv_obj_align(time_label, NULL, LV_ALIGN_CENTER, 0, -15);
+    lv_obj_set_event_cb(time_label, time_update_event_handler);
 
     // Set date text
     lv_label_set_text(date_label, date_str);
