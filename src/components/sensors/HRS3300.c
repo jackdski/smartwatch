@@ -13,78 +13,106 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 
+HRS3300_t hrs3300 = {
+    .ID = 0,
+    .enable = false,
+    .CH1DATA = 0,
+    .CH0DATA = 0,
+    .HWT = HRS_CONVERSION_WAIT_TIME_400MS,
+    .PDRIVE = HRS_PDRIVE_12_5MA,
+    .ALS_RES = HRS_ALS_RES_12BITS,
+    .HGAIN = HRS_HGAIN_X2
+};
+
 bool HRS3300_init(void)
 {
-    HRS3300_enable();
-
+    if(HRS3300_get_device_id())
     {
-        uint8_t data[] = {HRS_RES_REG, HRS_RES_16BIT};
-        twi_tx(HRS_ADDRESS, data, sizeof(data));
+        HRS3300_set_conversion_wait_time(hrs3300.HWT);
+        HRS3300_set_pdrive_current(hrs3300.PDRIVE);
+        HRS3300_set_resolution(hrs3300.ALS_RES);
+        HRS3300_set_hgain(hrs3300.HGAIN);
+        HRS3300_enable(hrs3300.enable);
+        return true;
     }
-
-    {
-        uint8_t data[] = {HRS_HGAIN_REG, HRS_HGAIN_DOUBLE};
-        twi_tx(HRS_ADDRESS, data, sizeof(data));
-    }
-
-    {
-        uint8_t data[] = {HRS_PDRIVER_REG, (HRS_PDRIVER_PON | (1 << 6))};
-        twi_tx(HRS_ADDRESS, data, sizeof(data));
-    }
-    return true;
+    return false;
 }
 
-void HRS3300_enable(void)
+void HRS3300_enable(bool enable)
 {
-    uint8_t data[] = {HRS_ENABLE_REG, (HRS_ENABLE_HEN | HRS_ENABLE_DEFAULT)};
-    twi_tx(HRS_ADDRESS, data, sizeof(data));
+    hrs3300.enable = enable;
+    uint8_t data;
+
+    // ENABLE
+    data = HRS_PACK_ENABLE_REG(hrs3300.enable, hrs3300.HWT, hrs3300.PDRIVE);
+    twi_reg_write(HRS_ADDRESS, HRS_REG_ENABLE, data);
+
+    // LED DRIVE
+    data = HRS_PACK_LED_DRIVE_REG(hrs3300.enable, hrs3300.PDRIVE);
+    twi_reg_write(HRS_ADDRESS, HRS_REG_ENABLE, data);
 }
 
 bool HRS3300_get_device_id(void)
 {
     uint8_t dev_id = 0;
-    twi_read_reg(HRS_ADDRESS, HRS_DEVICE_ID_REG, &dev_id, 1);
+    twi_reg_read(HRS_ADDRESS, HRS_DEVICE_ID_REG, &dev_id);
     NRF_LOG_INFO("HRS3300 DEVICE ID: %d", dev_id);
-
-    bool ret = false;
-    if (dev_id == HRS_DEVICE_ID) {
-        ret = true;
-    }
-    return ret;
+    return (dev_id == HRS_DEVICE_ID);
 }
 
-void HRS3300_low_power(void)
+void HRS3300_set_conversion_wait_time(eHRS_HWT wait_time)
 {
-    uint8_t data[] = {HRS_PDRIVER_REG, HRS_PDRIVER_PON};
-    twi_tx(HRS_ADDRESS, data, sizeof(data));
-}
-
-void HRS3300_change_sample_rate(uint8_t rate)
-{
-
+    hrs3300.HWT = wait_time;
+    uint8_t data = HRS_PACK_ENABLE_REG(hrs3300.enable, hrs3300.HWT, hrs3300.PDRIVE);
+    twi_reg_write(HRS_ADDRESS, HRS_REG_ENABLE, data);
 }
 
 uint32_t HRS3300_get_sample(bool channel)
 {
-    uint8_t rxdata[8] = {0};
+    uint8_t high, medium, low;
     if(channel == 0)
     {
-        twi_read_reg(HRS_ADDRESS, HRS_C0DATAH_REG, &rxdata[0], 1);
-        twi_read_reg(HRS_ADDRESS, HRS_C0DATAM_REG, &rxdata[1], 1);
-        twi_read_reg(HRS_ADDRESS, HRS_C0DATAL_REG, &rxdata[2], 1);
-        return ((rxdata[2] & 0x30) << 16) | (rxdata[0] << 8) | ((rxdata[1] & 0x0F) << 4) | (rxdata[2] & 0x0F);
+        twi_reg_read(HRS_ADDRESS, HRS_REG_C0DATAH, &high);
+        twi_reg_read(HRS_ADDRESS, HRS_REG_C0DATAM, &medium);
+        twi_reg_read(HRS_ADDRESS, HRS_REG_C0DATAL, &low);
+        hrs3300.CH0DATA = HRS_CH0_SET(high, medium, low);
+        return hrs3300.CH0DATA;
     }
     else
     {
-        twi_read_reg(HRS_ADDRESS, HRS_C1DATAH_REG, &rxdata[0], 1);
-        twi_read_reg(HRS_ADDRESS, HRS_C1DATAM_REG, &rxdata[1], 1);
-        twi_read_reg(HRS_ADDRESS, HRS_C1DATAL_REG, &rxdata[2], 1);
-        return ((rxdata[0] & 0x3F) << 11) | (rxdata[1] << 3) | (rxdata[2] & 0x07);
+        twi_reg_read(HRS_ADDRESS, HRS_REG_C1DATAH, &high);
+        twi_reg_read(HRS_ADDRESS, HRS_REG_C1DATAM, &medium);
+        twi_reg_read(HRS_ADDRESS, HRS_REG_C1DATAL, &low);
+        hrs3300.CH1DATA = HRS_CH1_SET(high, medium, low);
+        return hrs3300.CH1DATA;
     }
 }
 
-void HRS3300_set_pdrive_current(ePDriveCurrent current)
+void HRS3300_set_pdrive_current(eHRS_PDRIVE pdrive)
 {
-    uint8_t data[] = {HRS_PDRIVER_REG, (HRS_TWELVE_MILLIAMP_LED_DRIVE | 6) | HRS_PDRIVER_PON};
-    twi_tx(HRS_ADDRESS, data, sizeof(data));
+    hrs3300.PDRIVE = pdrive;
+    uint8_t data;
+
+    // ENABLE
+    data = HRS_PACK_ENABLE_REG(hrs3300.enable, hrs3300.HWT, hrs3300.PDRIVE);
+    twi_reg_write(HRS_ADDRESS, HRS_REG_ENABLE, data);
+
+    // LED DRIVE
+    data = HRS_PACK_LED_DRIVE_REG(hrs3300.enable, hrs3300.PDRIVE);
+    twi_reg_write(HRS_ADDRESS, HRS_REG_ENABLE, data);
 }
+
+void HRS3300_set_resolution(eHRS_ALS_RES res)
+{
+    hrs3300.ALS_RES = res;
+    uint8_t data = HRS_ALS_RES_PACK(hrs3300.ALS_RES);
+    twi_reg_write(HRS_ADDRESS, HRS_REG_ENABLE, data);
+}
+
+void HRS3300_set_hgain(eHRS_HGAIN hgain)
+{
+    hrs3300.HGAIN = hgain;
+    uint8_t data = HRS_HGAIN_PACK(hrs3300.HGAIN);
+    twi_reg_write(HRS_ADDRESS, HRS_REG_ENABLE, data);
+}
+

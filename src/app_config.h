@@ -3,7 +3,7 @@
 //#define SCREEN_PRINT
 
 /*          RTOS           */
-#define TASK_SYSTASK_STACK_SIZE                 128U
+#define TASK_SYSTASK_STACK_SIZE                 256U
 #define TASK_DISPLAY_STACK_SIZE                 512U
 #define TASK_BLEGENERAL_STACK_SIZE              128U
 #define TASK_TIMER_STACK_SIZE                   256U
@@ -65,7 +65,7 @@
 #define SENSORS_SCL_PIN                 NRF_GPIO_PIN_MAP(0, 7)
 
 #define BMA421_INT_PIN                  NRF_GPIO_PIN_MAP(0, 8)
-#define TP_INT_PIN                      NRF_GPIO_PIN_MAP(0, 20)
+#define TP_INT_PIN                      NRF_GPIO_PIN_MAP(0, 28)
 #define TP_RESET_PIN                    NRF_GPIO_PIN_MAP(0, 10)
 #define HRS3300_TEST_PIN                NRF_GPIO_PIN_MAP(0, 30)
 

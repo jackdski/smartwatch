@@ -17,7 +17,8 @@
 #include "battery.h"
 #include "button.h"
 
-#include "nrf_temp.h"
+// TODO: temporary
+#include "CST816S.h"
 
 // nRF Logging includes
 #include "nrf_log_default_backends.h"
@@ -54,16 +55,30 @@ static bool init_system_startup(void)
 {
     EventBits_t set_bits = xEventGroupGetBits(error_event_group);
 
-    if(!bma_init())
+//    if(!bma_init())
+//    {
+//        bma423_get_device_id();
+//        set_bits |= COMPONENT_SENSOR_IMU;
+//    }
+    if(HRS3300_init())
     {
-        bma423_get_device_id();
-        set_bits |= COMPONENT_SENSOR_IMU;
-    }
-    if(!HRS3300_init())
-    {
-        HRS3300_get_device_id();
         set_bits |= COMPONENT_SENSOR_HRS;
+        NRF_LOG_INFO("HRS3300 initialized");
     }
+    else
+    {
+        NRF_LOG_INFO("HRS3300 not init'd!");
+    }
+
+    if(CST816S_init())
+    {
+        NRF_LOG_INFO("CST816S initialized");
+    }
+    else
+    {
+        NRF_LOG_INFO("CST816S not init'd!");
+    }
+
     haptic_init();
     update_battery_state();
     return true;
@@ -76,19 +91,25 @@ void sys_task(void * arg)
     NRF_LOG_INFO("Init SystemTask");
     UNUSED_PARAMETER(arg);
 
+    uint32_t touchscreen_pressed = false;
     init_system_startup();
-    config_button(system_button_handler);
-
     sys.initialized = true;
     NRF_LOG_INFO("SysTask Init'd");
+
+    uint16_t x, y;
 
     while(1)
     {
         run_battery_app();
 //        run_accel_app();
-//        run_heart_rate_app();
+        run_heart_rate_app();
 //        run_settings_app();
         run_haptic_app();
+
+        if(xTaskNotifyWait(0, 0, &touchscreen_pressed, 0))
+        {
+            CST816S_read_touch(&x, &y);
+        }
 //        run_sensor_update_display();
         vTaskDelay(pdMS_TO_TICKS(1000));
     }

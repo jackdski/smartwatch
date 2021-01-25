@@ -3,8 +3,7 @@
 //
 
 #include "peripherals.h"
-#include "nrf_drv_gpiote.h"
-#include "pwm_driver.h"
+#include <stdbool.h>
 
 
 void config_pinout(void)
@@ -58,6 +57,7 @@ void config_pinout(void)
 
     /** CST816S **/
     nrf_gpio_cfg_output(TP_RESET_PIN);  // Reset Pin
+    nrf_gpio_pin_set(TP_RESET_PIN);
     nrf_gpio_cfg_sense_input(TP_INT_PIN, NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_LOW);
 
     /** BMA421 **/
@@ -78,24 +78,6 @@ void config_peripherals(void) {
     config_spi_master();
     config_twi();
     config_pwm();
-}
-
-
-/** GPIOTE **/
-
-void config_gpio_interrupts(void * handler_function)
-{
-    ret_code_t err_code;
-    err_code = nrf_drv_gpiote_init();
-    APP_ERROR_CHECK(err_code);
-
-    nrf_drv_gpiote_in_config_t button_in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-    button_in_config.pull = NRF_GPIO_PIN_PULLUP;
-
-    err_code = nrf_drv_gpiote_in_init(TP_INT_PIN,
-                                      &button_in_config,
-                                      handler_function);
-    APP_ERROR_CHECK(err_code);
 }
 
 

@@ -12,17 +12,17 @@
 #include "timers.h"
 
 /* ENUMS */
-//typedef enum {
-//  NO_MSG,
-//  INITIALIZATION,
-//  // Sleep/Low Power
-//  GO_TO_SLEEP,
-//  // Display
-//  DISPLAY_INACTIVITY_TIMER_EXPIRED,
-//  DISPLAY_ACTIVE,
-//  // Button
-//  BUTTON_PRESSED
-//} eMessage;
+typedef enum {
+  NO_MSG,
+  INITIALIZATION,
+  // Sleep/Low Power
+  GO_TO_SLEEP,
+  // Display
+  DISPLAY_INACTIVITY_TIMER_EXPIRED,
+  DISPLAY_ACTIVE,
+  // Button
+  BUTTON_PRESSED
+} eMessage;
 
 
 typedef enum {

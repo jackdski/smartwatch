@@ -48,8 +48,9 @@ void run_heart_rate_app(void)
 {
     static bool channel = 1;
     channel ^= 1;
-    HRS3300_enable();
+    HRS3300_enable(true);
     heart_rate = HRS3300_get_sample(channel);
+    HRS3300_enable(false);
     NRF_LOG_INFO("Heart rate: %d", heart_rate);
 }
 

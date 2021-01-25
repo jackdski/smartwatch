@@ -12,11 +12,9 @@
 
 void config_twi(void);
 void twi_disable(void);
-void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context);
-//void twi_rx(uint8_t devAddr, uint8_t * buffer, uint32_t size, void * intf_ptr);
-void twi_read_reg(uint8_t devAddr, uint8_t reg, uint8_t * buffer, uint8_t size);
-//void twi_tx(uint8_t devAddr, uint8_t * buffer, uint8_t size, void * intf_ptr);
-void twi_tx(uint8_t devAddr, uint8_t * buffer, uint8_t size);
-void twi_rx(uint8_t devAddr, uint8_t * buffer, uint32_t size);
+void twi_tx(uint8_t dev_addr, uint8_t * buffer, uint8_t size);
+void twi_reg_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
+void twi_rx(uint8_t dev_addr, uint8_t reg_addr, uint8_t * buffer, uint8_t size);
+void twi_reg_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t * buffer);
 
 #endif //JDSMARTWATCHPROJECT_SRC_DRIVERS_TWI_DRIVER_H

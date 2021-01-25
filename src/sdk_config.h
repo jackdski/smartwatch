@@ -7423,7 +7423,7 @@
 
 
 #ifndef NRF_TWI_MNGR_ENABLED
-#define NRF_TWI_MNGR_ENABLED 0
+#define NRF_TWI_MNGR_ENABLED 1
 #endif
 
 // <q> SLIP_ENABLED  - slip - SLIP encoding and decoding
@@ -7491,7 +7491,7 @@
 
 
 #ifndef BUTTON_HIGH_ACCURACY_ENABLED
-#define BUTTON_HIGH_ACCURACY_ENABLED 0
+#define BUTTON_HIGH_ACCURACY_ENABLED 1
 #endif
 
 // </h>

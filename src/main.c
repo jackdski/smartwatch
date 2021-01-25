@@ -24,6 +24,7 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_clock.h"
 #include "nrf_gpio.h"
+#include "nrf_drv_gpiote.h"
 #include "nrf_drv_wdt.h"
 
 // FreeRTOS
@@ -75,6 +76,7 @@ extern SemaphoreHandle_t button_semphr;
 extern TimerHandle_t display_timeout_tmr;
 extern TimerHandle_t display_update_timer;
 extern TimerHandle_t haptic_timer;
+extern TimerHandle_t button_debounce_timer;
 
 // Event Groups
 extern EventGroupHandle_t component_event_group;
@@ -96,10 +98,45 @@ void wdt_event_handler(void)
     // TODO
 }
 
-void button_callback(void)
+/** GPIO INTERRUPTS **/
+
+void gpio_irq_callback(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-    NRF_LOG_INFO("BUTTON PRESSED");
-    system_button_handler();
+    UNUSED_PARAMETER(action);
+
+    if(pin == PUSH_BUTTON_IN_PIN)
+    {
+        NRF_LOG_INFO("BUTTON PRESSED");
+        bool pin_status = nrf_gpio_pin_read(PUSH_BUTTON_IN_PIN);
+        NRF_LOG_INFO("BUTTON STATUS: %d", pin_status);
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTimerStartFromISR(button_debounce_timer, &xHigherPriorityTaskWoken);
+    }
+    else if(pin == TP_INT_PIN)
+    {
+        NRF_LOG_INFO("TS PRESSED");
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTaskNotifyFromISR(thSysTask, BUTTON_PRESSED, eSetValueWithOverwrite,&xHigherPriorityTaskWoken);
+    }
+    else
+    {
+        NRF_LOG_INFO("UNKNOWN GPIOTE");
+    }
+
+}
+
+void button_debounce_callback(TimerHandle_t xTimer)
+{
+    xTimerStop(button_debounce_timer, 0);
+    if(nrf_gpio_pin_read(PUSH_BUTTON_IN_PIN) == false)  // active low
+    {
+        NRF_LOG_INFO("BUTTON DEBOUNCE PASSED");
+        system_button_handler();
+    }
+    else
+    {
+        NRF_LOG_INFO("BUTTON FAULT");
+    }
 }
 
 /**@brief Callback function for asserts in the SoftDevice.
@@ -142,6 +179,13 @@ static void rtos_timers_init(void)
                                 pdFALSE,
                                 (void *)0,
                                 haptic_timer_callback);
+
+    button_debounce_timer = xTimerCreate("button_debounce",
+                                         pdMS_TO_TICKS(150),
+                                         pdFALSE,
+                                         (void *)0,
+                                         button_debounce_callback);
+
 }
 
 /**@brief Function for putting the chip into sleep mode.
@@ -191,6 +235,37 @@ static void clock_init(void)
 //    NRF_CLOCK->TASKS_LFCLKSTART = 1;
 //    while(NRF_CLOCK->EVENTS_LFCLKSTARTED == 0);
 //    NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
+}
+
+/** GPIOTE **/
+
+void config_gpio_interrupts(void)
+{
+    ret_code_t err_code;
+    if(!nrf_drv_gpiote_is_init())
+    {
+        err_code = nrf_drv_gpiote_init();
+        APP_ERROR_CHECK(err_code);
+    }
+
+    nrf_drv_gpiote_in_config_t input_config;
+    input_config.pull = NRF_GPIO_PIN_NOPULL;
+    input_config.is_watcher = false;
+    input_config.hi_accuracy = true;
+    input_config.skip_gpio_setup = false,
+    input_config.pull = NRF_GPIO_PIN_PULLUP;
+    input_config.sense = NRF_GPIOTE_POLARITY_HITOLO;
+
+
+    // Button
+    err_code = nrf_drv_gpiote_in_init(PUSH_BUTTON_IN_PIN, &input_config, gpio_irq_callback);
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_gpiote_in_event_enable(PUSH_BUTTON_IN_PIN, true);
+
+    // HRS3300 Interrupt
+    err_code = nrf_drv_gpiote_in_init(TP_INT_PIN, &input_config, gpio_irq_callback);
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_gpiote_in_event_enable(TP_INT_PIN, true);
 }
 
 #if(DEBUG_INFO_ENABLED == 1)
@@ -313,15 +388,15 @@ int main(void)
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
 
-    if(pdPASS != xTaskCreate(Display_Task,
-                     "Display",
-                             TASK_DISPLAY_STACK_SIZE,
-                             NULL,
-                             3,
-                             &thDisplay))
-    {
-        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
-    }
+//    if(pdPASS != xTaskCreate(Display_Task,
+//                     "Display",
+//                             TASK_DISPLAY_STACK_SIZE,
+//                             NULL,
+//                             3,
+//                             &thDisplay))
+//    {
+//        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+//    }
 
     // Start execution.
     if (pdPASS != xTaskCreate(logger_thread,
@@ -392,7 +467,8 @@ int main(void)
     NRF_LOG_INFO("Watchdog Configured...");
 #endif
 
-//    config_button_event(button_callback);
+    config_gpio_interrupts();
+
 //    init_display();
     NRF_LOG_INFO("Start Scheduler...");
     vTaskStartScheduler();
