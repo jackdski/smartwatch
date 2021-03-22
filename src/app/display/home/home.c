@@ -7,7 +7,7 @@
 
 #include "display.h"
 #include "components/time/time.h"
-#include "app/sys_task/app_settings.h"
+#include "app_settings.h"
 
 #define NUM_HOME_BUTTONS	4
 
@@ -35,35 +35,35 @@ static void settings_event_handler(lv_obj_t * obj, lv_event_t event)
 {
     UNUSED_PARAMETER(obj);
     UNUSED_PARAMETER(event);
-    display_set_screen(DISPLAY_SCREEN_SETTINGS);
+    display_change_screen(DISPLAY_SCREEN_SETTINGS);
 }
 
 static void brightness_event_handler(lv_obj_t * obj, lv_event_t event)
 {
     UNUSED_PARAMETER(obj);
     UNUSED_PARAMETER(event);
-    display_set_screen(DISPLAY_SCREEN_BRIGHTNESS);
+    display_change_screen(DISPLAY_SCREEN_BRIGHTNESS);
 }
 
 static void steps_event_handler(lv_obj_t * obj, lv_event_t event)
 {
     UNUSED_PARAMETER(obj);
     UNUSED_PARAMETER(event);
-    display_set_screen(DISPLAY_SCREEN_STEPS);
+    display_change_screen(DISPLAY_SCREEN_STEPS);
 }
 
 static void heart_rate_event_handler(lv_obj_t * obj, lv_event_t event)
 {
     UNUSED_PARAMETER(obj);
     UNUSED_PARAMETER(event);
-    display_set_screen(DISPLAY_SCREEN_HEART_RATE);
+    display_change_screen(DISPLAY_SCREEN_HEART_RATE);
 }
 
 static void stopwatch_event_handler(lv_obj_t * obj, lv_event_t event)
 {
     UNUSED_PARAMETER(obj);
     UNUSED_PARAMETER(event);
-    display_set_screen(DISPLAY_SCREEN_SETTINGS);
+    display_change_screen(DISPLAY_SCREEN_SETTINGS);
 }
 
 void home_screen(void)

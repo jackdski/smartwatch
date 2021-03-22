@@ -65,11 +65,13 @@ extern QueueHandle_t settings_queue;
 extern QueueHandle_t haptic_queue;
 extern QueueHandle_t ble_action_queue;
 extern QueueHandle_t ble_response_queue;
+extern QueueHandle_t display_info_queue;
 
 // Semaphores/Mutexes
 extern SemaphoreHandle_t twi_mutex;
 extern SemaphoreHandle_t spi_mutex;
 extern SemaphoreHandle_t lvgl_mutex;
+extern SemaphoreHandle_t haptic_mutex;
 extern SemaphoreHandle_t button_semphr;
 
 // Timers
@@ -80,7 +82,6 @@ extern TimerHandle_t button_debounce_timer;
 
 // Event Groups
 extern EventGroupHandle_t component_event_group;
-extern EventGroupHandle_t charging_event_group;
 extern EventGroupHandle_t error_event_group;
 
 static lv_disp_buf_t lvgl_disp_buf;
@@ -103,26 +104,33 @@ void wdt_event_handler(void)
 void gpio_irq_callback(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     UNUSED_PARAMETER(action);
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     if(pin == PUSH_BUTTON_IN_PIN)
     {
         NRF_LOG_INFO("BUTTON PRESSED");
         bool pin_status = nrf_gpio_pin_read(PUSH_BUTTON_IN_PIN);
         NRF_LOG_INFO("BUTTON STATUS: %d", pin_status);
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         xTimerStartFromISR(button_debounce_timer, &xHigherPriorityTaskWoken);
     }
     else if(pin == TP_INT_PIN)
     {
         NRF_LOG_INFO("TS PRESSED");
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        xTaskNotifyFromISR(thSysTask, BUTTON_PRESSED, eSetValueWithOverwrite,&xHigherPriorityTaskWoken);
+        system_button_handler();
+        xTaskNotifyFromISR(thDisplay, DISPLAY_BUTTON_PRESSED, eSetValueWithOverwrite,&xHigherPriorityTaskWoken);
     }
+#if (BMA_IMU_ENABLED == 1)
+    else if(pin == BMA421_INT_PIN)
+    {
+        NRF_LOG_INFO("BMA421 INT");
+        system_button_handler();
+        xTaskNotifyFromISR(thSysTask, 0xFF, eSetValueWithOverwrite,&xHigherPriorityTaskWoken);
+    }
+#endif
     else
     {
         NRF_LOG_INFO("UNKNOWN GPIOTE");
     }
-
 }
 
 void button_debounce_callback(TimerHandle_t xTimer)
@@ -169,7 +177,7 @@ static void rtos_timers_init(void)
                                        vDisplayTimeoutCallback);
 
     display_update_timer = xTimerCreate("DisplayUpdate",
-                                        pdMS_TO_TICKS(1000),
+                                        pdMS_TO_TICKS(500),
                                         pdFALSE,
                                         (void *)0,
                                         vDisplayUpdateCallback);
@@ -230,11 +238,11 @@ static void clock_init(void)
     ret_code_t err_code = nrf_drv_clock_init();
     APP_ERROR_CHECK(err_code);
 
-//    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSTAT_SRC_Xtal << CLOCK_LFCLKSTAT_SRC_Pos);
-//    NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
-//    NRF_CLOCK->TASKS_LFCLKSTART = 1;
-//    while(NRF_CLOCK->EVENTS_LFCLKSTARTED == 0);
-//    NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
+    NRF_CLOCK->LFCLKSRC = (CLOCK_LFCLKSTAT_SRC_Xtal << CLOCK_LFCLKSTAT_SRC_Pos);
+    NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
+    NRF_CLOCK->TASKS_LFCLKSTART = 1;
+    while(NRF_CLOCK->EVENTS_LFCLKSTARTED == 0);
+    NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
 }
 
 /** GPIOTE **/
@@ -256,7 +264,6 @@ void config_gpio_interrupts(void)
     input_config.pull = NRF_GPIO_PIN_PULLUP;
     input_config.sense = NRF_GPIOTE_POLARITY_HITOLO;
 
-
     // Button
     err_code = nrf_drv_gpiote_in_init(PUSH_BUTTON_IN_PIN, &input_config, gpio_irq_callback);
     APP_ERROR_CHECK(err_code);
@@ -266,6 +273,13 @@ void config_gpio_interrupts(void)
     err_code = nrf_drv_gpiote_in_init(TP_INT_PIN, &input_config, gpio_irq_callback);
     APP_ERROR_CHECK(err_code);
     nrf_drv_gpiote_in_event_enable(TP_INT_PIN, true);
+
+    // BMA421 Interrupt
+#if (BMA_IMU_ENABLED == 1)
+    err_code = nrf_drv_gpiote_in_init(BMA421_INT_PIN, &input_config, gpio_irq_callback);
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_gpiote_in_event_enable(BMA421_INT_PIN, true);
+#endif
 }
 
 #if(DEBUG_INFO_ENABLED == 1)
@@ -356,6 +370,13 @@ int main(void)
     lvgl_disp_drv.flush_cb = my_flush_cb;
     lv_disp_drv_register(&lvgl_disp_drv);
 
+    // init touch input
+    NRF_LOG_INFO("Init LV Touch");
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = touchscreen_read;
+    lv_indev_drv_register(&indev_drv);
+
     config_pinout();
     config_peripherals();
     display_backlight_set(BACKLIGHT_OFF);
@@ -366,37 +387,38 @@ int main(void)
     twi_mutex = xSemaphoreCreateMutex();
     spi_mutex = xSemaphoreCreateMutex();
     lvgl_mutex = xSemaphoreCreateMutex();
+    haptic_mutex = xSemaphoreCreateMutex();
     button_semphr = xSemaphoreCreateBinary();
     settings_queue = xQueueCreate(3, sizeof(ChangeSetting_t));
     haptic_queue = xQueueCreate(3, sizeof(eHaptic_State));
     ble_action_queue = xQueueCreateCountingSemaphore(5, sizeof(BLEMsg_t));
     ble_response_queue = xQueueCreate(5, sizeof(BLEMsg_t));
-    charging_event_group = xEventGroupCreate();
+    display_info_queue = xQueueCreate(5, sizeof(SensorData_t));
     component_event_group = xEventGroupCreate();
     error_event_group = xEventGroupCreate();
 
     //
     // Create tasks
     //
-    if(pdPASS != xTaskCreate(sys_task,
-                     "SysTask",
-                             TASK_SYSTASK_STACK_SIZE,
-                             NULL,
-                             2,
-                             &thSysTask))
-    {
-        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
-    }
-
-//    if(pdPASS != xTaskCreate(Display_Task,
-//                     "Display",
-//                             TASK_DISPLAY_STACK_SIZE,
+//    if(pdPASS != xTaskCreate(sys_task,
+//                     "SysTask",
+//                             TASK_SYSTASK_STACK_SIZE,
 //                             NULL,
 //                             3,
-//                             &thDisplay))
+//                             &thSysTask))
 //    {
 //        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
 //    }
+
+    if(pdPASS != xTaskCreate(Display_Task,
+                     "Display",
+                             256,
+                             NULL,
+                             2,
+                             &thDisplay))
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
 
     // Start execution.
     if (pdPASS != xTaskCreate(logger_thread,
@@ -424,26 +446,24 @@ int main(void)
     // Activate deep sleep mode.
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 //    nrf_drv_wdt_channel_feed(m_channel_id);
-    uint32_t free_heap = xPortGetFreeHeapSize();
-    NRF_LOG_INFO("Heap Remaining (Bytes): %d", free_heap);
 
-//    NRF_LOG_INFO("BLE Init");
-//    ble_stack_init();
-//
-//    // Init BLE
-//    NRF_LOG_INFO("BLE Init 2");
-//    power_management_init();
-//    gap_params_init();
-//    gatt_init();
-//    db_discovery_init();
-//    services_init();
-//    advertising_init();
-//    peer_manager_init();
-//    conn_params_init();
-//
-//    NRF_LOG_INFO("BLE Init 3");
-//    nrf_sdh_freertos_init(advertising_start, NULL);
-//
+    NRF_LOG_INFO("BLE Init");
+    ble_stack_init();
+
+    // Init BLE
+    NRF_LOG_INFO("BLE Init 2");
+    power_management_init();
+    gap_params_init();
+    gatt_init();
+    db_discovery_init();
+    services_init();
+    advertising_init();
+    peer_manager_init();
+    conn_params_init();
+
+    NRF_LOG_INFO("BLE Init 3");
+    nrf_sdh_freertos_init(advertising_start, NULL);
+
 //    NRF_LOG_INFO("BLE Init 4");
 //    if(pdPASS != xTaskCreate(BLE_Manager_Task,
 //                             "BLEMan",
@@ -469,7 +489,10 @@ int main(void)
 
     config_gpio_interrupts();
 
-//    init_display();
+    uint32_t free_heap = xPortGetFreeHeapSize();
+    NRF_LOG_INFO("Heap Remaining (Bytes): %d", free_heap);
+
+    init_display();
     NRF_LOG_INFO("Start Scheduler...");
     vTaskStartScheduler();
 

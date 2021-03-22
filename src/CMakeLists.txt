@@ -374,8 +374,8 @@
     #        drivers/ST7735.c
             drivers/ST7789.h
             drivers/ST7789.c
-            drivers/CST816S.h
-            drivers/CST816S.c
+            components/touchscreen/CST816S.h
+            components/touchscreen/CST816S.c
             drivers/display_drv.h
             drivers/display_drv.c
             drivers/button.h
@@ -407,8 +407,6 @@
             app/sys_task/sys_task.c
             app/sys_task/app_settings.h
             app/sys_task/app_settings.c
-            app/sys_task/app_battery.h
-            app/sys_task/app_battery.c
             app/sys_task/app_sensors.h
             app/sys_task/app_sensors.c
             app/display/brightness/display_brightness.h

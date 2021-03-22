@@ -9,12 +9,11 @@
 // nRF Logging includes
 #include "nrf_log_default_backends.h"
 #include "nrf_log.h"
-#include "nrf_log_ctrl.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 
-CST816S_Event_t * evt;
+CST816S_Event_t * event;
 
 
 uint8_t CST816S_init(void)
@@ -37,38 +36,44 @@ uint8_t CST816S_init(void)
     return true;
 }
 
-bool CST816S_read_touch(uint16_t * x, uint16_t * y)
+bool CST816S_read_touch(void)
 {
     uint8_t data[10];
     twi_rx(CST816S_ADDR, 0, data, 8);
-    evt->numTouchPoints = data[CST816S_TOUCH_INDEX] & 0x0F;
+    event->numTouchPoints = data[CST816S_TOUCH_INDEX] & 0x0F;
     // uint8_t pointID = data[data[5]] >> 4;
 
-    if(evt->numTouchPoints == 0)
+    if(event->numTouchPoints == 0)
     {
-        evt->touch_active = false;
-        evt->gestureID = NO_GESTURE;
+        event->touch_active = false;
+        event->gestureID = NO_GESTURE;
     }
     else
     {
-        evt->touch_active = true;
-        evt->point.x = ((data[CST816S_X_MSB] & 0x0F) << 8) | (data[CST816S_X_LSB]);
-        evt->point.y = ((data[CST816S_Y_MSB] & 0x0F) << 8) | (data[CST816S_Y_LSB]);
-        evt->gestureID = data[CST816S_GESTURE_ID_INDEX] >> 6;
+        event->touch_active = true;
+//        event->point.x = ((uint16_t)(data[CST816S_X_MSB] & 0x0F) << 8) | (data[CST816S_X_LSB]);
+//        event->point.y = ((uint16_t)(data[CST816S_Y_MSB] & 0x0F) << 8) | (data[CST816S_Y_LSB]);
+        event->point.x = CST816S_SET_MSB(data[CST816S_X_MSB]) | (data[CST816S_X_LSB]);
+        event->point.y = CST816S_SET_MSB(data[CST816S_Y_MSB]) | (data[CST816S_Y_LSB]);
+        event->gestureID = (uint16_t)data[CST816S_GESTURE_ID_INDEX] >> 6;
 
-        NRF_LOG_INFO("GestureID: %d", evt->gestureID);
-        NRF_LOG_INFO("X: %i", evt->point.x);
-        NRF_LOG_INFO("Y: %i", evt->point.x);
-
-        *x = evt->point.x;
-        *y = evt->point.y;
+        NRF_LOG_INFO("GestureID: %d", event->gestureID);
+        NRF_LOG_INFO("X: %i", event->point.x);
+        NRF_LOG_INFO("Y: %i", event->point.x);
     }
-    return evt->touch_active;
+
+    return event->touch_active;
 }
 
-bool CST816S_isTouchActive(void)
+bool CST816S_get_touch_active(void)
 {
-    return evt->touch_active;
+    return event->touch_active;
+}
+
+void CST816S_get_xy(uint16_t * x, uint16_t * y)
+{
+    *x = event->point.x;
+    *y = event->point.y;
 }
 
 /**

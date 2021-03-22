@@ -12,18 +12,12 @@
 #include "timers.h"
 
 /* ENUMS */
-typedef enum {
-  NO_MSG,
-  INITIALIZATION,
-  // Sleep/Low Power
-  GO_TO_SLEEP,
-  // Display
-  DISPLAY_INACTIVITY_TIMER_EXPIRED,
-  DISPLAY_ACTIVE,
-  // Button
-  BUTTON_PRESSED
-} eMessage;
 
+typedef enum {
+  SYSTEM_INITIALIZATION,
+  SYSTEM_RUN,
+  SYSTEM_SLEEP
+} eSysState;
 
 typedef enum {
   DISPLAY_NO_MSG,
@@ -40,6 +34,7 @@ typedef struct {
   bool      sleep;
   bool      wakeup;
   bool      display_active;
+  eSysState state;
 } System_t;
 
 void sys_task(void * arg);

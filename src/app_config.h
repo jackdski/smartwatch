@@ -4,7 +4,7 @@
 
 /*          RTOS           */
 #define TASK_SYSTASK_STACK_SIZE                 256U
-#define TASK_DISPLAY_STACK_SIZE                 512U
+#define TASK_DISPLAY_STACK_SIZE                 700U
 #define TASK_BLEGENERAL_STACK_SIZE              128U
 #define TASK_TIMER_STACK_SIZE                   256U
 
@@ -20,6 +20,7 @@
 #define BLINKY_TEST                             0
 #define DEBUG_INFO_ENABLED                      0
 #define WATCHDOG_ENABLED                        0
+#define BMA_IMU_ENABLED                         0
 
 /*          DFU         */
 //#define FEATURE_OTA_UPDATE                      1

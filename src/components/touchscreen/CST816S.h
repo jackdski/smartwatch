@@ -25,6 +25,8 @@
 #define CST816S_Y_MSB               0x05
 #define CST816S_Y_LSB               0x06
 
+#define  CST816S_SET_MSB(XY)         (uint16_t)((XY & 0x0F) << 8)
+
 #define CST816S_TOUCH_STEP          0x06
 
 enum {
@@ -68,6 +70,9 @@ typedef enum {
   GESTURE_LONG_PRESS    = 0x0C
 } eGesture;
 
+typedef void (*i2c_read_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t * buffer);
+typedef void (*i2c_write_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
+
 typedef struct {
   uint16_t x;
   uint16_t y;
@@ -93,7 +98,8 @@ typedef struct {
 
 void CST816S_pin_configure(void);
 uint8_t CST816S_init(void);
-bool CST816S_read_touch(uint16_t * x, uint16_t * y);
-bool CST816S_isTouchActive(void);
+bool CST816S_read_touch(void);
+bool CST816S_get_touch_active(void);
+void CST816S_get_xy(uint16_t * x, uint16_t * y);
 
 #endif //BLINKYEXAMPLEPROJECT_SRC_DRIVERS_CST816S_H

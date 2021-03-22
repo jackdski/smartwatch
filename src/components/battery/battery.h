@@ -25,7 +25,8 @@ typedef enum {
   BATTERY_STATUS_LOW          = (1 << 6),
   BATTERY_STATUS_MEDIUM       = (1 << 7),
   BATTERY_STATUS_HIGH         = (1 << 8),
-  BATTERY_STATUS_FULL         = (1 << 9)
+  BATTERY_STATUS_FULL         = (1 << 9),
+  BATTERY_STATUS_UNKNOWN      = (1 << 10)
 } eBatteryEvent;
 
 typedef struct {

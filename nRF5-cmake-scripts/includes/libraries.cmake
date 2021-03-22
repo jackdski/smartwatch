@@ -483,10 +483,12 @@ endmacro()
 macro(nRF5_addRTC)
     list(APPEND INCLUDE_DIRS
             "${SDK_ROOT}/modules/nrfx/drivers/include"
+#            "${SDK_ROOT}/integration/nrfx/legacy/"
             )
 
     list(APPEND SOURCE_FILES
             "${SDK_ROOT}/modules/nrfx/drivers/src/nrfx_rtc.c"
+#            "${SDK_ROOT}/integration/nrfx/legacy/nrf_drv_rtc"
             )
 endmacro()
 

@@ -44,7 +44,7 @@ typedef struct {
   uint16_t    year;
 } Time_t;
 
-void rtc_handler(nrf_drv_rtc_int_type_t int_type);
+//void rtc_handler(nrf_drv_rtc_int_type_t int_type);
 void update_time(Time_t new_time);
 void update_time_month(eMonth month);
 void update_time_weekday(eWeekday weekday);

@@ -17,7 +17,6 @@ TaskHandle_t thDisplay;
 
 /** EVENT GROUPS **/
 EventGroupHandle_t component_event_group;
-EventGroupHandle_t charging_event_group;
 EventGroupHandle_t error_event_group;
 
 /** TIMER HANDLES **/
@@ -29,7 +28,7 @@ TimerHandle_t button_debounce_timer;
 /** QUEUES **/
 QueueHandle_t system_queue;
 QueueHandle_t settings_queue;
-QueueHandle_t display_queue;
+QueueHandle_t display_info_queue;
 QueueHandle_t haptic_queue;
 QueueHandle_t ble_action_queue;
 QueueHandle_t ble_response_queue;

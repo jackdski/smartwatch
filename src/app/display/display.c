@@ -3,13 +3,11 @@
 //
 
 #include "display.h"
-#include "sys_task.h" // try not to include
 #include "lvgl/lvgl.h"
 
 // nRF Logging includes
 #include "nrf_log_default_backends.h"
 #include "nrf_log.h"
-#include "nrf_log_ctrl.h"
 
 // FreeRTOS files
 #include "FreeRTOS.h"
@@ -17,9 +15,11 @@
 #include "timers.h"
 #include "semphr.h"
 #include "event_groups.h"
+#include "queue.h"
 
 // Drivers and Components
-#include "CST816S.h"
+#include "touchscreen/CST816S.h"
+#include "app_sensors.h"
 #include "battery.h"
 #include "settings.h"
 #include "display_drv.h"
@@ -37,52 +37,32 @@
 //LV_FONT_DECLARE(jetbrains_mono_bold_20)
 
 extern TimerHandle_t display_timeout_tmr;
-extern TimerHandle_t display_lv_handler_tmr;
+extern TimerHandle_t display_update_timer;
 extern SemaphoreHandle_t lvgl_mutex;
 extern SemaphoreHandle_t button_semphr;
 extern QueueHandle_t ble_action_queue;
 extern QueueHandle_t ble_response_queue;
+extern QueueHandle_t display_info_queue;
 extern QueueHandle_t settings_queue;
 extern EventGroupHandle_t component_event_group;
-extern EventGroupHandle_t charging_event_group;
-
-
-typedef struct {
-  bool                initialized:1;
-  bool                active:1;
-  bool                always_on:1;
-  bool                debug:1;
-  bool                charging:1;
-  bool                button_pressed:1;
-  eBatteryEvent       battery_events;
-  eDisplayBatteryStatus battery_status;
-  Display_States_E    state;
-  Display_Screens_E   screen;
-  eBacklightSetting   backlight_setting;
-  eDisplayRotation    rotation_setting;
-  uint8_t             soc;
-} Display_Control_t;
 
 static Display_Control_t display = {
     .initialized        = false,
     .active             = true,
-    .always_on          = true,
+    .always_on          = false,
     .debug              = true,
     .charging           = false,
     .button_pressed     = false,
-    .battery_events     = BATTERY_LOW_POWER,
+    .touch_active       = false,
     .battery_status     = BATTERY_EMPTY,
     .state              = DISPLAY_STATE_INITIALIZATION,
     .backlight_setting  = BACKLIGHT_HIGH,
     .rotation_setting   = DISPLAY_ROTATION_0,  // TODO: retrieve from non-volatile memory
-    .soc                = 0
+    .soc                = 0,
+    .heart_rate         = 0
 };
 
-
-// LVGL
-//lv_disp_t * disp;
-//lv_disp_drv_t lvgl_disp_drv;
-//lv_indev_drv_t indev_drv;
+static SensorData_t display_sensor_data = {0};
 
 
 /** Private Functions **/
@@ -106,55 +86,48 @@ static void update_sleep_status(void)
     }
 }
 
-static void update_battery_info(void)
+/**
+ *  Determines which information about battery and charging to display
+ */
+static void determine_battery_info(Display_Control_t * d, SensorData_t sensor_data)
 {
-    display.battery_events = xEventGroupGetBits(charging_event_group);
-
     // Update charging info
-    if(display.battery_events & BATTERY_CHARGING)
+    if(sensor_data.battery_events & BATTERY_CHARGING)
     {
-        display.charging = true;
-        if(display.battery_events & BATTERY_CHARGING_STARTED)
-        {
-            // charging is started - update screen
-            xEventGroupClearBits(charging_event_group, BATTERY_CHARGING_STARTED);
-        }
+        d->charging = true;
     }
     else
     {
-        display.charging = false;
+        d->charging = false;
     }
 
     // Update battery status info
-    if(display.battery_events & BATTERY_LOW_POWER)
+    if(sensor_data.battery_events & BATTERY_LOW_POWER)
     {
-        display.battery_status = BATTERY_EMPTY;
+        d->battery_status = BATTERY_EMPTY;
     }
     else
     {
         uint32_t battery_status_mask = (BATTERY_STATUS_FULL | BATTERY_STATUS_HIGH | BATTERY_STATUS_MEDIUM | BATTERY_STATUS_LOW);
-        uint32_t status = (display.battery_events & battery_status_mask);
+        uint32_t status = (sensor_data.battery_events & battery_status_mask);
 
         switch(status)
         {
         case BATTERY_STATUS_FULL:
-            display.battery_status = BATTERY_FULL;
+            d->battery_status = BATTERY_FULL;
             break;
         case BATTERY_STATUS_HIGH:
-            display.battery_status = BATTERY_ALMOST_FULL;
+            d->battery_status = BATTERY_ALMOST_FULL;
             break;
         case BATTERY_STATUS_MEDIUM:
-            display.battery_status = BATTERY_HALF_FULL;
+            d->battery_status = BATTERY_HALF_FULL;
             break;
         case BATTERY_STATUS_LOW:
         default:
-            display.battery_status = BATTERY_LOW;
+            d->battery_status = BATTERY_LOW;
             break;
         }
     }
-
-    // Update SOC
-    display.soc = get_battery_soc();
 }
 
 static void update_brightness(void)
@@ -210,14 +183,14 @@ void Display_Task(void * arg)
             NRF_LOG_INFO("Display Case Init");
             display.backlight_setting = BACKLIGHT_HIGH;
             update_brightness();
-            init_display();
+//            init_display();
 
-            // init touch input
-            NRF_LOG_INFO("Init LV Touch");
-            lv_indev_drv_init(&indev_drv);
-            indev_drv.type = LV_INDEV_TYPE_POINTER;
-            indev_drv.read_cb = read_touchscreen;
-            lv_indev_drv_register(&indev_drv);
+//            // init touch input
+//            NRF_LOG_INFO("Init LV Touch");
+//            lv_indev_drv_init(&indev_drv);
+//            indev_drv.type = LV_INDEV_TYPE_POINTER;
+//            indev_drv.read_cb = touchscreen_read;
+//            lv_indev_drv_register(&indev_drv);
 
             if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
             {
@@ -229,18 +202,6 @@ void Display_Task(void * arg)
                 NRF_LOG_INFO("Display Boot Complete")
             }
 
-            // show boot screen for brief period
-            TickType_t start_tick_count = xTaskGetTickCount();
-            while(xTaskGetTickCount() - start_tick_count < 5000)
-            {
-                if(xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE)
-                {
-                    lv_task_handler();
-                    xSemaphoreGive(lvgl_mutex);
-                }
-                vTaskDelay(pdMS_TO_TICKS(10));
-            }
-
             display_timeout_enable();
             display_change_screen(DISPLAY_SCREEN_HOME);
             display.state = DISPLAY_STATE_RUN;
@@ -248,7 +209,7 @@ void Display_Task(void * arg)
 
         case DISPLAY_STATE_RUN:
             // select graphics based on current info
-            if(display.button_pressed == true)
+            if(display.button_pressed)
             {
                 display_handle_button();
                 display.button_pressed = false;
@@ -268,13 +229,14 @@ void Display_Task(void * arg)
             display_backlight_set(display.backlight_setting);
             display_off();
             display_go_to_sleep();
+            xTimerStop(display_update_timer, pdMS_TO_TICKS(5));
             display.active = false;
             display.state = DISPLAY_STATE_SLEEP;
             vTaskSuspend(xTaskGetCurrentTaskHandle());
             break;
 
         case DISPLAY_STATE_SLEEP:
-            if(display.initialized == true)
+            if(display.initialized)
             {
                 display.state = DISPLAY_STATE_RUN;
                 display_timeout_enable();
@@ -288,14 +250,13 @@ void Display_Task(void * arg)
     }
 }
 
+/**   Timer Calbacks   **/
 void vDisplayTimeoutCallback(TimerHandle_t xTimer)
 {
     UNUSED_PARAMETER(xTimer);
-    if(display.always_on == false) {
+    if(display.always_on == false)
+    {
         display_timeout_disable();
-        display.backlight_setting = BACKLIGHT_OFF;
-        update_brightness();
-        display.active = false;
         display.state = DISPLAY_STATE_GO_TO_SLEEP;
     }
 }
@@ -306,13 +267,30 @@ void vDisplayUpdateCallback(TimerHandle_t xTimer)
     NRF_LOG_INFO("Display Task Update");
     update_brightness();
     update_sleep_status();
-    update_battery_info();
+    if(xQueueReceive(display_info_queue, &display_sensor_data, 5))
+    {
+        determine_battery_info(&display, display_sensor_data);
+    }
+
+    // touchscreen
+    uint32_t touchscreen_pressed = false;
+    if(xTaskNotifyWait(0, 0, &touchscreen_pressed, 0))
+    {
+        CST816S_read_touch();
+    }
+    display.touch_active = CST816S_get_touch_active();
 
     // button
     if(xSemaphoreTake(button_semphr, pdMS_TO_TICKS(0)))
     {
         display.button_pressed = true;
         xSemaphoreGive(button_semphr);
+    }
+
+    // timeout timer refresh
+    if(display.touch_active || display.button_pressed)
+    {
+        display_timeout_refresh();
     }
 
 //    if(get_minute() != minute_update_cmp)
@@ -323,7 +301,8 @@ void vDisplayUpdateCallback(TimerHandle_t xTimer)
 
 void display_timeout_refresh(void)
 {
-    if(xTimerReset(display_timeout_tmr, pdMS_TO_TICKS(100)) == pdPASS) {
+    if(xTimerReset(display_timeout_tmr, pdMS_TO_TICKS(100)) == pdPASS)
+    {
         display.active = true;
         display.state = DISPLAY_STATE_RUN;
     }
@@ -338,6 +317,9 @@ void display_timeout_disable(void)
 {
     xTimerStop(display_timeout_tmr, 0);
 }
+
+
+/**   LVGL Callbacks   */
 
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
@@ -378,15 +360,41 @@ void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * 
     lv_disp_flush_ready(disp_drv);
 }
 
-void display_set_screen(Display_Screens_E screen)
+/** Touchscreen **/
+bool touchscreen_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
-    display.screen = screen;
+    static uint16_t x_last = 0;
+    static uint16_t y_last = 0;
+    uint16_t x = 0;
+    uint16_t y = 0;
+
+    if(CST816S_get_touch_active())
+    {
+        CST816S_get_xy(&x_last, &y_last);
+        x_last = x;
+        y_last = y;
+        data->state = LV_INDEV_STATE_PR;
+    }
+    else
+    {
+        data->state = LV_INDEV_STATE_REL;
+    }
+
+    data->point.x = x;
+    data->point.y = y;
+
+    return false;
 }
+
+
+/**   Display Library Functions   */
 
 void display_change_screen(Display_Screens_E screen)
 {
-    display.screen = screen;
-    switch(screen) {
+    if(xSemaphoreTake(lvgl_mutex, pdMS_TO_TICKS(10)))
+    {
+        display.screen = screen;
+        switch(screen) {
         case DISPLAY_SCREEN_INITIALIZATION:     display_boot_up(); break;
         case DISPLAY_SCREEN_SETTINGS:           display_settings_screen(); break;
         case DISPLAY_SCREEN_BRIGHTNESS:         brightness_screen(); break;
@@ -394,10 +402,12 @@ void display_change_screen(Display_Screens_E screen)
         case DISPLAY_SCREEN_HEART_RATE:         heart_rate_screen(); break;
         case DISPLAY_SCREEN_TEXT_MESSAGE:       /*text_message_screen();*/ break;
         case DISPLAY_SCREEN_PHONE_NOTIFICATION: /*phone_notification_screen();*/ break;
-        case DISPLAY_SCREEN_HOME: 
+        case DISPLAY_SCREEN_HOME:
         default:
             home_screen();
             break;
+        }
+        xSemaphoreGive(lvgl_mutex);
     }
 }
 
@@ -428,6 +438,16 @@ eDisplayBatteryStatus display_get_battery_status(void)
     return display.battery_status;
 }
 
+// Shared Data
+void display_setting_changed(eSetting setting)
+{
+    ChangeSetting_t new_setting;
+    new_setting.setting = setting;
+//    xQueueSend(settings_queue, &new_setting, 0);
+}
+
+
+// Test Functions
 void display_brightness_test(void)
 {
     eBacklightSetting backlights[] = {BACKLIGHT_LOW, BACKLIGHT_MID, BACKLIGHT_HIGH, BACKLIGHT_MID, BACKLIGHT_LOW, BACKLIGHT_OFF, BACKLIGHT_HIGH};
@@ -450,43 +470,3 @@ void display_color_fill_test(void)
     }
 }
 
-/** Touchscreen **/
-bool read_touchscreen(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
-{
-    static uint16_t x_last;
-    static uint16_t y_last;
-    uint16_t x;
-    uint16_t y;
-
-    if(CST816S_read_touch(&x, &y))
-    {
-        x_last = x;
-        y_last = y;
-    }
-    else
-    {
-        x = x_last;
-        y = y_last;
-    }
-
-    data->point.x = x;
-    data->point.y = y;
-
-    if(CST816S_isTouchActive())
-    {
-        data->state = LV_INDEV_STATE_PR;
-    }
-    else {
-        data->state = LV_INDEV_STATE_REL;
-    }
-
-    return false;
-}
-
-// Shared Data
-void display_setting_changed(eSetting setting)
-{
-    ChangeSetting_t new_setting;
-    new_setting.setting = setting;
-    xQueueSend(settings_queue, &new_setting, 0);
-}

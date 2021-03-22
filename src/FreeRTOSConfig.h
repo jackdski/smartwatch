@@ -62,7 +62,7 @@
 #define configTICK_RATE_HZ                                                        1024
 #define configMAX_PRIORITIES                                                      ( 5 )
 #define configMINIMAL_STACK_SIZE                                                  ( 128 )
-#define configTOTAL_HEAP_SIZE                                                     ( 1024 * 8 )
+#define configTOTAL_HEAP_SIZE                                                     ( 1024 * 10 )
 #define configMAX_TASK_NAME_LEN                                                   ( 6 )
 #define configUSE_16_BIT_TICKS                                                    0
 #define configIDLE_SHOULD_YIELD                                                   1
@@ -73,7 +73,7 @@
 #define configUSE_ALTERNATIVE_API                                                 0    /* Deprecated! */
 #define configQUEUE_REGISTRY_SIZE                                                 8
 #define configUSE_QUEUE_SETS                                                      0
-//#define configUSE_TIME_SLICING                                                    0
+#define configUSE_TIME_SLICING                                                    0
 #define configUSE_NEWLIB_REENTRANT                                                0
 #define configENABLE_BACKWARD_COMPATIBILITY                                       1
 #define configMESSAGE_BUFFER_LENGTH_TYPE                                          size_t//uint8_t

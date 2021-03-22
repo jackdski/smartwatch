@@ -86,6 +86,9 @@ typedef enum {
 
 #define HRS_HGAIN_PACK(X)           (X << 2)
 
+typedef void (*i2c_read_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t * buffer);
+typedef void (*i2c_write_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
+
 typedef struct {
   uint8_t       ID;
   bool          enable;
@@ -95,6 +98,8 @@ typedef struct {
   eHRS_PDRIVE   PDRIVE;
   eHRS_ALS_RES  ALS_RES;
   eHRS_HGAIN    HGAIN;
+  i2c_write_reg write_reg;
+  i2c_read_reg  read_reg;
 } HRS3300_t;
 
 bool HRS3300_init(void);
