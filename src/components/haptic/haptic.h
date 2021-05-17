@@ -2,8 +2,8 @@
 // Created by jack on 9/12/20.
 //
 
-#ifndef BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_HAPTIC_H
-#define BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_HAPTIC_H
+#ifndef HAPTIC_H_
+#define HAPTIC_H_
 
 #include <stdint.h>
 
@@ -43,13 +43,12 @@ typedef struct {
 } Haptic_t;
 
 // App
-void run_haptic_app(void);
+void init_haptic(void);
+void app_haptic(void);
 void haptic_timer_callback(TimerHandle_t timerx);
-void haptic_init(void);
 
 
 // Public Functions
-void haptic_pwm_config(void);
 void haptic_disable(void);
 void haptic_start(eHaptic_State new_state);
 uint16_t haptic_get_period_ms(void);

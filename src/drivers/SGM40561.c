@@ -6,10 +6,7 @@
 #include "nrf_saadc.h"
 #include "nrf_drv_saadc.h"
 
-// nRF Logging includes
-#include "nrf_log_default_backends.h"
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
+#include "app_config.h"
 
 #define SAADC_CALIBRATION_INTERVAL          5
 
@@ -128,11 +125,9 @@ uint16_t SGM40561_sample_battery_voltage(void)
 //        avg += battery_adc_result[i];
 //    }
 //    avg = (avg / BATTERY_SAADC_BUFFER_SIZE);
-//    NRF_LOG_INFO("Battery ADC Avg: %d", avg);
 //    return ((avg * 2000) / 1241);
     nrf_saadc_value_t value = 0;
     nrfx_saadc_sample_convert(BATTERY_VOLTAGE_SAADC_CH, &value);
-    NRF_LOG_INFO("Battery ADC Value: %d", value);
     return (value * 2) / (1024 / 3);
 }
 

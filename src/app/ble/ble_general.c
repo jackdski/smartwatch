@@ -4,25 +4,32 @@
 
 #include "ble_general.h"
 
+#include "features.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+
+#define CTS_UPDATE_PERIOD                               pdMS_TO_TICKS(10 * 1000)  // [ms]
 
 // RTOS Components
 extern QueueHandle_t ble_response_queue;
 
 // Private Variables
 
-NRF_BLE_GATTS_C_DEF(m_gatts_c);                         /**< GATT Service client instance. Handles Service Changed indications from the peer. */
+// NRF_BLE_GATTS_C_DEF(m_gatts_c);                         /**< GATT Service client instance. Handles Service Changed indications from the peer. */
+
+#if (FEATURE_ANCS)
 BLE_ANCS_C_DEF(m_ancs_c);                               /**< Apple Notification Service Client instance. */
+#endif /* FEATURE_ANCS */
 BLE_CTS_C_DEF(m_cts_c);                                 /**< Current Time service instance. */
 NRF_BLE_GATT_DEF(m_gatt);
 NRF_BLE_QWR_DEF(m_qwr);                                 /**< GATT module instance. */
 BLE_ADVERTISING_DEF(m_advertising);
 BLE_DB_DISCOVERY_DEF(m_ble_db_discovery);               /**< DB discovery module instance. */
 NRF_BLE_GQ_DEF(m_ble_gatt_queue,                        /**< BLE GATT Queue instance. */
-                NRF_SDH_BLE_PERIPHERAL_LINK_COUNT,
-                NRF_BLE_GQ_QUEUE_SIZE);                 /**< Advertising module instance. */
+               NRF_SDH_BLE_PERIPHERAL_LINK_COUNT,
+               NRF_BLE_GQ_QUEUE_SIZE);                 /**< Advertising module instance. */
 
 
 static pm_peer_id_t m_peer_id;                                                      /**< Device reference handle to the current bonded central. */
@@ -30,29 +37,32 @@ static uint16_t     m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
 static pm_peer_id_t m_whitelist_peers[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
 static uint32_t     m_whitelist_peer_cnt;
-static ble_gatt_db_srv_t m_peer_srv_buf[2] = {0};                             /**< Array of services with room to store both GATT Service and ANCS. */
 
-static ble_ancs_c_evt_notif_t m_notification_latest;                          /**< Local copy to keep track of the newest arriving notifications. */
-static ble_ancs_c_attr_t      m_notif_attr_latest;                            /**< Local copy of the newest notification attribute. */
-static ble_ancs_c_attr_t      m_notif_attr_app_id_latest;                     /**< Local copy of the newest app attribute. */
+// static ble_gatt_db_srv_t m_peer_srv_buf[2] = {0};                             /**< Array of services with room to store both GATT Service and ANCS. */
 
-static uint8_t m_attr_appid[ATTR_DATA_SIZE];                                  /**< Buffer to store attribute data. */
-static uint8_t m_attr_title[ATTR_DATA_SIZE];                                  /**< Buffer to store attribute data. */
-static uint8_t m_attr_subtitle[ATTR_DATA_SIZE];                               /**< Buffer to store attribute data. */
-static uint8_t m_attr_message[ATTR_DATA_SIZE];                                /**< Buffer to store attribute data. */
-static uint8_t m_attr_message_size[ATTR_DATA_SIZE];                           /**< Buffer to store attribute data. */
-static uint8_t m_attr_date[ATTR_DATA_SIZE];                                   /**< Buffer to store attribute data. */
-static uint8_t m_attr_posaction[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
-static uint8_t m_attr_negaction[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
-static uint8_t m_attr_disp_name[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
+// static ble_ancs_c_evt_notif_t m_notification_latest;                          /**< Local copy to keep track of the newest arriving notifications. */
+// static ble_ancs_c_attr_t      m_notif_attr_latest;                            /**< Local copy of the newest notification attribute. */
+// static ble_ancs_c_attr_t      m_notif_attr_app_id_latest;                     /**< Local copy of the newest app attribute. */
+
+// static uint8_t m_attr_appid[ATTR_DATA_SIZE];                                  /**< Buffer to store attribute data. */
+// static uint8_t m_attr_title[ATTR_DATA_SIZE];                                  /**< Buffer to store attribute data. */
+// static uint8_t m_attr_subtitle[ATTR_DATA_SIZE];                               /**< Buffer to store attribute data. */
+// static uint8_t m_attr_message[ATTR_DATA_SIZE];                                /**< Buffer to store attribute data. */
+// static uint8_t m_attr_message_size[ATTR_DATA_SIZE];                           /**< Buffer to store attribute data. */
+// static uint8_t m_attr_date[ATTR_DATA_SIZE];                                   /**< Buffer to store attribute data. */
+// static uint8_t m_attr_posaction[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
+// static uint8_t m_attr_negaction[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
+// static uint8_t m_attr_disp_name[ATTR_DATA_SIZE];                              /**< Buffer to store attribute data. */
 
 
-static ble_uuid_t   m_adv_uuids[] = {
-        { BLE_UUID_CURRENT_TIME_SERVICE, BLE_UUID_TYPE_BLE }
-//        { ANCS_UUID_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN }
-    };
+static ble_uuid_t m_adv_uuids[] =
+{
+        // { ANCS_UUID_SERVICE,                BLE_UUID_TYPE_VENDOR_BEGIN },
+        { BLE_UUID_CURRENT_TIME_SERVICE,    BLE_UUID_TYPE_BLE }
+};
 
-static BLE_Manager_t ble_manager = {
+static BLE_Manager_t ble_manager =
+{
     .connected = false,
     .cts_discovered = false,
     .cts_request = false,
@@ -60,18 +70,19 @@ static BLE_Manager_t ble_manager = {
     .ancs_discovered = false,
     .ancs_event = false,
     .gatts_discovered = false,
-    {
-        .hour = 0,
-        .minute = 0,
-        .second = 0,
-        .day_of_week = 0,
-        .day_of_month = 0,
-        .month = 0,
-        .year = 0
-    }
+    // {
+    //     .hour = 0,
+    //     .minute = 0,
+    //     .second = 0,
+    //     .day_of_week = 0,
+    //     .day_of_month = 0,
+    //     .month = 0,
+    //     .year = 0
+    // }
 };
 
-static char const * day_of_week[] = {
+static char const * day_of_week[] =
+{
         "Unknown",
         "Monday",
         "Tuesday",
@@ -82,7 +93,8 @@ static char const * day_of_week[] = {
         "Sunday"
 };
 
-static char const * month_of_year[] = {
+static char const * month_of_year[] =
+{
         "Unknown",
         "January",
         "February",
@@ -101,50 +113,54 @@ static char const * month_of_year[] = {
 
 void BLE_Manager_Task(void * arg)
 {
+    UNUSED_PARAMETER(arg);
 //    rtc_config(rtc_handler);
-    NRF_LOG_INFO("BLEMan Task Init");
+
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xFrequency = pdMS_TO_TICKS(500);
+
+    TickType_t cts_last_read_tick = 0; 
+
     while(1)
     {
         // Requesting Read
 //        if(ble_manager.cts_discovered)
-//        if(ble_cts_c_is_cts_discovered(&m_cts_c))
-//        {
-//                if(ble_manager.cts_event == true)
-//                {
-//                    NRF_LOG_INFO("BLE: TIME -  %i:%i:%i", ble_manager.cts_time.hour, ble_manager.cts_time.minute, ble_manager.cts_time.second)
-//                    NRF_LOG_INFO("BLE: DATE -  %i/%i/%i", ble_manager.cts_time.day_of_month, ble_manager.cts_time.month, ble_manager.cts_time.year)
-//                    update_time(ble_manager.cts_time);
-//                    ble_manager.cts_event = false;
-//                }
-//                if(ble_manager.cts_request == true)
-//                {
-//                    ble_cts_c_current_time_read(&m_cts_c);
-//                    ble_manager.cts_request = false;
-//                }
-//        }
-//        if(ble_manager.ancs_discovered)
-//        {
-//            BLEMsg_t ble_msg;
-//            if(ble_manager.ancs_event)
-//            {
-//                NRF_LOG_INFO("Last Event: %s", m_notification_latest.category_id);
-//                if(ancs_notif_has_evt_flags(&m_notification_latest) == true)
-//                {
-//                    if(m_notification_latest.evt_flags.positive_action || m_notification_latest.evt_flags.negative_action)
-//                    {
-//                        // notify display task
-//                        NRF_LOG_INFO("ANCS notification needs input");
-//                    }
-//                }
-//            }
-//            if(xQueueReceive(ble_response_queue, &ble_msg, pdMS_TO_TICKS(5)))
-//            {
-//
-//            }
-//        }
-//        ret = nrf_ble_ancs_c_request_attrs(&m_ancs_c, &m_notification_latest);
-        NRF_LOG_INFO("BLEMAN Task");
-        vTaskDelay(5000);
+       if(ble_cts_c_is_cts_discovered(&m_cts_c))
+       {
+               if(ble_manager.cts_event == true)
+               {
+                    // update_time(ble_manager.cts_time);
+                    ble_manager.cts_event = false;
+               }
+               if(cts_last_read_tick - xTaskGetTickCount() < CTS_UPDATE_PERIOD)
+               {   
+                    ble_cts_c_current_time_read(&m_cts_c);
+                    ble_manager.cts_request = false;
+                    cts_last_read_tick = xTaskGetTickCount();
+               }
+       }
+#if (FEATURE_ANCS)
+        if(ble_manager.ancs_discovered)
+        {
+            // BLEMsg_t ble_msg;
+            if(ble_manager.ancs_event)
+            {
+                if(ancs_notif_has_evt_flags(&m_notification_latest) == true)
+                {
+                    if(m_notification_latest.evt_flags.positive_action || m_notification_latest.evt_flags.negative_action)
+                    {
+                        // notify display task
+                    }
+                }
+            }
+            // if(xQueueReceive(ble_response_queue, &ble_msg, pdMS_TO_TICKS(5)))
+            // {
+
+            // }
+        }
+        nrf_ble_ancs_c_request_attrs(&m_ancs_c, &m_notification_latest);
+#endif /* FEATURE_ANCS */
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
 }
 
@@ -189,6 +205,7 @@ void ble_stack_init(void)
  */
 void services_init(void)
 {
+#if 0
     ret_code_t              err_code;
     ble_ancs_c_init_t       ancs_c_init;
     nrf_ble_gatts_c_init_t  gatts_c_init;
@@ -216,6 +233,7 @@ void services_init(void)
     err_code               = ble_cts_c_init(&m_cts_c, &cts_init);
     APP_ERROR_CHECK(err_code);
 
+#if (FEATURE_ANCS)
     // Init the Apple Notification Center Service client module.
     memset(&ancs_c_init, 0, sizeof(ancs_c_init));
 
@@ -279,6 +297,26 @@ void services_init(void)
 
     err_code = ble_ancs_c_init(&m_ancs_c, &ancs_c_init);
     APP_ERROR_CHECK(err_code);
+#endif /* FEATURE_ANCS */
+#endif
+
+    ret_code_t         err_code;
+    ble_cts_c_init_t   cts_init = {0};
+    nrf_ble_qwr_init_t qwr_init = {0};
+
+    // Initialize Queued Write Module.
+    qwr_init.error_handler = nrf_qwr_error_handler;
+
+    err_code = nrf_ble_qwr_init(&m_qwr, &qwr_init);
+    APP_ERROR_CHECK(err_code);
+
+    // Initialize CTS.
+    cts_init.evt_handler   = on_cts_c_evt;
+    cts_init.error_handler = current_time_error_handler;
+    cts_init.p_gatt_queue  = &m_ble_gatt_queue;
+    err_code               = ble_cts_c_init(&m_cts_c, &cts_init);
+    APP_ERROR_CHECK(err_code);
+
 }
 
 /**@brief Function for the GAP initialization.
@@ -299,6 +337,8 @@ void gap_params_init(void)
                                           strlen(DEVICE_NAME));
     APP_ERROR_CHECK(err_code);
 
+    err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_WATCH);
+    APP_ERROR_CHECK(err_code);
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
 
@@ -344,11 +384,15 @@ void advertising_init(void)
 
     memset(&init, 0, sizeof(init));
 
-    init.advdata.name_type               = BLE_ADVDATA_FULL_NAME;
-    init.advdata.include_appearance      = true;
-    init.advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
-    init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-    init.advdata.uuids_complete.p_uuids  = m_adv_uuids;
+    // m_adv_uuids[0].type = m_ancs_c.service.service.uuid.type;
+
+    init.advdata.name_type                = BLE_ADVDATA_FULL_NAME;
+    init.advdata.include_appearance       = true;
+    init.advdata.flags                    = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+    // init.advdata.uuids_complete.uuid_cnt  = 0;
+    // init.advdata.uuids_complete.p_uuids   = NULL;    
+    init.advdata.uuids_solicited.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
+    init.advdata.uuids_solicited.p_uuids  = m_adv_uuids;
 
     init.config.ble_adv_whitelist_enabled = true;
     init.config.ble_adv_fast_enabled      = true;
@@ -428,17 +472,17 @@ void peer_manager_init(void)
 void apple_notification_setup(void)
 {
     ret_code_t ret;
+    
+    vTaskDelay(pdMS_TO_TICKS(100));
+    // nrf_delay_ms(100); // Delay because we cannot add a CCCD to close to starting encryption. iOS specific.
 
-//    vTaskDelay(pdMS_TO_TICKS(100));
-    nrf_delay_ms(100); // Delay because we cannot add a CCCD to close to starting encryption. iOS specific.
-
+#if (FEATURE_ANCS)
     ret = ble_ancs_c_notif_source_notif_enable(&m_ancs_c);
     APP_ERROR_CHECK(ret);
 
     ret = ble_ancs_c_data_source_notif_enable(&m_ancs_c);
     APP_ERROR_CHECK(ret);
-
-    NRF_LOG_DEBUG("Notifications Enabled.");
+#endif /* FEATURE_ANCS */
 }
 
 /**@brief Function for starting advertising.
@@ -463,8 +507,10 @@ void advertising_start(void * p_erase_bonds)
         ret = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
         APP_ERROR_CHECK(ret);
 
+        // Setup the device identies list.
+        // Some SoftDevices do not support this feature.
         ret = pm_device_identities_list_set(m_whitelist_peers, m_whitelist_peer_cnt);
-        if(ret != NRF_ERROR_NOT_SUPPORTED)
+        if (ret != NRF_ERROR_NOT_SUPPORTED)
         {
             APP_ERROR_CHECK(ret);
         }
@@ -490,57 +536,100 @@ void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
     switch (p_ble_evt->header.evt_id)
     {
-        case BLE_GAP_EVT_CONNECTED: {
-            NRF_LOG_INFO("Connected.");
-            APP_ERROR_CHECK(err_code);
+        case BLE_GAP_EVT_CONNECTED:
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
             APP_ERROR_CHECK(err_code);
             ble_manager.connected = true;
             break;
-        }
-        case BLE_GAP_EVT_DISCONNECTED: {
-            NRF_LOG_INFO("Disconnected.");
+
+        case BLE_GAP_EVT_DISCONNECTED:
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
             if (p_ble_evt->evt.gap_evt.conn_handle == m_cts_c.conn_handle)
             {
                 m_cts_c.conn_handle = BLE_CONN_HANDLE_INVALID;
             }
+#if (FEATURE_ANCS)
             if (p_ble_evt->evt.gap_evt.conn_handle == m_ancs_c.conn_handle)
             {
                 m_ancs_c.conn_handle = BLE_CONN_HANDLE_INVALID;
             }
             ble_manager.connected = false;
             break;
-        }
-        case BLE_GAP_EVT_PHY_UPDATE_REQUEST: {
-            NRF_LOG_DEBUG("PHY update request.");
-            ble_gap_phys_t const phys = {
-                    .rx_phys = BLE_GAP_PHY_AUTO,
-                    .tx_phys = BLE_GAP_PHY_AUTO,
+#endif /* FEATURE_ANCS */
+        
+        case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
+        {
+            ble_gap_phys_t const phys =
+            {
+                .rx_phys = BLE_GAP_PHY_AUTO,
+                .tx_phys = BLE_GAP_PHY_AUTO,
             };
             err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
             APP_ERROR_CHECK(err_code);
-            break;
-        }
-        case BLE_GATTC_EVT_TIMEOUT: {
+        } break;
+        
+        case BLE_GATTC_EVT_TIMEOUT:
             // Disconnect on GATT Client timeout event.
-            NRF_LOG_DEBUG("GATT Client Timeout.");
             err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
             APP_ERROR_CHECK(err_code);
-            break;
             ble_manager.connected = false;
-        }
-        case BLE_GATTS_EVT_TIMEOUT: {
+            break;
+        
+        case BLE_GATTS_EVT_TIMEOUT:
             // Disconnect on GATT Server timeout event.
-            NRF_LOG_DEBUG("GATT Server Timeout.");
             err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
             APP_ERROR_CHECK(err_code);
-            break;
             ble_manager.connected = false;
+            break;
+
+        case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
+        {
+            // ble_gap_data_length_params_t dl_params;
+            // memset(&dl_params, 0, sizeof(ble_gap_data_length_params_t));
+            // uint32_t err_code = sd_ble_gap_data_length_update(p_ble_evt->evt.gap_evt.conn_handle, &dl_params, NULL);
+            
+            err_code = sd_ble_gatts_exchange_mtu_reply(p_ble_evt->evt.common_evt.conn_handle, NRF_SDH_BLE_GATT_MAX_MTU_SIZE); 
+            APP_ERROR_CHECK(err_code);  
         }
+            break;
+        
+        case BLE_EVT_USER_MEM_REQUEST:
+            err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gattc_evt.conn_handle, NULL);
+            APP_ERROR_CHECK(err_code);
+            break;
+
+        case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
+        {
+            ble_gatts_evt_rw_authorize_request_t  req;
+            ble_gatts_rw_authorize_reply_params_t auth_reply;
+
+            req = p_ble_evt->evt.gatts_evt.params.authorize_request;
+
+            if (req.type != BLE_GATTS_AUTHORIZE_TYPE_INVALID)
+            {
+                if ((req.request.write.op == BLE_GATTS_OP_PREP_WRITE_REQ)     ||
+                    (req.request.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) ||
+                    (req.request.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_CANCEL))
+                {
+                    if (req.type == BLE_GATTS_AUTHORIZE_TYPE_WRITE)
+                    {
+                        auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+                    }
+                    else
+                    {
+                        auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_READ;
+                    }
+                    auth_reply.params.write.gatt_status = BLE_GATT_STATUS_ATTERR_REQUEST_NOT_SUPPORTED;
+                    err_code = sd_ble_gatts_rw_authorize_reply(p_ble_evt->evt.gatts_evt.conn_handle,
+                                                               &auth_reply);
+                    APP_ERROR_CHECK(err_code);
+                }
+            }
+        } break; // BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST
+        
         default:
             // No implementation needed.
             break;
@@ -551,6 +640,7 @@ void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
    @param[in] p_evt GATT Service event.
 */
+#if 0
 void gatts_c_evt_handler(nrf_ble_gatts_c_evt_t * p_evt)
 {
     ret_code_t ret = NRF_SUCCESS;
@@ -612,9 +702,11 @@ void gatts_c_evt_handler(nrf_ble_gatts_c_evt_t * p_evt)
             break;
     }
 }
+#endif
 
 void ancs_c_evt_handler(ble_ancs_c_evt_t * p_evt)
 {
+#if (FEATURE_ANCS)
     switch (p_evt->evt_type)
     {
         case BLE_ANCS_C_EVT_DISCOVERY_COMPLETE: {
@@ -683,6 +775,7 @@ void ancs_c_evt_handler(ble_ancs_c_evt_t * p_evt)
             // No implementation needed.
             break;
     }
+#endif /* FEATURE_ANCS */
 }
 
 /**@brief Function for handling Peer Manager events.
@@ -691,6 +784,7 @@ void ancs_c_evt_handler(ble_ancs_c_evt_t * p_evt)
  */
 void pm_evt_handler(pm_evt_t const * p_evt)
 {
+#if 0
     ret_code_t err_code, ret;
 
     pm_handler_on_pm_evt(p_evt);
@@ -698,15 +792,15 @@ void pm_evt_handler(pm_evt_t const * p_evt)
 
     switch (p_evt->evt_id)
     {
-        case PM_EVT_BONDED_PEER_CONNECTED: {
-            NRF_LOG_INFO("Connected to a previously bonded device.");
+        case PM_EVT_BONDED_PEER_CONNECTED:
+        {
             if (p_evt->peer_id != PM_PEER_ID_INVALID)
             {
                 uint32_t data_len = sizeof(m_peer_srv_buf);
                 ret = pm_peer_data_remote_db_load(p_evt->peer_id, m_peer_srv_buf, &data_len);
                 if (ret == NRF_ERROR_NOT_FOUND)
                 {
-                    NRF_LOG_DEBUG("Could not find the remote database in flash.");
+                    // NRF_LOG_DEBUG("Could not find the remote database in flash.");
                     ret = nrf_ble_gatts_c_handles_assign(&m_gatts_c, p_evt->conn_handle, NULL);
                     APP_ERROR_CHECK(ret);
 
@@ -722,7 +816,7 @@ void pm_evt_handler(pm_evt_t const * p_evt)
                     // Check if the load was successful.
                     ASSERT(data_len == sizeof(m_peer_srv_buf));
                     APP_ERROR_CHECK(ret);
-                    NRF_LOG_INFO("Remote Database loaded from flash.");
+                    // NRF_LOG_INFO("Remote Database loaded from flash.");
 
                     // Assign the loaded handles to the GATT Service client module.
                     ble_gatt_db_char_t srv_changed_handles = m_peer_srv_buf[0].charateristics[0];
@@ -735,6 +829,7 @@ void pm_evt_handler(pm_evt_t const * p_evt)
                     ret = nrf_ble_gatts_c_enable_indication(&m_gatts_c, true);
                     APP_ERROR_CHECK(ret);
 
+#if (FEATURE_ANCS)
                     //Load the relevant handles into a ble_ancs_c_service_t struct that can be
                     // assigned to the ANCS module.
                     ble_ancs_c_service_t ancs_handles;
@@ -748,6 +843,7 @@ void pm_evt_handler(pm_evt_t const * p_evt)
                     ret = nrf_ble_ancs_c_handles_assign(&m_ancs_c, p_evt->conn_handle,
                                                         &ancs_handles);
                     APP_ERROR_CHECK(ret);
+#endif /* FEATURE_ANCS */
                 }
             }
         } break;
@@ -769,22 +865,18 @@ void pm_evt_handler(pm_evt_t const * p_evt)
                 APP_ERROR_CHECK(ret);
             }
             m_peer_id = p_evt->peer_id;
-
-            // Discover peer's services.
-            err_code  = ble_db_discovery_start(&m_ble_db_discovery, p_evt->conn_handle);
-            APP_ERROR_CHECK(err_code);
         } break;
 
         case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
             {
             // Note: You should check on what kind of white list policy your application should use.
             if (     p_evt->params.peer_data_update_succeeded.flash_changed
-                     && (p_evt->params.peer_data_update_succeeded.data_id == PM_PEER_DATA_ID_BONDING))
+                &&  (p_evt->params.peer_data_update_succeeded.data_id == PM_PEER_DATA_ID_BONDING))
             {
-                NRF_LOG_DEBUG("New Bond, add the peer to the whitelist if possible");
-                NRF_LOG_DEBUG("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d",
-                              m_whitelist_peer_cnt + 1,
-                              BLE_GAP_WHITELIST_ADDR_MAX_COUNT);
+                // NRF_LOG_DEBUG("New Bond, add the peer to the whitelist if possible");
+                // NRF_LOG_DEBUG("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d",
+                            //   m_whitelist_peer_cnt + 1,
+                            //   BLE_GAP_WHITELIST_ADDR_MAX_COUNT);
 
                 if (m_whitelist_peer_cnt < BLE_GAP_WHITELIST_ADDR_MAX_COUNT)
                 {
@@ -865,6 +957,75 @@ void pm_evt_handler(pm_evt_t const * p_evt)
         default:
             break;
     }
+#endif 
+
+    ret_code_t err_code;
+
+    pm_handler_on_pm_evt(p_evt);
+    pm_handler_flash_clean(p_evt);
+
+    switch (p_evt->evt_id)
+    {
+        case PM_EVT_CONN_SEC_SUCCEEDED:
+        {
+            m_peer_id = p_evt->peer_id;
+
+            // Discover peer's services.
+            err_code  = ble_db_discovery_start(&m_ble_db_discovery, p_evt->conn_handle);
+            APP_ERROR_CHECK(err_code);
+        } break;
+
+        case PM_EVT_PEERS_DELETE_SUCCEEDED:
+        {
+            advertising_start(false);
+        } break;
+
+        case PM_EVT_CONN_SEC_CONFIG_REQ:
+        {
+            // Reject pairing request from an already bonded peer.
+            pm_conn_sec_config_t conn_sec_config = {.allow_repairing = false};
+            pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+        } break;
+
+        case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
+        {
+            // Note: You should check on what kind of white list policy your application should use.
+            if (     p_evt->params.peer_data_update_succeeded.flash_changed
+                 && (p_evt->params.peer_data_update_succeeded.data_id == PM_PEER_DATA_ID_BONDING))
+            {
+                // NRF_LOG_DEBUG("New Bond, add the peer to the whitelist if possible");
+                // NRF_LOG_DEBUG("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d",
+                //                m_whitelist_peer_cnt + 1,
+                //                BLE_GAP_WHITELIST_ADDR_MAX_COUNT);
+
+                if (m_whitelist_peer_cnt < BLE_GAP_WHITELIST_ADDR_MAX_COUNT)
+                {
+                    // Bonded to a new peer, add it to the whitelist.
+                    m_whitelist_peers[m_whitelist_peer_cnt++] = m_peer_id;
+
+                    // The whitelist has been modified, update it in the Peer Manager.
+                    err_code = pm_device_identities_list_set(m_whitelist_peers, m_whitelist_peer_cnt);
+                    if (err_code != NRF_ERROR_NOT_SUPPORTED)
+                    {
+                        APP_ERROR_CHECK(err_code);
+                    }
+
+                    err_code = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
+                    APP_ERROR_CHECK(err_code);
+                }
+            }
+        } break;
+
+        case PM_EVT_CONN_SEC_START:
+        // case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
+        case PM_EVT_PEER_DELETE_SUCCEEDED:
+        case PM_EVT_LOCAL_DB_CACHE_APPLIED:
+        case PM_EVT_SERVICE_CHANGED_IND_SENT:
+        case PM_EVT_SERVICE_CHANGED_IND_CONFIRMED:
+        default:
+            break;
+    }
+
 }
 
 /**@brief Function for handling Database Discovery events.
@@ -877,9 +1038,25 @@ void pm_evt_handler(pm_evt_t const * p_evt)
  */
 void db_disc_handler(ble_db_discovery_evt_t * p_evt)
 {
-    ble_ancs_c_on_db_disc_evt(&m_ancs_c, p_evt);
-    nrf_ble_gatts_c_on_db_disc_evt(&m_gatts_c, p_evt);
-    ble_cts_c_on_db_disc_evt(&m_cts_c, p_evt);
+    uint16_t uuid = p_evt->params.discovered_db.srv_uuid.uuid;
+
+    switch(uuid)
+    {
+#if (FEATURE_ANCS)
+    case ANCS_UUID_SERVICE:
+        ble_ancs_c_on_db_disc_evt(&m_ancs_c, p_evt);
+        nrf_ble_gatts_c_on_db_disc_evt(&m_gatts_c, p_evt);
+        break;
+#endif /* FEATURE_ANCS */
+
+    case BLE_UUID_CURRENT_TIME_SERVICE:
+        ble_cts_c_on_db_disc_evt(&m_cts_c, p_evt);
+        // nrf_ble_gatts_c_on_db_disc_evt(&m_gatts_c, p_evt);
+        break;
+
+    default:
+        break;
+    }
 }
 
 /**@brief Function for handling Queued Write Module errors.
@@ -967,15 +1144,14 @@ void on_cts_c_evt(ble_cts_c_t * p_cts, ble_cts_c_evt_t * p_evt)
             break;
 
         case BLE_CTS_C_EVT_CURRENT_TIME:
-            NRF_LOG_INFO("Current Time received.");
 //            current_time_print(p_evt);
-            ble_manager.cts_time.day_of_week = p_evt->params.current_time.exact_time_256.day_date_time.day_of_week  ;
-            ble_manager.cts_time.day_of_month = p_evt->params.current_time.exact_time_256.day_date_time.date_time.day;
-            ble_manager.cts_time.month = p_evt->params.current_time.exact_time_256.day_date_time.date_time.month;
-            ble_manager.cts_time.year = p_evt->params.current_time.exact_time_256.day_date_time.date_time.year;
-            ble_manager.cts_time.hour = p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours;
-            ble_manager.cts_time.minute = p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes;
-            ble_manager.cts_time.second = p_evt->params.current_time.exact_time_256.day_date_time.date_time.seconds;
+            // ble_manager.cts_time.day_of_week = p_evt->params.current_time.exact_time_256.day_date_time.day_of_week  ;
+            // ble_manager.cts_time.day_of_month = p_evt->params.current_time.exact_time_256.day_date_time.date_time.day;
+            // ble_manager.cts_time.month = p_evt->params.current_time.exact_time_256.day_date_time.date_time.month;
+            // ble_manager.cts_time.year = p_evt->params.current_time.exact_time_256.day_date_time.date_time.year;
+            // ble_manager.cts_time.hour = p_evt->params.current_time.exact_time_256.day_date_time.date_time.hours;
+            // ble_manager.cts_time.minute = p_evt->params.current_time.exact_time_256.day_date_time.date_time.minutes;
+            // ble_manager.cts_time.second = p_evt->params.current_time.exact_time_256.day_date_time.date_time.seconds;
             ble_manager.cts_event = true;
             break;
 
@@ -1000,29 +1176,25 @@ void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 
     switch(ble_adv_evt)
     {
-        case BLE_ADV_EVT_FAST: {
-            NRF_LOG_INFO("Fast advertising.");
-            APP_ERROR_CHECK(err_code);
-            NRF_LOG_INFO("Fast advertising err check passed");
-            break;
-        }
-        case BLE_ADV_EVT_SLOW: {
-            NRF_LOG_INFO("Slow Advertising.");
-            APP_ERROR_CHECK(err_code);
-        }
-        case BLE_ADV_EVT_FAST_WHITELIST: {
-            NRF_LOG_INFO("Fast advertising with WhiteList");
+        case BLE_ADV_EVT_FAST:
             APP_ERROR_CHECK(err_code);
             break;
-        }
-        case BLE_ADV_EVT_SLOW_WHITELIST: {
-            NRF_LOG_INFO("Slow advertising with WhiteList");
+        
+        case BLE_ADV_EVT_SLOW:
             APP_ERROR_CHECK(err_code);
+        
+        case BLE_ADV_EVT_FAST_WHITELIST:
+            APP_ERROR_CHECK(err_code);
+            break;
+        
+        case BLE_ADV_EVT_SLOW_WHITELIST:
+        //     APP_ERROR_CHECK(err_code);
             err_code = ble_advertising_restart_without_whitelist(&m_advertising);
             APP_ERROR_CHECK(err_code);
             break;
-        }
-        case BLE_ADV_EVT_WHITELIST_REQUEST: {
+        
+        case BLE_ADV_EVT_WHITELIST_REQUEST:
+        {
             ble_gap_addr_t whitelist_addrs[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
             ble_gap_irk_t  whitelist_irks[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
             uint32_t       addr_cnt = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
@@ -1030,22 +1202,20 @@ void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 
             err_code = pm_whitelist_get(whitelist_addrs, &addr_cnt, whitelist_irks, &irk_cnt);
             APP_ERROR_CHECK(err_code);
-            NRF_LOG_DEBUG("pm_whitelist_get returns %d addr in whitelist and %d irk whitelist",
-                          addr_cnt,
-                          irk_cnt);
 
             // Apply the whitelist.
             err_code = ble_advertising_whitelist_reply(&m_advertising,
-                                                  whitelist_addrs,
-                                                  addr_cnt,
-                                                  whitelist_irks,
-                                                  irk_cnt);
+                                                       whitelist_addrs,
+                                                       addr_cnt,
+                                                       whitelist_irks,
+                                                       irk_cnt);
             APP_ERROR_CHECK(err_code);
-            break;
-        }
-        case BLE_ADV_EVT_IDLE: {
-//            sleep_mode_enter();
-        }
+        } break;
+        
+        case BLE_ADV_EVT_IDLE:
+#if (FEATURE_SLEEP)
+           sleep_mode_enter();
+#endif /* FEATURE_SLEEP */
         default:
             break;
     }
@@ -1174,8 +1344,6 @@ void current_time_print(ble_cts_c_evt_t * p_evt)
 void delete_bonds(void)
 {
     ret_code_t err_code;
-
-    NRF_LOG_INFO("Erase bonds!");
 
     err_code = pm_peers_delete();
     APP_ERROR_CHECK(err_code);

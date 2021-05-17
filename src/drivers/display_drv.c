@@ -3,14 +3,9 @@
 //
 
 #include "display_drv.h"
-#include "drivers/spi_driver.h"
+#include "spi_driver.h"
 
 #include "nrf_delay.h"
-
-// nRF Logging includes
-#include "nrf_log_default_backends.h"
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -19,6 +14,16 @@
 #include "ST7789.h"
 
 extern SemaphoreHandle_t spi_mutex;
+
+#define RTOS_DELAY          750U
+
+
+// Utils
+static void display_delay_ms(uint32_t ms)
+{
+    vTaskDelay(pdMS_TO_TICKS(ms));
+    // nrf_delay_ms(ms);
+}
 
 
 void display_on(void)
@@ -43,12 +48,12 @@ void display_wake_up(void)
 
 void display_draw_pixel(uint16_t x, uint16_t y, uint16_t color)
 {
-    if ((x < 0) || (x >= DISPLAY_WIDTH) || (y < 0) || (y >= DISPLAY_HEIGHT))
-    {
-        return;
-    }
+    // if ((x < 0) || (x >= DISPLAY_WIDTH) || (y < 0) || (y >= DISPLAY_HEIGHT))
+    // {
+    //     return;
+    // }
 
-    display_set_address_window(x, x+1, y, y+1);
+    display_set_address_window(x, x, y, y);
 //    uint8_t rgb[] = {(color & 0x1F), ((color & 0x03) << 3) | (color & 0xE0), (color & 0xF8)};
     uint8_t rgb[] = {((color >> 8) & 0xFF), (color & 0xFF)};
     display_write_data(rgb, sizeof(rgb));
@@ -68,27 +73,27 @@ void display_draw_fill(uint8_t color)
 
 void display_set_address_window(uint16_t x0, uint16_t x1, uint16_t y0, uint16_t y1)
 {
-    uint8_t cmds[3] = {ST77XX_CASET, ST77XX_RASET, ST77XX_RAMWR};
+    // uint8_t cmds[3] = {ST77XX_CASET, ST77XX_RASET, ST77XX_RAMWR};
 
     // Set Column Address
-    display_write_command(cmds[0]);
-//    display_write_command(ST7789_CASET);
-    {
-        uint8_t data[] = {x0 >> 8, x0 & 0xFF, x1 >> 8, x1 & 0xFF};
-        display_write_data(data, sizeof(data));
-    }
+    // display_write_command(cmds[0]);
+   display_write_command(ST7789_CASET);
+    // {
+    uint8_t data_x[4] = {x0 >> 8, x0 & 0xFF, x1 >> 8, x1 & 0xFF};
+    display_write_data(data_x, 4);
+    // }
 
     // Set Row Address
-    display_write_command(cmds[1]);
-//    display_write_command(ST77XX_RASET);
-    {
-        uint8_t data[] = {y0 >> 8, y0 & 0xFF, y1 >> 8, y1 & 0xFF};
-        display_write_data(data, sizeof(data));
-    }
+    // display_write_command(cmds[1]);
+   display_write_command(ST77XX_RASET);
+    // {
+    uint8_t data_y[4] = {y0 >> 8, y0 & 0xFF, y1 >> 8, y1 & 0xFF};
+    display_write_data(data_y, 4);
+    // }
 
     // Write to RAM
-    display_write_command(cmds[2]);
-//    display_write_command(ST77XX_RAMWR);
+    // display_write_command(cmds[2]);
+   display_write_command(ST77XX_RAMWR);
 }
 
 void display_set_rotation(eDisplayRotation rotation)
@@ -118,37 +123,28 @@ void display_set_rotation(eDisplayRotation rotation)
 void display_configure(void)
 {
     // hardware reset
-    NRF_LOG_INFO("Display HW reset");
     display_reset_set();
     display_reset_clear();
-//    vTaskDelay(pdMS_TO_TICKS(10));
-    nrf_delay_ms(10);
+    display_delay_ms(10);
     display_reset_set();
-    NRF_LOG_INFO("Display reset");
 
     // software reset
     display_write_command(ST7789_SWRESET);
-//    vTaskDelay(pdMS_TO_TICKS(150));
-    nrf_delay_ms(150);
+    display_delay_ms(150);
 
     // SleepOut
     display_write_command(ST7789_SLPOUT);
 
-    NRF_LOG_INFO("Display Chkpt 1");
-
     // ColMod
     display_write_command(ST7789_COLMOD);
     display_write_byte(ST7789_COLOR_MODE_16bit);
-//    vTaskDelay(pdMS_TO_TICKS(10));
-    nrf_delay_ms(10);
+    display_delay_ms(10);
 
     // MemDataAccessCtl
     display_write_command(ST7789_MADCTL);
     display_write_byte(0x00);
 
-    NRF_LOG_INFO("Display Chkpt 2");
-
-// Column Address Set
+    // Column Address Set
     display_write_command(ST7789_CASET);
     {
         uint8_t data[] = {0x00, 0x00, 240U >> 8, 240u & 0xFFu};
@@ -164,34 +160,40 @@ void display_configure(void)
 
     // inversion
     display_write_command(ST7789_INVON);
-//    vTaskDelay(pdMS_TO_TICKS(10));
-    nrf_delay_ms(10);
+    display_delay_ms(10);
 
     display_write_command(ST7789_NORON);
-//    vTaskDelay(pdMS_TO_TICKS(10));
-    nrf_delay_ms(10);
+    display_delay_ms(10);
 
     // Display On
     display_on();
-    NRF_LOG_INFO("Display Config Finished");
 }
 
 void display_write_command(uint8_t cmd)
 {
-    display_dc_cmd_clear();
-    spi_write(DISPLAY_CS_PIN, &cmd, sizeof(cmd));
+    if(xSemaphoreTake(spi_mutex, 0) == pdTRUE)
+    {
+        display_dc_cmd_clear();
+        spi_write(DISPLAY_CS_PIN, &cmd, sizeof(cmd));
+    }
 }
 
 void display_write_byte(uint8_t data)
 {
-    display_dc_cmd_set();
-    spi_write(DISPLAY_CS_PIN, &data, sizeof(data));
+    if(xSemaphoreTake(spi_mutex, 0) == pdTRUE)
+    {
+        display_dc_cmd_set();
+        spi_write(DISPLAY_CS_PIN, &data, sizeof(data));
+    }
 }
 
 void display_write_data(uint8_t * data, size_t data_size)
 {
-    display_dc_cmd_set();
-    spi_write(DISPLAY_CS_PIN, data, data_size);
+    if(xSemaphoreTake(spi_mutex, 0) == pdTRUE)
+    {
+        display_dc_cmd_set();
+        spi_write(DISPLAY_CS_PIN, data, data_size);
+    }
 }
 
 void display_reset_set(void)

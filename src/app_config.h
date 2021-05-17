@@ -1,20 +1,24 @@
+#ifndef APP_CONFIG_H_
+#define APP_CONFIG_H_
+
+#include "nrf_gpio.h"
+
 /*          DEBUG          */
-//#define PRINT_CONFIG								0
-//#define SCREEN_PRINT
+#define             DEBUG
 
 /*          RTOS           */
-#define TASK_SYSTASK_STACK_SIZE                 256U
-#define TASK_DISPLAY_STACK_SIZE                 700U
+#define TASK_SYSTASK_STACK_SIZE                 128U
+#define TASK_DISPLAY_STACK_SIZE                 400U
 #define TASK_BLEGENERAL_STACK_SIZE              128U
-#define TASK_TIMER_STACK_SIZE                   256U
+#define TASK_TIMER_STACK_SIZE                   512U
 
 
 /*          LOGGER         */
-#define NRF_LOG_BACKEND_RTT_ENABLED             1   // enable rtt
-#define NRF_LOG_BACKEND_UART_ENABLED            0   // disable uart
-#define NRF_LOG_DEFERRED                        0   // flush logs immediately
-#define NRF_LOG_ALLOW_OVERFLOW                  1
-#define SEGGER_RTT_CONFIG_DEFAULT_MODE          0   // trim
+// #define NRF_LOG_BACKEND_RTT_ENABLED             1   // enable rtt
+// #define NRF_LOG_BACKEND_UART_ENABLED            0   // disable uart
+// #define NRF_LOG_DEFERRED                        0   // flush logs immediately
+// #define NRF_LOG_ALLOW_OVERFLOW                  1
+// #define SEGGER_RTT_CONFIG_DEFAULT_MODE          0   // trim
 //#define NRF_PWR_MGMT_CONFIG_CPU_USAGE_MONITOR_ENABLED 1 // log CPU usage at 1Hz
 
 #define BLINKY_TEST                             0
@@ -28,16 +32,16 @@
 
 
 /*          BLE         */
-#define FREERTOS      // Needed to use FreeRTOS with SoftDevice
-#define SOFTDEVICE_PRESENT                      1
+// #define FREERTOS      // Needed to use FreeRTOS with SoftDevice
+// #define SOFTDEVICE_PRESENT                      1
 #define USE_BLE                                 1
-//#define USE_PEER_MANAGER                        1
-#define BLE_STACK_SUPPORT_REQD                  1
-//#define NRF_BLE_GQ_ENABLED                      1
-#define BLE_CTS_C_ENABLED                       1
-#define BLE_ANCS_C_ENABLED                      1
-#define BLE_DB_DISCOVERY_ENABLED                1
-#define NRF_BLE_GATTS_C_ENABLED                 1
+// #define USE_PEER_MANAGER                        1
+// #define BLE_STACK_SUPPORT_REQD                  1
+// #define NRF_BLE_GQ_ENABLED                      1
+// #define BLE_CTS_C_ENABLED                       1
+// #define BLE_ANCS_C_ENABLED                      1
+// #define BLE_DB_DISCOVERY_ENABLED                1
+// #define NRF_BLE_GATTS_C_ENABLED                 1
 
 //#define NRF_BLE_GQ_ENABLED 1
 //#define NRF_BLE_GQ_DATAPOOL_ELEMENT_COUNT       8
@@ -54,6 +58,13 @@
 #define SPI_MISO_PIN                    NRF_GPIO_PIN_MAP(0, 4)
 #define SPI_MOSI_PIN                    NRF_GPIO_PIN_MAP(0, 3)
 #define SPI_SCK_PIN                     NRF_GPIO_PIN_MAP(0, 2)
+
+// #define SPI_ENABLED                             1
+// #define SPI1_ENABLED                            1
+// #define NRFX_SPIM_ENABLED                       1
+// #define NRFX_SPIM1_ENABLED                      1
+// #define NRFX_SPI_ENABLED                        1
+// #define NRFX_SPI1_ENABLED                       1
 
 
 /*          SENSORS         */
@@ -72,9 +83,9 @@
 
 
 /*          DISPLAY         */
-#define DISPLAY_SPI_INSTANCE            1
-#define SPI1_ENABLED 					1
-#define SPI1_USE_EASY_DMA				1
+#define DISPLAY_SPI_INSTANCE            1U
+// #define SPI1_ENABLED 					0
+// #define SPI1_USE_EASY_DMA				0
 
 #define USING_240X240
 #define DISPLAY_HEIGHT                  240U
@@ -94,7 +105,7 @@
 
 
 /*          NOR FLASH       */
-#define FLASH_SPI_INSTANCE              1
+#define FLASH_SPI_INSTANCE              1U
 #define FLASH_CS_PIN                    NRF_GPIO_PIN_MAP(0, 5)
 
 
@@ -103,15 +114,15 @@
 #define POWER_PRESENCE_PIN              NRF_GPIO_PIN_MAP(0, 19)
 #define VCC_POWER_CONTROL_PIN           NRF_GPIO_PIN_MAP(0, 24)
 #define BATTERY_VOLTAGE_PIN             NRF_GPIO_PIN_MAP(0, 31)
-#define BATTERY_VOLTAGE_SAADC_CH        0 // 7
+#define BATTERY_VOLTAGE_SAADC_CH        0U // 7
 
 
 /*          HAPTIC          */
 #define HAPTIC_PWM_BASE                 NRF_PWM0
 #define HAPTIC_PIN                      NRF_GPIO_PIN_MAP(0, 16)
-#define HAPTIC_CLOCK_HZ                 500000
+#define HAPTIC_CLOCK_HZ                 500000U
 #define HAPTIC_CLOCK_MICROSECONDS       (1000000 / HAPTIC_CLOCK_HZ)
-#define HAPTIC_PERIOD_MICROSECONDS      50
+#define HAPTIC_PERIOD_MICROSECONDS      50U
 #define HAPTIC_PWM_COUNTERTOP           (HAPTIC_PERIOD_MICROSECONDS / HAPTIC_CLOCK_MICROSECONDS)
 
 
@@ -119,3 +130,6 @@
 #define PUSH_BUTTON_IN_PIN              NRF_GPIO_PIN_MAP(0, 13)
 #define PUSH_BUTTON_OUT_PIN             NRF_GPIO_PIN_MAP(0, 15)
 #define STATUS_LED_PIN                  NRF_GPIO_PIN_MAP(0, 27)
+
+
+#endif /* APP_CONFIG_H_ */

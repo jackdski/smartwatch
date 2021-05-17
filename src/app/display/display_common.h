@@ -2,20 +2,32 @@
 // Created by jack on 10/13/20.
 //
 
-#ifndef BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_DISPLAY_DISPLAY_COMMON_H
-#define BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_DISPLAY_DISPLAY_COMMON_H
+#ifndef DISPLAY_COMMON_H_
+#define DISPLAY_COMMON_H_
 
 #include "lvgl/lvgl.h"
 
 typedef enum {
-  BATTERY_FULL,
-  BATTERY_ALMOST_FULL,
-  BATTERY_HALF_FULL,
-  BATTERY_LOW,
-  BATTERY_EMPTY
-} eDisplayBatteryStatus;
+    BATTERY_FULL,
+    BATTERY_ALMOST_FULL,
+    BATTERY_HALF_FULL,
+    BATTERY_LOW,
+    BATTERY_EMPTY
+} DisplayBatteryStatus_E;
 
-void display_battery_layer(lv_obj_t * par);
-void display_screen_title(lv_obj_t * par, char * title);
+typedef enum {
+    DISPLAY_SCREEN_INITIALIZATION,
+    DISPLAY_SCREEN_HOME,
+    DISPLAY_SCREEN_SETTINGS,
+    DISPLAY_SCREEN_BRIGHTNESS,
+    DISPLAY_SCREEN_STEPS,
+    DISPLAY_SCREEN_HEART_RATE,
+    DISPLAY_SCREEN_TEXT_MESSAGE,
+    DISPLAY_SCREEN_PHONE_NOTIFICATION
+} DisplayScreens_E;
 
-#endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_DISPLAY_DISPLAY_COMMON_H
+DisplayScreens_E display_get_parent_screen(DisplayScreens_E screen);
+void display_battery_layer(lv_obj_t * parent);
+void display_screen_title(lv_obj_t * parent, char * title);
+
+#endif //DISPLAY_COMMON_H_

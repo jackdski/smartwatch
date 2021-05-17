@@ -2,8 +2,8 @@
 // Created by jack on 11/8/20.
 //
 
-#ifndef JD_SMARTWATCH_SRC_APP_SYS_TASK_APP_SENSORS_H
-#define JD_SMARTWATCH_SRC_APP_SYS_TASK_APP_SENSORS_H
+#ifndef APP_SENSORS_H_
+#define APP_SENSORS_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -13,30 +13,49 @@
 #define BATTERY_SOC_HIGH        75U
 #define BATTERY_SOC_FULL        95U  // not 100% to encourage not overcharging or "topping off"
 
-typedef uint32_t BatteryEventBits;
+typedef enum
+{
+    BATTERY_CHARGING_IDLE,
+    BATTERY_CHARGING_ACTIVE,
+    BATTERY_CHARGING_COMPLETE
+} BatteryChargingState_E;
+
+typedef enum
+{
+    BATTERY_LEVEL_DEFAULT,
+    BATTERY_LEVEL_LOW,
+    BATTERY_LEVEL_MEDIUM,
+    BATTERY_LEVEL_HIGH,
+    BATTERY_LEVEL_FULL
+} BatteryLevel_E;
 
 typedef struct {
-  bool          interrupt_active:1;
-  uint8_t       interrupt_source;
-  uint32_t      steps;
+    bool          interrupt_active:1;
+    uint8_t       interrupt_source;
+    uint32_t      steps;
 } IMU_t;
 
 typedef struct {
-  uint16_t      heart_rate;
-  bool          channel;
+    uint16_t      heart_rate;
+    bool          channel;
 } HRS_t;
 
 typedef struct {
-  uint32_t          steps;
-  uint32_t          heart_rate;
-  BatteryEventBits  battery_events;
-  uint8_t           battery_soc;
+    uint8_t                 soc;
+    BatteryLevel_E          level;
+    BatteryChargingState_E  charging_state;
+} BatteryData_t;
+
+typedef struct {
+    IMU_t                   imu;
+    HRS_t                   hrs;
+    BatteryData_t           battery;
 } SensorData_t;
 
 
-void run_accel_app(void);
-void run_battery_app(void);
-void run_heart_rate_app(void);
-void run_sensor_update_display(void);
+void app_accel(void);
+void app_battery(void);
+void app_heart_rate(void);
+void app_sensor_update_display(void);
 
-#endif //JD_SMARTWATCH_SRC_APP_SYS_TASK_APP_SENSORS_H
+#endif // APP_SENSORS_H_

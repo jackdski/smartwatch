@@ -133,3 +133,8 @@ bool is_battery_soc_valid(uint8_t soc)
 {
     return ((soc >= 0) && (soc <= 100));
 }
+
+bool is_charging_complete(void)
+{
+    return (battery_monitor.state == CHARGE_COMPLETE);
+}

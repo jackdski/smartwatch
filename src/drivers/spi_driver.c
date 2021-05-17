@@ -3,14 +3,12 @@
 //
 
 #include "spi_driver.h"
+#include "app_config.h"
 
-// nRF Logging includes
-#include "nrf_log_default_backends.h"
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "portmacro_cmsis.h"
 
 #include "nrf52.h"
 #include "nrf_gpio.h"
@@ -47,7 +45,12 @@ void spim_evt_handler(nrfx_spim_evt_t const * p_event, void * p_context)
 {
     if(p_event->type == NRFX_SPIM_EVENT_DONE)
     {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         spi_xfer_done = true;
+        nrf_gpio_pin_set(current_cs_pin);
+        BaseType_t highPriorityTask = pdFALSE;
+        xSemaphoreGiveFromISR(spi_mutex, &highPriorityTask);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 }
 
@@ -58,8 +61,8 @@ void config_spi_master(void)
 
 bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
 {
-    if(xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(500)) == pdTRUE)
-    {
+    // if(xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(10)) == pdTRUE)
+    // {
         nrfx_spim_xfer_desc_t xfer = {
             .p_tx_buffer = data,
             .tx_length = size,
@@ -70,14 +73,14 @@ bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
         nrf_gpio_pin_clear(current_cs_pin);
         spi_xfer_done = false;
         nrfx_spim_xfer(&m_spim, &xfer, 0);
-        while(!spi_xfer_done);
-        nrf_gpio_pin_set(current_cs_pin);
-        xSemaphoreGive(spi_mutex);
-    }
-    else
-    {
-        return false;
-    }
+        // while(!spi_xfer_done);
+        // nrf_gpio_pin_set(current_cs_pin);
+        // xSemaphoreGive(spi_mutex);
+    // }
+    // else
+    // {
+    //     return false;
+    // }
     return true;
 }
 
@@ -108,7 +111,7 @@ void config_spi_master(void)
     nrf_spim_enable(SPIM_BASE);
 
     // Enable IRQ and Set Priority
-    NRFX_IRQ_PRIORITY_SET(SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, 3);
+    NRFX_IRQ_PRIORITY_SET(SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, 2);
     NRFX_IRQ_ENABLE(SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn);
 }
 
@@ -236,16 +239,16 @@ void disable_workaround_spim(uint32_t ppi_channel, uint32_t gpiote_channel) {
 
 #endif
 
-void spi_wakeup(void)
-{
-    xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(100));
-    nrf_spim_enable(SPIM_BASE);
-    xSemaphoreGive(spi_mutex);
-}
+// void spi_wakeup(void)
+// {
+//     xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(100));
+//     nrf_spim_enable(SPIM_BASE);
+//     xSemaphoreGive(spi_mutex);
+// }
 
-void spi_disable(void)
-{
-    xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(100));
-    nrf_spim_disable(SPIM_BASE);
-    xSemaphoreGive(spi_mutex);
-}
+// void spi_disable(void)
+// {
+//     xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(100));
+//     nrf_spim_disable(SPIM_BASE);
+//     xSemaphoreGive(spi_mutex);
+// }

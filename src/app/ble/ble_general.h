@@ -55,12 +55,12 @@
 // Application Includes
 #include "ble_ancs.h"
 #include "sys_task.h"
-#include "components/time/time.h"
+// #include "components/time/time.h"
 
 // BLE settings
-#define DEVICE_NAME                     "jdski_smartwatch"    /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "jdski"    /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "JD"                    /**< Manufacturer. Will be passed to Device Information Service. */
-#define APP_ADV_INTERVAL                300                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
+#define APP_ADV_INTERVAL                150                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 #define APP_ADV_DURATION                18000                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 
 #define APP_BLE_OBSERVER_PRIO           3                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
@@ -79,25 +79,29 @@
 
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(5000)                   /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000)                  /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
-#define MAX_CONN_PARAMS_UPDATE_COUNT    5
+#define MAX_CONN_PARAMS_UPDATE_COUNT    3
 
 #define MESSAGE_BUFFER_SIZE             18                                      /**< Size of buffer holding optional messages in notifications. */
 #define NOTIFICATION_INTERVAL           APP_TIMER_TICKS(1000)
 
-#define ATTR_DATA_SIZE                 BLE_ANCS_ATTR_DATA_MAX                   /**< Allocated size for attribute data. */
+#define SECURITY_REQUEST_DELAY          APP_TIMER_TICKS(1500)                  /**< Delay after connection until security request is sent, if necessary (ticks). */
+
+#define ATTR_DATA_SIZE                  BLE_ANCS_ATTR_DATA_MAX                   /**< Allocated size for attribute data. */
 
 #define SEC_PARAM_TIMEOUT               30                                          /**< Time-out for pairing request or security request (in seconds). */
 #define SEC_PARAM_BOND                  1                                       /**< Perform bonding. */
 #define SEC_PARAM_MITM                  0                                       /**< Man In The Middle protection not required. */
 #define SEC_PARAM_LESC                  0                                       /**< LE Secure Connections not enabled. */
 #define SEC_PARAM_KEYPRESS              0                                       /**< Keypress notifications not enabled. */
-#define SEC_PARAM_IO_CAPABILITIES       BLE_GAP_IO_CAPS_NONE                    /**< No I/O capabilities. */
+#define SEC_PARAM_IO_CAPABILITIES       BLE_GAP_IO_CAPS_DISPLAY_YESNO           /**< I/O capabilities. */
 #define SEC_PARAM_OOB                   0                                       /**< Out Of Band data not available. */
 #define SEC_PARAM_MIN_KEY_SIZE          7                                       /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 
+#define DEAD_BEEF                       0xDEADBEEF
 
-typedef struct {
+typedef struct
+{
     bool    connected;
     bool    wait_for_input;
     bool    cts_discovered;
@@ -106,7 +110,7 @@ typedef struct {
     bool    ancs_discovered;
     bool    ancs_event;
     bool    gatts_discovered;
-    Time_t  cts_time;
+    // Time_t  cts_time;
 } BLE_Manager_t;
 
 

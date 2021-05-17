@@ -1,6 +1,6 @@
-CSRCS += lv_hal_disp.c
-CSRCS += lv_hal_indev.c
-CSRCS += lv_hal_tick.c
+SRC_FILES += lv_hal_disp.c
+SRC_FILES += lv_hal_indev.c
+SRC_FILES += lv_hal_tick.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/lvgl/src/lv_hal
 VPATH += :$(LVGL_DIR)/lvgl/src/lv_hal

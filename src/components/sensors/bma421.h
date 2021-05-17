@@ -2,8 +2,8 @@
 // Created by jack on 8/22/20.
 //
 
-#ifndef BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_SENSORS_BMA421_H
-#define BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_SENSORS_BMA421_H
+#ifndef BMA421_H_
+#define BMA421_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -36,6 +36,7 @@ typedef struct {
 } bma_ctrl_t;
 
 bool bma_init(void);
+void init_bma_gpio_interrupt(void * irq_pfn);
 bool bma423_get_device_id(void);
 bool bma423_set_interrupt_source(eBMAInterruptSource int_source);
 bool bma423_get_interrupt_status();
@@ -44,4 +45,4 @@ uint32_t get_step_count(void);
 void delay(uint32_t period_us, void * intf_ptr);
 bool sleep_bma(void);
 
-#endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_SENSORS_BMA421_H
+#endif /* BMA421_H_s */

@@ -1,9 +1,5 @@
-//
-// Created by jack on 9/2/20.
-//
-
-#ifndef BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_SENSORS_HRS3300_H
-#define BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_SENSORS_HRS3300_H
+#ifndef HRS3300_H_
+#define HRS3300_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -102,7 +98,7 @@ typedef struct {
   i2c_read_reg  read_reg;
 } HRS3300_t;
 
-bool HRS3300_init(void);
+bool init_HRS3300(void);
 void HRS3300_enable(bool enable);
 bool HRS3300_get_device_id(void);
 void HRS3300_set_conversion_wait_time(eHRS_HWT wait_time);
@@ -111,4 +107,4 @@ void HRS3300_set_pdrive_current(eHRS_PDRIVE pdrive);
 void HRS3300_set_resolution(eHRS_ALS_RES res);
 void HRS3300_set_hgain(eHRS_HGAIN hgain);
 
-#endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_SENSORS_HRS3300_H
+#endif /* HRS3300_H */

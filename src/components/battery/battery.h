@@ -15,20 +15,6 @@ typedef enum {
   CHARGE_COMPLETE
 } eBattery_State;
 
-typedef enum {
-  BATTERY_LOW_POWER           = (1 << 0),
-  BATTERY_DISCHARGE           = (1 << 1),
-  BATTERY_CHARGING            = (1 << 2),
-  BATTERY_CHARGING_STARTED    = (1 << 3),
-  BATTERY_CHARGING_STOPPED    = (1 << 4),
-  BATTERY_CHARGING_COMPLETE   = (1 << 5),
-  BATTERY_STATUS_LOW          = (1 << 6),
-  BATTERY_STATUS_MEDIUM       = (1 << 7),
-  BATTERY_STATUS_HIGH         = (1 << 8),
-  BATTERY_STATUS_FULL         = (1 << 9),
-  BATTERY_STATUS_UNKNOWN      = (1 << 10)
-} eBatteryEvent;
-
 typedef struct {
   eBattery_State        state;
   bool                  low_power:1;
@@ -66,6 +52,7 @@ uint8_t estimate_soc(void);
 uint8_t get_battery_soc(void);
 uint8_t get_battery_voltage_mv(void);
 bool is_battery_charging(void);
+bool is_charging_complete(void);
 void set_battery_prev_charging(bool prev_charging);
 bool get_battery_prev_charging(void);
 

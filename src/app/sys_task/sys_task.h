@@ -2,8 +2,8 @@
 // Created by jack on 7/19/20.
 //
 
-#ifndef JDSMARTWATCHPROJECT_SRC_COMPONENTS_SYS_TASK_H
-#define JDSMARTWATCHPROJECT_SRC_COMPONENTS_SYS_TASK_H
+#ifndef SYS_TASK_H_
+#define SYS_TASK_H_
 
 #include "haptic.h"
 
@@ -35,11 +35,11 @@ typedef struct {
   bool      wakeup;
   bool      display_active;
   eSysState state;
+  uint32_t  free_heap;
 } System_t;
 
 void sys_task(void * arg);
-void system_button_handler(void);
 void haptic_timer_callback(TimerHandle_t timerx);
 //const char * get_systask_name(eMessage msg);
 
-#endif //JDSMARTWATCHPROJECT_SRC_COMPONENTS_SYS_TASK_H
+#endif //SYS_TASK_H_

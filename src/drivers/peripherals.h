@@ -14,12 +14,11 @@
 #include "spi_driver.h"
 #include "twi_driver.h"
 #include "pwm_driver.h"
-#include "button.h"
+#include "side_button.h"
 #include "SGM40561.h"
 
 void config_pinout(void);
 void config_peripherals(void);
-//void config_gpio_interrupts(void * handler_function);
 void sleep_peripherals(void);
 
 #endif //BLINKYEXAMPLEPROJECT_SRC_DRIVERS_PINS_H

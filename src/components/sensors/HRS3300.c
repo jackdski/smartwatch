@@ -3,14 +3,11 @@
 //
 
 #include "HRS3300.h"
-#include "drivers/twi_driver.h"
+#include "twi_driver.h"
 
 #include <stdint.h>
 #include <stdbool.h>
 
-// nRF Logging includes
-#include "nrf_log_default_backends.h"
-#include "nrf_log.h"
 
 HRS3300_t hrs3300 = {
     .ID         = 0,
@@ -25,7 +22,7 @@ HRS3300_t hrs3300 = {
     .read_reg   = twi_reg_read
 };
 
-bool HRS3300_init(void)
+bool init_HRS3300(void)
 {
     if(HRS3300_get_device_id())
     {
@@ -57,7 +54,6 @@ bool HRS3300_get_device_id(void)
 {
     uint8_t dev_id = 0;
     hrs3300.read_reg(HRS_ADDRESS, HRS_DEVICE_ID_REG, &dev_id);
-    NRF_LOG_INFO("HRS3300 DEVICE ID: %d", dev_id);
     return (dev_id == HRS_DEVICE_ID);
 }
 

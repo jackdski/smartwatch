@@ -3,6 +3,8 @@
 //
 
 #include "peripherals.h"
+#include "app_config.h"
+
 #include <stdbool.h>
 
 

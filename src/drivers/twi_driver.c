@@ -3,6 +3,8 @@
 //
 
 #include "twi_driver.h"
+#include "app_config.h"
+
 #include "FreeRTOS.h"
 #include "semphr.h"
 

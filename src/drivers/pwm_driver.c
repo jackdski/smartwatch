@@ -3,6 +3,7 @@
 //
 
 #include "pwm_driver.h"
+#include "app_config.h"
 
 
 APP_PWM_INSTANCE(HAPTIC_PWM, 1);  // Setup a PWM instance with TIMER 1
@@ -39,7 +40,7 @@ NRF_PWM_Type * pwm_get_pwm_base(ePWM_INDEX index)
 void config_pwm(void)
 {
     app_pwm_config_t HAPTIC_PWM_cfg = {
-        .pins               = {16, APP_PWM_NOPIN},
+        .pins               = {HAPTIC_PIN, APP_PWM_NOPIN},
         .pin_polarity       = {APP_PWM_POLARITY_ACTIVE_HIGH, APP_PWM_POLARITY_ACTIVE_LOW},
         .num_of_channels    = 1,
         .period_us          = HAPTIC_PERIOD_MICROSECONDS

@@ -26,13 +26,13 @@ static Time_t time = {
 };
 
 /** RTC HANDLER **/
-//void rtc_handler(nrf_drv_rtc_int_type_t int_type)
-//{
-//    if (int_type == NRF_DRV_RTC_INT_COMPARE0)
-//    {
-//        increment_time_second(RTC_TIME_SYNC_SEC);
-//    }
-//}
+void rtc_handler(nrf_drv_rtc_int_type_t int_type)
+{
+   if (int_type == NRF_DRV_RTC_INT_COMPARE0)
+   {
+       increment_time_second(RTC_TIME_SYNC_SEC);
+   }
+}
 
 /** TIME **/
 void update_time(Time_t new_time)
@@ -124,9 +124,9 @@ void increment_time_month(eMonth month)
     time.day = 1;
 }
 
-Time_t get_time(void)
+void get_time(Time_t * t)
 {
-    return time;
+    memcpy(&time, t, sizeof(Time_t));
 }
 
 // ENUM TO STRINGS

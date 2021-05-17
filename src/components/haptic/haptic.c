@@ -3,12 +3,9 @@
 //
 
 #include "haptic.h"
-#include "drivers/pwm_driver.h"
+#include "pwm_driver.h"
 
-// nRF Logging includes
-#include "nrf_log_default_backends.h"
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
+#include "app_config.h"
 
 // FreeRTOS files
 #include "FreeRTOS.h"
@@ -20,7 +17,7 @@ extern QueueHandle_t haptic_queue;
 extern TimerHandle_t haptic_timer;
 
 static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle);
-//static uint8_t haptic_get_pwm_duty_cycle(void);
+
 
 // Private Variables
 static Haptic_t haptic = {
@@ -34,7 +31,7 @@ static Haptic_t haptic = {
 };
 
 // App
-void run_haptic_app(void)
+void app_haptic(void)
 {
     if(xQueueReceive(haptic_queue, &haptic.request, pdMS_TO_TICKS(0)))
     {
@@ -65,12 +62,6 @@ void haptic_timer_callback(TimerHandle_t timerx)
     }
 }
 
-void haptic_init(void)
-{
-//    haptic_pwm_config();
-    haptic_start(HAPTIC_PULSE_INITIALIZATION);
-}
-
 
 // Private Functions
 
@@ -80,13 +71,15 @@ static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle)
     pwm_set_duty_cycle(HAPTIC_PWM_INDEX, haptic.duty_cycle);
 }
 
-//static uint8_t haptic_get_pwm_duty_cycle(void)
-//{
-//    return haptic.duty_cycle;
-//}
 
 
 // Public Functions
+
+void init_haptic(void)
+{
+    // config_pwm();
+    haptic_start(HAPTIC_PULSE_INITIALIZATION);
+}
 
 void haptic_disable(void)
 {

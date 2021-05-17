@@ -11,6 +11,6 @@
 #define RTC_TIME_SYNC_SEC  (10UL)
 
 
-//void rtc_config(void * handler);
+void rtc_config(void * handler);
 
 #endif //JD_SMARTWATCH_SRC_DRIVERS_RTC_DRIVER_H

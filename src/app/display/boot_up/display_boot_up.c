@@ -12,9 +12,10 @@ void display_boot_up(void)
 
     static lv_style_t boot_style;
     lv_style_copy(&boot_style, &lv_style_plain);
-    boot_style.body.main_color = LV_COLOR_BLACK;
+    
+    boot_style.body.main_color = LV_COLOR_RED;
     boot_style.body.radius = 3;
-    boot_style.text.color = LV_COLOR_WHITE;
+    boot_style.text.color = LV_COLOR_BLACK;
     boot_style.text.font = &lv_font_roboto_22;
 
     lv_label_set_style(main_label, LV_LABEL_STYLE_MAIN, &boot_style);

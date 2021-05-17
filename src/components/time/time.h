@@ -2,8 +2,8 @@
 // Created by jack on 11/29/20.
 //
 
-#ifndef JD_SMARTWATCH_SRC_COMPONENTS_TIME_TIME_H
-#define JD_SMARTWATCH_SRC_COMPONENTS_TIME_TIME_H
+#ifndef TIME_TIME_H_
+#define TIME_TIME_H_
 
 #include <stdint.h>
 #include "rtc_driver.h"
@@ -51,7 +51,7 @@ void update_time_weekday(eWeekday weekday);
 void increment_time_second(uint8_t sec);
 void increment_time_day(void);
 void increment_time_month(eMonth month);
-Time_t get_time(void);
+void get_time(Time_t * t);
 
 char * get_year_str(void);
 char * get_month_str(void);
@@ -69,4 +69,4 @@ void format_date(char * ret_str);
 void format_time_military(char * ret_str);
 void format_time_standard(char * ret_str);
 
-#endif //JD_SMARTWATCH_SRC_COMPONENTS_TIME_TIME_H
+#endif //TIME_TIME_H_

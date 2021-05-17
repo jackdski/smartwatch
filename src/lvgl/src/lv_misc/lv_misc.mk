@@ -1,19 +1,19 @@
-CSRCS += lv_circ.c
-CSRCS += lv_area.c
-CSRCS += lv_task.c
-CSRCS += lv_fs.c
-CSRCS += lv_anim.c
-CSRCS += lv_mem.c
-CSRCS += lv_ll.c
-CSRCS += lv_color.c
-CSRCS += lv_txt.c
-CSRCS += lv_math.c
-CSRCS += lv_log.c
-CSRCS += lv_gc.c
-CSRCS += lv_utils.c
-CSRCS += lv_async.c
-CSRCS += lv_printf.c
-CSRCS += lv_bidi.c
+SRC_FILES += lv_circ.c
+SRC_FILES += lv_area.c
+SRC_FILES += lv_task.c
+SRC_FILES += lv_fs.c
+SRC_FILES += lv_anim.c
+SRC_FILES += lv_mem.c
+SRC_FILES += lv_ll.c
+SRC_FILES += lv_color.c
+SRC_FILES += lv_txt.c
+SRC_FILES += lv_math.c
+SRC_FILES += lv_log.c
+SRC_FILES += lv_gc.c
+SRC_FILES += lv_utils.c
+SRC_FILES += lv_async.c
+SRC_FILES += lv_printf.c
+SRC_FILES += lv_bidi.c
 
 
 DEPPATH += --dep-path $(LVGL_DIR)/lvgl/src/lv_misc

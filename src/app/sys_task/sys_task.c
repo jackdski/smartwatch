@@ -5,18 +5,23 @@
 #include "sys_task.h"
 #include "nrf52.h"
 
+#include "features.h"
+
 // app includes
 #include "app_settings.h"
 #include "app_sensors.h"
 
 // component includes
 #include "bma421.h"
+#include "callbacks.h"
 #include "common.h"
+#include "CST816S.h"
 #include "HRS3300.h"
 #include "battery.h"
+#include "side_button.h"
 
-// TODO: temporary
-#include "touchscreen/CST816S.h"
+#include "display.h"
+#include "haptic.h"
 
 // nRF Logging includes
 #include "nrf_log_default_backends.h"
@@ -29,15 +34,8 @@
 #include "semphr.h"
 #include "event_groups.h"
 
-#include "display.h"
-#include "haptic.h"
 
 // RTOS Variables
-extern SemaphoreHandle_t button_semphr;
-extern TaskHandle_t thDisplay;
-extern TaskHandle_t thSysTask;
-extern EventGroupHandle_t component_event_group;
-//extern EventGroupHandle_t charging_event_group;
 extern EventGroupHandle_t error_event_group;
 
 
@@ -46,42 +44,25 @@ System_t sys = {
     .initialized    = false,
     .sleep          = false,
     .wakeup         = false,
-    .state          = SYSTEM_INITIALIZATION
+    .state          = SYSTEM_INITIALIZATION,
+    .free_heap      = 0
 };
 
 
 static bool init_system_startup(void)
 {
-    EventBits_t set_bits = xEventGroupGetBits(error_event_group);
-#if(BMA_IMU_ENABLED == 1)
+#if(FEATURE_BMA_IMU)
     if(bma_init())
     {
         bma423_get_device_id();
-        set_bits |= COMPONENT_SENSOR_IMU;
-        NRF_LOG_INFO("BMA initialized");
     }
 #endif
-    if(HRS3300_init())
-    {
-        set_bits |= COMPONENT_SENSOR_HRS;
-        NRF_LOG_INFO("HRS3300 initialized");
-    }
-    else
-    {
-        NRF_LOG_INFO("HRS3300 not init'd!");
-    }
 
-    if(CST816S_init())
-    {
-        NRF_LOG_INFO("CST816S initialized");
-    }
-    else
-    {
-        NRF_LOG_INFO("CST816S not init'd!");
-    }
+    init_HRS3300();
+    init_CST816S();
+    init_haptic();
+    init_gpio_interrupts();
 
-    haptic_init();
-    update_battery_state();
     return true;
 }
 
@@ -89,53 +70,47 @@ static bool init_system_startup(void)
 /** Public Functions **/
 void sys_task(void * arg)
 {
-    NRF_LOG_INFO("Init SystemTask");
     UNUSED_PARAMETER(arg);
 
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xFrequency = pdMS_TO_TICKS(100);
+
+    sys.free_heap = xPortGetFreeHeapSize();
+    
     while(1)
     {
         switch(sys.state)
         {
-            case SYSTEM_RUN:
-                run_battery_app();
-                run_heart_rate_app();
-                // run_settings_app();
-                run_haptic_app();
-#if (BMA_IMU_ENABLED == 1)
-                run_accel_app();
-#endif
-                 run_sensor_update_display();
-                break;
-            case SYSTEM_SLEEP:
-//                sd_power_mode_set(NRF_POWER_MODE_LOWPWR);
-//                if(ble.connection_active == false) {
-//                    sd_power_system_off();
-//                }
-                sys.state = SYSTEM_RUN;
-                break;
             case SYSTEM_INITIALIZATION:
                 init_system_startup();
+
                 sys.initialized = true;
                 sys.state = SYSTEM_RUN;
-                NRF_LOG_INFO("SysTask Init'd");
+                break;
+
+            case SYSTEM_RUN:
+                app_battery();
+                app_heart_rate();
+                // app_settings();
+                app_haptic();
+
+#if (FEATURE_BMA_IMU)
+                app_accel();
+#endif /* FEATURE_BMA_IMU */
+                 app_sensor_update_display();
+                break;
+            
+            case SYSTEM_SLEEP:
+            //    sd_power_mode_set(NRF_POWER_MODE_LOWPWR);
+            //    if(ble.connection_active == false) {
+            //        sd_power_system_off();
+            //    }
+                sys.state = SYSTEM_RUN;  // temp
+                break;
+
         default:
                 break;
         }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
 }
-
-void system_button_handler(void)
-{
-    // Resume tasks if suspended
-    if(eTaskGetState(thSysTask) == eSuspended)
-    {
-        vTaskResume(thSysTask);
-    }
-
-    if(eTaskGetState(thDisplay) == eSuspended)
-    {
-        vTaskResume(thDisplay);
-    }
-}
-

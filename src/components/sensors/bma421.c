@@ -7,18 +7,21 @@
 #include "task.h"
 #include "semphr.h"
 
+#include "app_config.h"
+#include <string.h>
+
 // TWI
 #include "twi_driver.h"
+
+// GPIO
 #include "nrf_gpio.h"
+#include "nrf_drv_gpiote.h"
 
 // BMA421
 #include "bma4.h"
 #include "bma423.h"
 #include "bma4_defs.h"
 
-// nRF Logging includes
-#include "nrf_log_default_backends.h"
-#include "nrf_log.h"
 
 BMA4_INTF_RET_TYPE twi_bus_read(uint8_t reg_addr, uint8_t *read_data, uint32_t len, void *intf_ptr);
 BMA4_INTF_RET_TYPE twi_bus_write(uint8_t reg_addr, const uint8_t *read_data, uint32_t len, void *intf_ptr);
@@ -52,14 +55,10 @@ bool bma_init(void)
 
     bma.intf_ptr = &bma_address;
     ret = bma423_init(&bma);
-    NRF_LOG_INFO("BMA Init Ret: %d", ret);
-
     ret = bma423_write_config_file(&bma);
-    NRF_LOG_INFO("BMA Config Ret: %d", ret);
 
     uint16_t id;
     bma423_get_config_id(&id, &bma);
-    NRF_LOG_INFO("BMA421 ID: %d", id);
 
     accel_conf.odr = BMA4_OUTPUT_DATA_RATE_25HZ;
     accel_conf.range = BMA4_ACCEL_RANGE_2G;
@@ -88,8 +87,30 @@ bool bma_init(void)
     ret |= bma423_set_interrupt_source(bma_ctrl.interrupt_source);
 
     vTaskDelay(pdMS_TO_TICKS(150));
-    NRF_LOG_INFO("BMA421 Init: %d", ret);
     return (ret == 0);
+}
+
+void init_bma_gpio_interrupt(void * irq_pfn)
+{
+    ret_code_t err_code;
+    if(!nrf_drv_gpiote_is_init())
+    {
+        err_code = nrf_drv_gpiote_init();
+        APP_ERROR_CHECK(err_code);
+    }
+
+    nrf_drv_gpiote_in_config_t input_config;
+    input_config.pull = NRF_GPIO_PIN_NOPULL;
+    input_config.is_watcher = false;
+    input_config.hi_accuracy = true;
+    input_config.skip_gpio_setup = false,
+    input_config.pull = NRF_GPIO_PIN_PULLUP;
+    input_config.sense = NRF_GPIOTE_POLARITY_HITOLO;
+
+    // BMA421 Interrupt
+    err_code = nrf_drv_gpiote_in_init(BMA421_INT_PIN, &input_config, irq_pfn);
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_gpiote_in_event_enable(BMA421_INT_PIN, true);
 }
 
 BMA4_INTF_RET_TYPE twi_bus_read(uint8_t reg_addr, uint8_t *read_data, uint32_t len, void *intf_ptr)
@@ -112,7 +133,6 @@ bool bma423_get_device_id(void)
 {
     uint8_t rx_data = 0;
     twi_reg_read(BMA4_I2C_ADDR_PRIMARY, BMA4_CHIP_ID_ADDR, &rx_data);
-    NRF_LOG_INFO("BMA ID: %d", rx_data);
 
     bool ret = false;
     if(rx_data == BMA423_CHIP_ID)
