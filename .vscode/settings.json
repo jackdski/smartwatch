@@ -47,10 +47,18 @@
         "string": "c",
         "string_view": "c",
         "features.h": "c",
-        "ble_general.h": "c"
+        "ble_general.h": "c",
+        "display_boot_up.h": "c",
+        "timer.h": "c",
+        "alerts.h": "c",
+        "hrs3300.h": "c",
+        "app_heart_rate.h": "c",
+        "sgm40561.h": "c",
+        "nrfx_spim.h": "c"
     },
     "workbench.colorTheme": "Monokai",
     "editor.fontSize": 12,
     "cmake.configureOnOpen": true,
-    "C_Cpp.default.intelliSenseMode": "gcc-arm"
+    "C_Cpp.default.intelliSenseMode": "gcc-arm",
+    "cortex-debug.variableUseNaturalFormat": false
 }

@@ -6,6 +6,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/src/drivers",
                 "${workspaceFolder}/src/components",
+                "${workspaceFolder}/src/components/alerts",
                 "${workspaceFolder}/src/components/battery",
                 "${workspaceFolder}/src/components/callbacks/",
                 "${workspaceFolder}/src/components/haptic",
@@ -17,6 +18,8 @@
                 "${workspaceFolder}/src/components/touchscreen",
                 "${workspaceFolder}/src/app/ble",
                 "${workspaceFolder}/src/app/display",
+                "${workspaceFolder}/src/app/display/drv_touchscreen",
+                "${workspaceFolder}/src/app/display/alerts/",
                 "${workspaceFolder}/src/app/display/boot_up/",
                 "${workspaceFolder}/src/app/display/brightness/",
                 "${workspaceFolder}/src/app/display/heart_rate/",
@@ -160,7 +163,7 @@
                 "toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/components/nfc/ndef/connection_handover/hs_rec",
                 "toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/components/nfc/ndef/conn_hand_parser/ac_rec_parser",
                 "toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/components/libraries/stack_guard",
-                "toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/components/libraries/log/src",
+                "toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/components/libraries/log/src"
             ],
             "defines": [
                 "CONFIG_GPIO_AS_PINRESET",
@@ -182,7 +185,8 @@
             ],
             "browse": {
                 "path": []
-            }
+            },
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4

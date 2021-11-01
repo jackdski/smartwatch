@@ -35,6 +35,7 @@
 #include "features.h"
 #include "app_config.h"
 
+#include "alerts.h"
 #include "battery.h"
 #include "ble_general.h"
 
@@ -49,6 +50,7 @@
 
 #include "common.h"
 #include "sys_task.h"
+#include "flash_task.h"
 #include "side_button.h"
 #include "app_sensors.h"
 
@@ -63,16 +65,19 @@ TaskHandle_t thSysTask;
 TaskHandle_t thBLEMan;
 TaskHandle_t thDisplay;
 TaskHandle_t thUIupdate;
+TaskHandle_t thFlash;
 
 /** EVENT GROUPS **/
 EventGroupHandle_t error_event_group;
 
 /** TIMER HANDLES **/
 TimerHandle_t display_timeout_tmr;
+TimerHandle_t display_alert_tmr;
 TimerHandle_t haptic_timer;
 TimerHandle_t button_debounce_timer;
 
 /** QUEUES **/
+QueueHandle_t alerts_queue;
 QueueHandle_t system_queue;
 QueueHandle_t settings_queue;
 QueueHandle_t display_sensor_info_queue;
@@ -88,18 +93,14 @@ SemaphoreHandle_t lvgl_mutex;
 SemaphoreHandle_t haptic_mutex;
 SemaphoreHandle_t button_semphr;
 
-// static lv_disp_buf_t lvgl_disp_buf;
-// static lv_color_t lvgl_buf[LV_HOR_RES_MAX * 8];
-// static lv_color_t lvgl_buf2[LV_HOR_RES_MAX * 4];
-// lv_disp_drv_t lvgl_disp_drv;
-// lv_indev_drv_t indev_drv;
 
 
 /** RTOS INITS **/
 void init_queues(void)
 {
     // settings_queue      = xQueueCreate(3, sizeof(ChangeSetting_t));
-    haptic_queue                = xQueueCreate(3, sizeof(eHaptic_State));
+    alerts_queue                = xQueueCreate(5, sizeof(Alerts_E));
+    haptic_queue                = xQueueCreate(3, sizeof(haptic_pulse_E));
     display_sensor_info_queue   = xQueueCreate(5, sizeof(SensorData_t));
 }
 
@@ -120,6 +121,12 @@ void init_timers(void)
                                        pdFALSE,
                                        (void *)0,
                                        vDisplayTimeoutCallback);
+
+    display_alert_tmr = xTimerCreate("DisplayAlerts",
+                                     pdMS_TO_TICKS(5000),
+                                     pdFALSE,
+                                     (void *)0,
+                                     vDisplayTimeoutCallback);
 #endif /* FEATURE_DISPLAY */
 
     haptic_timer = xTimerCreate("HapticTimer",
@@ -186,10 +193,10 @@ void vApplicationIdleHook( void )
 
 void vApplicationTickHook(void)
 {
-    if(xSemaphoreTakeFromISR(lvgl_mutex, 0))
-    {
+    // if(xSemaphoreTakeFromISR(lvgl_mutex, 0))
+    // {
         lv_tick_inc(1);
-    }
+    // }
 }
 
 /**
@@ -300,6 +307,18 @@ int main(void)
     vTaskSuspend(thUIupdate);
 #endif /* FEATURE_DISPLAY */
 
+#if (FEATURE_FLASH)
+    if(pdPASS != xTaskCreate(flash_task,
+                             "Flash",
+                             configMINIMAL_STACK_SIZE,
+                             NULL,
+                             4,
+                             &thFlash))
+    {
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
+#endif // FEATURE_FLASH
+
 #if (DEBUG_INFO_ENABLED == 1)
     if (pdPASS != xTaskCreate(debug_task,
                               "DebugInfo",
@@ -320,7 +339,7 @@ int main(void)
 #if (FEATURE_BLE)
 
     // Init BLE
-    // power_management_init();
+    power_management_init();
     ble_stack_init();
     gap_params_init();
     gatt_init();

@@ -13,29 +13,30 @@
 
 /* ENUMS */
 
-typedef enum {
-  SYSTEM_INITIALIZATION,
-  SYSTEM_RUN,
-  SYSTEM_SLEEP
-} eSysState;
+typedef enum
+{
+	SYSTEM_INITIALIZATION,
+	SYSTEM_RUN,
+	SYSTEM_SLEEP
+} systemStatus_E;
 
-typedef enum {
-  DISPLAY_NO_MSG,
-  DISPLAY_BUTTON_PRESSED,
-  DISPLAY_CHARGING_STARTED,
-  DISPLAY_CHARGING_ENDED
-} eDisplayMessage;
+typedef enum
+{
+	DISPLAY_NO_MSG,
+	DISPLAY_BUTTON_PRESSED,
+	DISPLAY_CHARGING_STARTED,
+	DISPLAY_CHARGING_ENDED
+} displayMessage_E;
 
 
 /* STRUCTS */
 
-typedef struct {
-  bool      initialized;
-  bool      sleep;
-  bool      wakeup;
-  bool      display_active;
-  eSysState state;
-  uint32_t  free_heap;
+typedef struct
+{
+	bool      goToSleep;
+	bool      display_active;
+	systemStatus_E state;
+	uint32_t  free_heap;
 } System_t;
 
 void sys_task(void * arg);

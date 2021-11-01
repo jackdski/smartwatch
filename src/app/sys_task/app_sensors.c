@@ -3,6 +3,8 @@
 //
 
 #include "app_sensors.h"
+
+#include "alerts.h"
 #include "battery.h"
 #include "bma421.h"
 #include "haptic.h"
@@ -23,50 +25,28 @@ extern QueueHandle_t display_sensor_info_queue;
 extern QueueHandle_t haptic_queue;
 
 
+/** Private Functions **/
+static void set_battery_status(uint8_t soc);
+
+
 static SensorData_t sensor_data = {
-    .imu = {
+    .imu =
+    {
         .interrupt_active   = false,
         .interrupt_source   = 0x08,
         .steps              = 0
     },
-    .hrs = {
-        .channel            = 0,
-        .heart_rate         = 0
-    },
-    .battery = {
+    .battery =
+    {
         .soc                = 0,
         .level              = BATTERY_LEVEL_DEFAULT,
+        .prev_level         = BATTERY_LEVEL_DEFAULT, 
         .charging_state     = BATTERY_CHARGING_IDLE
     }
 };
 
-// Private Functions
-static void set_battery_status(uint8_t soc)
-{
-    if(soc <= BATTERY_SOC_LOW)
-    {
-        sensor_data.battery.level = BATTERY_LEVEL_LOW;
-    }
-    else if(soc <= BATTERY_SOC_MED)
-    {
-        sensor_data.battery.level = BATTERY_LEVEL_MEDIUM;     
-    }
-    else if(soc <= BATTERY_SOC_HIGH)
-    {
-        sensor_data.battery.level = BATTERY_LEVEL_HIGH;
-    }
-    else if(soc >= BATTERY_SOC_HIGH)
-    {
-        sensor_data.battery.level = BATTERY_LEVEL_FULL;
-    }
-    else
-    {
-        // nothing
-    }
-}
 
-
-// Apps
+/** Public Functions **/
 void app_accel(void)
 {
     update_step_count();
@@ -83,14 +63,13 @@ void app_accel(void)
 
 void app_battery(void)
 {
-    update_battery_state();
+    battery_update();
     const bool battery_charging = is_battery_charging();
 
     if(is_charging_complete())
     {
         sensor_data.battery.charging_state = BATTERY_CHARGING_COMPLETE;
-        eHaptic_State haptic_request = HAPTIC_PULSE_START_STOP_CHARGING;
-        xQueueSend(haptic_queue, &haptic_request, pdMS_TO_TICKS(0));
+        haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
     }
     else
     {
@@ -98,35 +77,27 @@ void app_battery(void)
         {
             sensor_data.battery.charging_state = BATTERY_CHARGING_ACTIVE;
 
-            if(get_battery_prev_charging() == false)
+            if(get_battery_chargingPrevious() == false)
             {            
-                eHaptic_State haptic_request = HAPTIC_PULSE_START_STOP_CHARGING;
-                xQueueSend(haptic_queue, &haptic_request, pdMS_TO_TICKS(0));
+                haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
             }
         }
         else
         {
             sensor_data.battery.charging_state = BATTERY_CHARGING_IDLE;
 
-            if(get_battery_prev_charging() == true)
+            if(get_battery_chargingPrevious() == true)
             {            
-                eHaptic_State haptic_request = HAPTIC_PULSE_START_STOP_CHARGING;
-                xQueueSend(haptic_queue, &haptic_request, pdMS_TO_TICKS(0));
+                haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
             }
         }
     }
 
-    set_battery_prev_charging(battery_charging);
+    set_battery_chargingPrevious(battery_charging);
     set_battery_status(get_battery_soc());
 }
 
-void app_heart_rate(void)
-{
-    sensor_data.hrs.channel ^= 1;  // flip channels
-    HRS3300_enable(true);
-    sensor_data.hrs.heart_rate = HRS3300_get_sample(sensor_data.hrs.channel);
-    HRS3300_enable(false);
-}
+
 
 void app_sensor_update_display(void)
 {
@@ -134,4 +105,43 @@ void app_sensor_update_display(void)
     memcpy(&data, &sensor_data, sizeof(SensorData_t));
 
     xQueueSend(display_sensor_info_queue, &data, 5);
+}
+
+// Private Functions
+static void set_battery_status(uint8_t soc)
+{
+    if(soc <= BATTERY_SOC_LOW)
+    {
+        if(sensor_data.battery.prev_level != BATTERY_LEVEL_LOW)
+        {
+            set_alert(ALERT_BATTERY_LOW);
+        }
+
+        sensor_data.battery.prev_level = sensor_data.battery.level;
+        sensor_data.battery.level = BATTERY_LEVEL_LOW;
+    }
+    else if(soc <= BATTERY_SOC_MED)
+    {
+        sensor_data.battery.prev_level = sensor_data.battery.level;
+        sensor_data.battery.level = BATTERY_LEVEL_MEDIUM;     
+    }
+    else if(soc <= BATTERY_SOC_HIGH)
+    {
+        sensor_data.battery.prev_level = sensor_data.battery.level;
+        sensor_data.battery.level = BATTERY_LEVEL_HIGH;
+    }
+    else if(soc >= BATTERY_SOC_HIGH)
+    {
+        if(sensor_data.battery.prev_level != BATTERY_SOC_HIGH)
+        {
+            set_alert(ALERT_BATTERY_CHARGED);
+        }
+
+        sensor_data.battery.prev_level = sensor_data.battery.level; 
+        sensor_data.battery.level = BATTERY_LEVEL_FULL;
+    }
+    else
+    {
+        // nothing
+    }
 }

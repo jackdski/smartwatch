@@ -16,7 +16,9 @@
 void spim_evt_handler(nrfx_spim_evt_t const * p_event, void * p_context);
 void config_spi_master(void);
 void spi_end_event(void);
-bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size);
+bool spi_write(uint32_t cs_pin, uint8_t * const data, uint32_t size);
+bool spi_read(uint32_t cs_pin, uint8_t * reg_buffer, uint8_t * rx_buffer);
+
 void spi_wakeup(void);
 void spi_disable(void);
 void setup_workaround_spim(uint32_t ppi_channel, uint32_t gpiote_channel);

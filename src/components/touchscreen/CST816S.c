@@ -9,8 +9,11 @@
 
 #include "app_config.h"
 
+// FreeRTOS files
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 
 CST816S_t dev = {
@@ -24,17 +27,21 @@ CST816S_t dev = {
     .pressure       = 0,
     .touch_active   = false,
     .asleep         = false
+    // .i2c_read       = twi_rx
 };
 
 
 uint8_t init_CST816S(void)
 {
+    dev.timer = xTimerCreate("CST816S Timer",
+                             50U,
+                             pdFALSE,
+                             NULL,
+                             NULL
+                             );
+
     nrf_gpio_pin_set(TP_RESET_PIN);
-    vTaskDelay(pdMS_TO_TICKS(50));
-    nrf_gpio_pin_clear(TP_RESET_PIN);
-    vTaskDelay(pdMS_TO_TICKS(20));
-    nrf_gpio_pin_set(TP_RESET_PIN);
-    vTaskDelay(pdMS_TO_TICKS(50));
+    xTimerStart(dev.timer, 0);                             
 
 //    uint8_t temp;
 //    twi_reg_read(CST816S_ADDR, CST816S_REG_CHIP_ID, &temp);
@@ -50,7 +57,7 @@ uint8_t init_CST816S(void)
 void init_CST816S_interrupt(void * irq_pfn)
 {
     ret_code_t err_code;
-    if(!nrf_drv_gpiote_is_init())
+    if(nrf_drv_gpiote_is_init() == false)
     {
         err_code = nrf_drv_gpiote_init();
         APP_ERROR_CHECK(err_code);
@@ -67,6 +74,41 @@ void init_CST816S_interrupt(void * irq_pfn)
     err_code = nrf_drv_gpiote_in_init(TP_INT_PIN, &input_config, irq_pfn);
     APP_ERROR_CHECK(err_code);
     nrf_drv_gpiote_in_event_enable(TP_INT_PIN, true);
+}
+
+void app_CST816S(void)
+{
+    switch (dev.state)
+    {
+        case CST816S_INIT_1:
+            if (xTimerIsTimerActive(dev.timer) == false)
+            {
+                nrf_gpio_pin_clear(TP_RESET_PIN);
+                xTimerReset(dev.timer, 0);
+                dev.state = CST816S_INIT_2;
+            }
+            break;
+        case CST816S_INIT_2:
+            if (xTimerIsTimerActive(dev.timer) == false)
+            {
+                nrf_gpio_pin_set(TP_RESET_PIN);
+                xTimerReset(dev.timer, 0);
+                dev.state = CST816S_INIT_2;
+            }
+            break;
+        case CST816S_INIT_3:
+            if (xTimerIsTimerActive(dev.timer) == false)
+            {
+                nrf_gpio_pin_clear(TP_RESET_PIN);
+                xTimerReset(dev.timer, 0);
+                dev.state = CST816S_RUNNING;
+            }
+            break;
+        case CST816S_RUNNING:
+        default:
+            // nothing
+            break;
+    }
 }
 
 bool CST816S_read_touch(void)

@@ -8,24 +8,26 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef enum {
-  BATTERY_UNKNOWN_STATE,
-  DISCHARGE,
-  CHARGING,
-  CHARGE_COMPLETE
+typedef enum
+{
+  BATTERY_STATE_UNKNOWN,
+  BATTERY_STATE_DISCHARGE,
+  BATTERY_STATE_CHARGING,
+  BATTERY_STATE_CHARGE_COMPLETE
 } eBattery_State;
 
-typedef struct {
+typedef struct
+{
   eBattery_State        state;
-  bool                  low_power:1;
-  bool                  power_present:1;
+  bool                  lowPower:1;
+  bool                  powerPresent:1;
   bool                  charging:1;
-  bool                  prev_charging:1;
+  bool                  chargingPrevious:1;
   uint8_t               soc;
   uint16_t              voltage_mv;             // [mV]
-  uint16_t              full_voltage_mv;        // [mV]
-  uint16_t              full_charge_voltage_mv; // [mV]
-  uint16_t              empty_voltage_mv;       // [mV]
+  uint16_t              dischargeMaxVoltage_mv;        // [mV]
+  uint16_t              chargingMaxVoltage_mv; // [mV]
+  uint16_t              minVoltage_mv;       // [mV]
   uint16_t              charging_offset_mv;     // [mV]
 } Battery_t;
 
@@ -47,16 +49,16 @@ typedef struct {
 
 // Public Functions
 void run_battery_app(void);
-void update_battery_state(void);
-uint8_t estimate_soc(void);
+void battery_update(void);
+uint8_t battery_estimate_soc(void);
 uint8_t get_battery_soc(void);
 uint8_t get_battery_voltage_mv(void);
 bool is_battery_charging(void);
 bool is_charging_complete(void);
-void set_battery_prev_charging(bool prev_charging);
-bool get_battery_prev_charging(void);
+void set_battery_chargingPrevious(bool chargingPrevious);
+bool get_battery_chargingPrevious(void);
 
-bool get_battery_low_power(void);
-bool is_battery_soc_valid(uint8_t soc);
+bool get_battery_lowPower(void);
+bool battery_is_soc_valid(uint8_t soc);
 
 #endif //JDSMARTWATCHPROJECT_BATTERY_H

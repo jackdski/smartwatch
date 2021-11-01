@@ -9,7 +9,7 @@
 APP_PWM_INSTANCE(HAPTIC_PWM, 1);  // Setup a PWM instance with TIMER 1
 
 // Private Functions
-static const app_pwm_t * pwm_get_pwm_instance(ePWM_INDEX index)
+static const app_pwm_t * pwm_get_pwm_instance(PWM_Index_E index)
 {
     const app_pwm_t * ret = NULL;
     switch (index) {
@@ -19,7 +19,7 @@ static const app_pwm_t * pwm_get_pwm_instance(ePWM_INDEX index)
     return ret;
 }
 
-NRF_PWM_Type * pwm_get_pwm_base(ePWM_INDEX index)
+NRF_PWM_Type * pwm_get_pwm_base(PWM_Index_E index)
 {
     NRF_PWM_Type * ret = NULL;
 
@@ -53,7 +53,7 @@ void config_pwm(void)
     app_pwm_enable(&HAPTIC_PWM);
 }
 
-void pwm_set_duty_cycle(ePWM_INDEX index, uint8_t duty_cycle)
+void pwm_set_duty_cycle(PWM_Index_E index, uint8_t duty_cycle)
 {
     uint8_t dc = duty_cycle;
     if(duty_cycle == 0)
@@ -68,12 +68,12 @@ void pwm_set_duty_cycle(ePWM_INDEX index, uint8_t duty_cycle)
     app_pwm_channel_duty_set(pwm_get_pwm_instance(index), 0, dc);
 }
 
-uint8_t pwm_get_duty_cycle(ePWM_INDEX index)
+uint8_t pwm_get_duty_cycle(PWM_Index_E index)
 {
     return app_pwm_channel_duty_get(pwm_get_pwm_instance(index), 0);
 }
 
-void pwm_disable(ePWM_INDEX index)
+void pwm_disable(PWM_Index_E index)
 {
     nrf_pwm_disable(pwm_get_pwm_base(index));
     app_pwm_disable(pwm_get_pwm_instance(index));

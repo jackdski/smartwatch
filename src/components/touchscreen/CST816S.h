@@ -9,6 +9,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+// FreeRTOS files
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "timers.h"
+
+
 #define CST816S_ADDR                0x15
 
 #define CST816S_GESTURE             1U
@@ -27,11 +33,12 @@
 #define CST816S_Y_MSB               0x05
 #define CST816S_Y_LSB               0x06
 
-#define  CST816S_SET_MSB(XY)         (uint16_t)((XY & 0x0F) << 8)
+#define  CST816S_SET_MSB(XY)        (uint16_t)((XY & 0x0F) << 8)
 
 #define CST816S_TOUCH_STEP          0x06
 
-enum {
+enum
+{
     CST816S_REG_INT_CNT           = 0x8F,
     CST816S_REG_FLOW_WORK_CNT     = 0x91,
     CST816S_REG_WORKMODE          = 0x00,
@@ -50,7 +57,8 @@ enum {
     CST816S_REG_ESD_SATUREATE     = 0xED
 };
 
-typedef struct {
+typedef struct
+{
     uint8_t blank_0;
     uint8_t gesture;
     uint8_t x_msb;
@@ -61,7 +69,8 @@ typedef struct {
     uint8_t blank_1;
 } CST816S_TouchEvent_t;
 
-typedef enum {
+typedef enum
+{
     GESTURE_NONE,
     GESTURE_SLIDE_DOWN,
     GESTURE_SLIDE_UP,
@@ -73,7 +82,8 @@ typedef enum {
     NUM_GESTURES
 } Gesture_E;
 
-typedef enum {
+typedef enum
+{
     DOWN,
     UP,
     CONTACT
@@ -82,12 +92,22 @@ typedef enum {
 typedef void (*i2c_read_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t * buffer);
 typedef void (*i2c_write_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
 
-typedef struct {
+typedef struct
+{
     int16_t x;
     int16_t y;
 } TouchPoint_t;
 
-typedef struct {
+typedef enum
+{
+    CST816S_INIT_1,
+    CST816S_INIT_2,
+    CST816S_INIT_3,
+    CST816S_RUNNING
+} CST816S_state_E;
+
+typedef struct 
+{
     TouchPoint_t  point;
     Gesture_E     gesture;
     Gesture_E     prev_gesture;
@@ -96,6 +116,10 @@ typedef struct {
     uint8_t       pressure;
     bool          touch_active;
     bool          asleep;
+    TimerHandle_t timer;
+    CST816S_state_E state;
+    // i2c_read_reg  i2c_read;
+    // i2c_write_reg i2c_write;
 } CST816S_t;
 
 

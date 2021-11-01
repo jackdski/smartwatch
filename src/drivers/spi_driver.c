@@ -8,6 +8,7 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "task.h"
 #include "portmacro_cmsis.h"
 
 #include "nrf52.h"
@@ -20,15 +21,30 @@ extern SemaphoreHandle_t spi_mutex;
 
 #ifdef USE_NRF_SPIM_DRIVER_PRIVATE
 
-uint32_t current_cs_pin = 0;
-volatile bool spi_xfer_done = false;
+typedef struct
+{
+    TaskHandle_t    task;
+    uint32_t        cs_pin;
+    volatile bool   xfer_done;
+} spi_driver_data_t;
 
-nrfx_spim_t m_spim = {
-    .p_reg = SPIM_BASE,
+
+spi_driver_data_t driver_data =
+{
+    .task       = NULL,
+    .cs_pin     = 0U,
+    .xfer_done  = false
+};
+
+
+nrfx_spim_t m_spim =
+{
+    .p_reg = NRF_SPIM1,
     .drv_inst_idx = NRFX_SPIM1_INST_IDX
 };
 
-nrfx_spim_config_t spim_config = {
+const static nrfx_spim_config_t spim_config =
+{
     .sck_pin = SPI_SCK_PIN,
     .mosi_pin = SPI_MOSI_PIN,
     .miso_pin = SPI_MISO_PIN,
@@ -41,16 +57,26 @@ nrfx_spim_config_t spim_config = {
     .bit_order = NRF_SPIM_BIT_ORDER_MSB_FIRST
 };
 
+
+/** Public Functions **/
+
 void spim_evt_handler(nrfx_spim_evt_t const * p_event, void * p_context)
 {
     if(p_event->type == NRFX_SPIM_EVENT_DONE)
     {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        spi_xfer_done = true;
-        nrf_gpio_pin_set(current_cs_pin);
-        BaseType_t highPriorityTask = pdFALSE;
-        xSemaphoreGiveFromISR(spi_mutex, &highPriorityTask);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        BaseType_t xNotifyHigherPriorityTaskWoken = pdFALSE;
+        if (driver_data.task != NULL)
+        {
+            vTaskNotifyGiveFromISR(driver_data.task, &xNotifyHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xNotifyHigherPriorityTaskWoken);
+            // driver_data.task = NULL;
+        }
+
+        BaseType_t xMutexHigherPriorityTaskWoken = pdFALSE;
+        driver_data.xfer_done = true;
+        nrf_gpio_pin_set(driver_data.cs_pin);
+        xSemaphoreGiveFromISR(spi_mutex, &xMutexHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xMutexHigherPriorityTaskWoken);
     }
 }
 
@@ -59,38 +85,65 @@ void config_spi_master(void)
     nrfx_spim_init(&m_spim, &spim_config, spim_evt_handler, NULL);
 }
 
-bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
+bool spi_write(uint32_t cs_pin, uint8_t * const data, uint32_t size)
 {
-    // if(xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(10)) == pdTRUE)
-    // {
+    bool ret = true;
+    if(xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(0)) == pdTRUE)
+    {
+        driver_data.task = xTaskGetCurrentTaskHandle();
+
         nrfx_spim_xfer_desc_t xfer = {
             .p_tx_buffer = data,
             .tx_length = size,
             .p_rx_buffer = NULL,
             .rx_length = 0
         };
-        current_cs_pin = cs_pin;
-        nrf_gpio_pin_clear(current_cs_pin);
-        spi_xfer_done = false;
+        driver_data.cs_pin = cs_pin;
+        nrf_gpio_pin_clear(driver_data.cs_pin);
+        driver_data.xfer_done = false;
         nrfx_spim_xfer(&m_spim, &xfer, 0);
-        // while(!spi_xfer_done);
-        // nrf_gpio_pin_set(current_cs_pin);
-        // xSemaphoreGive(spi_mutex);
-    // }
-    // else
-    // {
-    //     return false;
-    // }
-    return true;
+    }
+    else
+    {
+        ret = false;
+    }
+    return ret;
 }
 
+bool spi_read(uint32_t cs_pin, uint8_t * reg_buffer, uint8_t * rx_buffer)
+{
+    bool ret = true;
+    if (xSemaphoreTake(spi_mutex, pdMS_TO_TICKS(10)) == pdTRUE)
+    {
+        driver_data.task = xTaskGetCurrentTaskHandle();
+
+        nrfx_spim_xfer_desc_t xfer = 
+        {
+            .p_rx_buffer = rx_buffer,
+            .rx_length = sizeof(*rx_buffer),
+            .p_tx_buffer = reg_buffer,
+            .tx_length = sizeof(*reg_buffer)
+        };
+        driver_data.cs_pin = cs_pin;
+        nrf_gpio_pin_clear(driver_data.cs_pin);
+        driver_data.xfer_done = false;
+        nrfx_spim_xfer(&m_spim, &xfer, 0);
+    }
+    else
+    {
+        ret = false;
+    }
+    return ret;
+}
 
 #else /* USE_NRF_SPI_DRIVER */
 #include "nrf_spim.h"
 
 static uint32_t tx_buffer_size = 0;
 static uint8_t * tx_buffer_addr = 0;
-static uint32_t current_cs_pin = 0;
+static uint32_t driver_data.cs_pin = 0;
+
+/** Public Functions **/
 
 void config_spi_master(void)
 {
@@ -138,7 +191,7 @@ void spi_end_event(void)
         nrf_spim_task_trigger(SPIM_BASE, NRF_SPIM_TASK_START);
     }
     else {  // End communication sequence
-        nrf_gpio_pin_set(current_cs_pin);
+        nrf_gpio_pin_set(driver_data.cs_pin);
         tx_buffer_addr = 0;
         tx_buffer_size = 0;
 
@@ -158,7 +211,7 @@ bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
     // Send Data
     if(xSemaphoreTake(spi_mutex, portMAX_DELAY) == pdTRUE)
     {
-        current_cs_pin = cs_pin;
+        driver_data.cs_pin = cs_pin;
         tx_buffer_size = size;
         tx_buffer_addr = data;
 
@@ -170,7 +223,7 @@ bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
         }
 
         // Select Chip, Set TX Buffer
-        nrf_gpio_pin_clear(current_cs_pin);
+        nrf_gpio_pin_clear(driver_data.cs_pin);
         nrf_spim_tx_buffer_set(SPIM_BASE, tx_buffer_addr, tx_buffer_size);
 
         // Update buffer
@@ -184,7 +237,7 @@ bool spi_write(uint32_t cs_pin, uint8_t * data, uint32_t size)
         if(size == 1)
         {
             while(SPIM_BASE->EVENTS_END == 0);
-            nrf_gpio_pin_set(current_cs_pin);
+            nrf_gpio_pin_set(driver_data.cs_pin);
             tx_buffer_addr = 0;
             xSemaphoreGive(spi_mutex);
         }

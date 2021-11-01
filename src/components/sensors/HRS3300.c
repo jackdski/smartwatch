@@ -9,7 +9,8 @@
 #include <stdbool.h>
 
 
-HRS3300_t hrs3300 = {
+HRS3300_t hrs3300 =
+{
     .ID         = 0,
     .enable     = false,
     .CH1DATA    = 0,
@@ -22,20 +23,9 @@ HRS3300_t hrs3300 = {
     .read_reg   = twi_reg_read
 };
 
-bool init_HRS3300(void)
-{
-    if(HRS3300_get_device_id())
-    {
-        HRS3300_set_conversion_wait_time(hrs3300.HWT);
-        HRS3300_set_pdrive_current(hrs3300.PDRIVE);
-        HRS3300_set_resolution(hrs3300.ALS_RES);
-        HRS3300_set_hgain(hrs3300.HGAIN);
-        HRS3300_enable(hrs3300.enable);
-        return true;
-    }
-    return false;
-}
-
+/*
+ *  Public Functions
+ */
 void HRS3300_enable(bool enable)
 {
     hrs3300.enable = enable;
@@ -50,6 +40,15 @@ void HRS3300_enable(bool enable)
     hrs3300.write_reg(HRS_ADDRESS, HRS_REG_ENABLE, data);
 }
 
+void HRS3300_update(void)
+{
+    HRS3300_set_conversion_wait_time(hrs3300.HWT);
+    HRS3300_set_pdrive_current(hrs3300.PDRIVE);
+    HRS3300_set_resolution(hrs3300.ALS_RES);
+    HRS3300_set_hgain(hrs3300.HGAIN);
+    HRS3300_enable(hrs3300.enable);
+}
+
 bool HRS3300_get_device_id(void)
 {
     uint8_t dev_id = 0;
@@ -57,7 +56,7 @@ bool HRS3300_get_device_id(void)
     return (dev_id == HRS_DEVICE_ID);
 }
 
-void HRS3300_set_conversion_wait_time(eHRS_HWT wait_time)
+void HRS3300_set_conversion_wait_time(HRS_HWT_E wait_time)
 {
     hrs3300.HWT = wait_time;
     uint8_t data = HRS_PACK_ENABLE_REG(hrs3300.enable, hrs3300.HWT, hrs3300.PDRIVE);
@@ -85,7 +84,7 @@ uint32_t HRS3300_get_sample(bool channel)
     }
 }
 
-void HRS3300_set_pdrive_current(eHRS_PDRIVE pdrive)
+void HRS3300_set_pdrive_current(HRS_PDRIVE_E pdrive)
 {
     hrs3300.PDRIVE = pdrive;
     uint8_t data;
@@ -99,14 +98,14 @@ void HRS3300_set_pdrive_current(eHRS_PDRIVE pdrive)
     hrs3300.write_reg(HRS_ADDRESS, HRS_REG_ENABLE, data);
 }
 
-void HRS3300_set_resolution(eHRS_ALS_RES res)
+void HRS3300_set_resolution(HRS_ALS_RES_E res)
 {
     hrs3300.ALS_RES = res;
     uint8_t data = HRS_ALS_RES_PACK(hrs3300.ALS_RES);
     hrs3300.write_reg(HRS_ADDRESS, HRS_REG_ENABLE, data);
 }
 
-void HRS3300_set_hgain(eHRS_HGAIN hgain)
+void HRS3300_set_hgain(HRS_HGAIN_E hgain)
 {
     hrs3300.HGAIN = hgain;
     uint8_t data = HRS_HGAIN_PACK(hrs3300.HGAIN);

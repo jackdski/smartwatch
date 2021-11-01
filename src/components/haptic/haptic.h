@@ -11,7 +11,8 @@
 #include "task.h"
 #include "timers.h"
 
-typedef enum {
+typedef enum
+{
   HAPTIC_PULSE_NONE,
   HAPTIC_PULSE_INITIALIZATION,
 
@@ -23,19 +24,21 @@ typedef enum {
   HAPTIC_PULSE_ALARM,
 
   HAPTIC_PULSE_COUNT
-} eHaptic_State;
+} haptic_pulse_E;
 
-typedef enum {
+typedef enum
+{
   HAPTIC_STRENGTH_INACTIVE  = 0,
   HAPTIC_STRENGTH_WEAK      = 25,
   HAPTIC_STRENGTH_MEDIUM    = 50,
   HAPTIC_STRENGTH_STRONG    = 85,
-} eHapticStrength;
+} haptic_strength_E;
 
-typedef struct {
-  eHaptic_State     state;
-  eHaptic_State     request;
-  eHapticStrength   strength;
+typedef struct
+{
+  haptic_pulse_E     state;
+  haptic_pulse_E     request;
+  haptic_strength_E   strength;
   uint16_t          period_ms;
   uint8_t           pulses;
   uint8_t           duty_cycle;
@@ -50,10 +53,11 @@ void haptic_timer_callback(TimerHandle_t timerx);
 
 // Public Functions
 void haptic_disable(void);
-void haptic_start(eHaptic_State new_state);
+void haptic_start(haptic_pulse_E new_state);
 uint16_t haptic_get_period_ms(void);
 uint8_t haptic_get_pulses(void);
 void haptic_pulse_run(void);
+void haptic_request(haptic_pulse_E request_type);
 void haptic_reset(void);
 
 #endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_HAPTIC_H

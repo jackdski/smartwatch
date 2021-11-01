@@ -22,7 +22,7 @@ void tearDown(void)
 
 
 // helper functions
-//uint16_t battery_monitor_sample(void)
+//uint16_t SGM40562_sample_battery_mv(void)
 //{
 //    return 1668 ;
 //}
@@ -32,10 +32,10 @@ void tearDown(void)
 
 void test_soc_calculation(void)
 {
-    TEST_ASSERT_TRUE(is_battery_soc_valid(0));
-    TEST_ASSERT_TRUE(is_battery_soc_valid(50));
-    TEST_ASSERT_TRUE(is_battery_soc_valid(100));
-    TEST_ASSERT_FALSE(is_battery_soc_valid(-128));
+    TEST_ASSERT_TRUE(battery_is_soc_valid(0));
+    TEST_ASSERT_TRUE(battery_is_soc_valid(50));
+    TEST_ASSERT_TRUE(battery_is_soc_valid(100));
+    TEST_ASSERT_FALSE(battery_is_soc_valid(-128));
 }
 
 void test_battery_states(void)

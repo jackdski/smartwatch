@@ -35,27 +35,22 @@ typedef struct {
     uint32_t      steps;
 } IMU_t;
 
-typedef struct {
-    uint16_t      heart_rate;
-    bool          channel;
-} HRS_t;
 
 typedef struct {
     uint8_t                 soc;
     BatteryLevel_E          level;
+    BatteryLevel_E          prev_level;
     BatteryChargingState_E  charging_state;
 } BatteryData_t;
 
 typedef struct {
     IMU_t                   imu;
-    HRS_t                   hrs;
     BatteryData_t           battery;
 } SensorData_t;
 
 
 void app_accel(void);
 void app_battery(void);
-void app_heart_rate(void);
 void app_sensor_update_display(void);
 
 #endif // APP_SENSORS_H_

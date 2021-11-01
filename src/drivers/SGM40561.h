@@ -25,6 +25,6 @@ void config_SGM40561(void);
 bool SGM40561_is_power_present(void);
 bool SGM40561_is_charging(void);
 uint16_t SGM40561_sample_battery_voltage(void);
-uint16_t battery_monitor_sample(void);
+uint16_t SGM40562_sample_battery_mv(void);
 
 #endif //JDSMARTWATCHPROJECT_SGM40561_H

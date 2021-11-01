@@ -131,7 +131,7 @@ uint16_t SGM40561_sample_battery_voltage(void)
     return (value * 2) / (1024 / 3);
 }
 
-uint16_t battery_monitor_sample(void)
+uint16_t SGM40562_sample_battery_mv(void)
 {
     uint16_t mv;
     battery_monitor_wakeup();

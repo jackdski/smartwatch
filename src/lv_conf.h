@@ -16,8 +16,8 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          (240)
-#define LV_VER_RES_MAX          (240)
+#define LV_HOR_RES_MAX          (240U)
+#define LV_VER_RES_MAX          (240U)
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -534,7 +534,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_SLIDER    1
 
 /*Spinbox (dependencies: lv_ta)*/
-#define LV_USE_SPINBOX       1
+#define LV_USE_SPINBOX       0
 
 /*Switch (dependencies: lv_slider)*/
 #define LV_USE_SW       1

@@ -75,18 +75,12 @@ static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle)
 
 // Public Functions
 
-void init_haptic(void)
-{
-    // config_pwm();
-    haptic_start(HAPTIC_PULSE_INITIALIZATION);
-}
-
 void haptic_disable(void)
 {
     pwm_disable(HAPTIC_PWM_INDEX);
 }
 
-void haptic_start(eHaptic_State new_state)
+void haptic_start(haptic_pulse_E new_state)
 {
     switch(new_state)
     {
@@ -154,6 +148,12 @@ void haptic_reset(void)
     haptic.period_ms = 0;
     haptic.pulses = 0;
     haptic.state = HAPTIC_PULSE_NONE;
+}
+
+void haptic_request(haptic_pulse_E request_type)
+{
+    const haptic_pulse_E request = request_type;
+    xQueueSend(haptic_queue, &request, 0);
 }
 
 uint16_t haptic_get_period_ms(void)

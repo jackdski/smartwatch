@@ -8,6 +8,7 @@
 #include "features.h"
 
 // app includes
+#include "app_heart_rate.h"
 #include "app_settings.h"
 #include "app_sensors.h"
 
@@ -40,32 +41,19 @@ extern EventGroupHandle_t error_event_group;
 
 
 // System State Variables
-System_t sys = {
-    .initialized    = false,
-    .sleep          = false,
-    .wakeup         = false,
+System_t sys =
+{
+    .goToSleep      = false,
     .state          = SYSTEM_INITIALIZATION,
     .free_heap      = 0
 };
 
 
-static bool init_system_startup(void)
+/** Private Functions **/
+static void sys_task_private_updateFreeHeapStat(void)
 {
-#if(FEATURE_BMA_IMU)
-    if(bma_init())
-    {
-        bma423_get_device_id();
-    }
-#endif
-
-    init_HRS3300();
-    init_CST816S();
-    init_haptic();
-    init_gpio_interrupts();
-
-    return true;
+    sys.free_heap = xPortGetFreeHeapSize();
 }
-
 
 /** Public Functions **/
 void sys_task(void * arg)
@@ -73,31 +61,44 @@ void sys_task(void * arg)
     UNUSED_PARAMETER(arg);
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xFrequency = pdMS_TO_TICKS(100);
-
-    sys.free_heap = xPortGetFreeHeapSize();
+    const TickType_t xAwakePeriod = pdMS_TO_TICKS(100);
+    const TickType_t xSleepPeriod = pdMS_TO_TICKS(1000);
     
     while(1)
     {
         switch(sys.state)
         {
             case SYSTEM_INITIALIZATION:
-                init_system_startup();
+                sys_task_private_updateFreeHeapStat();
 
-                sys.initialized = true;
+#if(FEATURE_BMA_IMU)
+                if(bma_init())
+                {
+                    bma423_get_device_id();
+                }
+#endif
+
+                app_heart_rate_init();
+                init_CST816S();
+                init_gpio_interrupts();
+
                 sys.state = SYSTEM_RUN;
                 break;
 
             case SYSTEM_RUN:
                 app_battery();
-                app_heart_rate();
-                // app_settings();
                 app_haptic();
+                app_heart_rate();
+                app_sensor_update_display();
 
 #if (FEATURE_BMA_IMU)
                 app_accel();
 #endif /* FEATURE_BMA_IMU */
-                 app_sensor_update_display();
+
+                // app_settings();
+                sys_task_private_updateFreeHeapStat();
+                
+                vTaskDelayUntil(&xLastWakeTime, xAwakePeriod);
                 break;
             
             case SYSTEM_SLEEP:
@@ -105,12 +106,11 @@ void sys_task(void * arg)
             //    if(ble.connection_active == false) {
             //        sd_power_system_off();
             //    }
-                sys.state = SYSTEM_RUN;  // temp
+                vTaskDelayUntil(&xLastWakeTime, xSleepPeriod);
                 break;
 
         default:
                 break;
         }
-        vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
 }
