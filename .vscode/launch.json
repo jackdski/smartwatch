@@ -10,13 +10,13 @@
         "name": "Debug J-Link",
         "cwd": "${workspaceRoot}",
         "executable": "${workspaceRoot}/_build/nrf52832_xxaa.out",
-        "serverpath": "/opt/SEGGER/JLink/JLinkGDBServerCLExe", 
+        "serverpath": "/opt/SEGGER/JLink/JLinkGDBServerCLExe",
         "servertype": "jlink",
         "device": "nRF52832_xxAA",
         "interface": "swd",
         "runToMain": true,
         "armToolchainPath": "/usr/bin/",
-        "svdFile": "${workspaceRoot}/toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/mdk/nrf52.svd" 
+        "svdFile": "${workspaceRoot}/toolchains/nRF5/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/mdk/nrf52.svd"
     }
     ]
 }

@@ -5,10 +5,12 @@
 #ifndef DISPLAY_SETTINGS_H_
 #define DISPLAY_SETTINGS_H_
 
-typedef enum {
-  SETTING_BUTTON,
-  SETTING_SWITCH
-} eDisplaySettingSelector;
+typedef enum
+{
+    SETTING_TYPE_BUTTON,
+    SETTING_TYPE_SWITCH
+} DisplaySettingType_E;
+
 
 void display_settings_screen(void);
 

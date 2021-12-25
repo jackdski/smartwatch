@@ -110,7 +110,7 @@ for source in sources:
     sumcode += size.code
     sumdata += size.data
     sumtotal += size.total()
-    print("%-40s \t%7s  (code: %d data: %d)" % (os.path.normpath(source), size.total(), size.code, size.data))
+    # print("%-40s \t%7s  (code: %d data: %d)" % (os.path.normpath(source), size.total(), size.code, size.data))
 print(f"\nCode size:\t{sumcode}\t-  {int(sumcode/1024)}KB\t-  {round(100*sumcode/1024/512, 2)}%")
-print(f"Data size:\t{sumdata}\t-  {int(sumdata/1024)}KB \t-  {round(100*sumdata/1024/512, 2)}%")
+print(f"Data size:\t{sumdata}\t-  {int(sumdata/1024)}KB \t\t-  {round(100*sumdata/1024/512, 2)}%")
 print(f"TOTAL size:\t{sumtotal}\t-  {int(sumtotal/1024)}KB\t-  {round(100*sumtotal/1024/512, 2)}%")

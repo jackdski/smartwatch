@@ -1,4 +1,4 @@
-/* 
+/*
  *  app_heart_rate.h
  */
 

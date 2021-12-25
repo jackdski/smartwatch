@@ -33,12 +33,13 @@
 #include "nrf_soc.h"
 #endif
 #include "app_util_platform.h"
+#include "nrf52.h"
 
 /*-----------------------------------------------------------
  * Possible configurations for system timer
  */
-#define FREERTOS_USE_RTC      0 /**< Use real time clock for the system */
-#define FREERTOS_USE_SYSTICK  1 /**< Use SysTick timer for system */
+#define FREERTOS_USE_RTC      1 /**< Use real time clock for the system */
+#define FREERTOS_USE_SYSTICK  0 /**< Use SysTick timer for system */
 
 /*-----------------------------------------------------------
  * Application specific definitions.

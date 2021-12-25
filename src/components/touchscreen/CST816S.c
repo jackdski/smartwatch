@@ -16,32 +16,37 @@
 #include "semphr.h"
 
 
-CST816S_t dev = {
-    .point = {
+CST816S_t cst_data =
+{
+    .initialized    = false,
+    .touch_active   = false,
+    .asleep         = false,
+    .point =
+    {
         .x = 0,
-        .y = 0
+        .y = 0,
     },
     .gesture        = GESTURE_NONE,
     .prev_gesture   = GESTURE_NONE,
     .numTouchPoints = 0,
     .pressure       = 0,
-    .touch_active   = false,
-    .asleep         = false
+    .timer          = NULL,
+    .state          = CST816S_INIT_1,
     // .i2c_read       = twi_rx
 };
 
 
 uint8_t init_CST816S(void)
 {
-    dev.timer = xTimerCreate("CST816S Timer",
-                             50U,
-                             pdFALSE,
-                             NULL,
-                             NULL
-                             );
+    cst_data.timer = xTimerCreate("CST816S Timer",
+                              50U,
+                              pdFALSE,
+                              NULL,
+                              NULL
+                              );
 
     nrf_gpio_pin_set(TP_RESET_PIN);
-    xTimerStart(dev.timer, 0);                             
+    xTimerStart(cst_data.timer, 0);
 
 //    uint8_t temp;
 //    twi_reg_read(CST816S_ADDR, CST816S_REG_CHIP_ID, &temp);
@@ -78,30 +83,30 @@ void init_CST816S_interrupt(void * irq_pfn)
 
 void app_CST816S(void)
 {
-    switch (dev.state)
+    switch (cst_data.state)
     {
         case CST816S_INIT_1:
-            if (xTimerIsTimerActive(dev.timer) == false)
+            if (xTimerIsTimerActive(cst_data.timer) == false)
             {
                 nrf_gpio_pin_clear(TP_RESET_PIN);
-                xTimerReset(dev.timer, 0);
-                dev.state = CST816S_INIT_2;
+                xTimerReset(cst_data.timer, 0);
+                cst_data.state = CST816S_INIT_2;
             }
             break;
         case CST816S_INIT_2:
-            if (xTimerIsTimerActive(dev.timer) == false)
+            if (xTimerIsTimerActive(cst_data.timer) == false)
             {
                 nrf_gpio_pin_set(TP_RESET_PIN);
-                xTimerReset(dev.timer, 0);
-                dev.state = CST816S_INIT_2;
+                xTimerReset(cst_data.timer, 0);
+                cst_data.state = CST816S_INIT_2;
             }
             break;
         case CST816S_INIT_3:
-            if (xTimerIsTimerActive(dev.timer) == false)
+            if (xTimerIsTimerActive(cst_data.timer) == false)
             {
                 nrf_gpio_pin_clear(TP_RESET_PIN);
-                xTimerReset(dev.timer, 0);
-                dev.state = CST816S_RUNNING;
+                xTimerReset(cst_data.timer, 0);
+                cst_data.state = CST816S_RUNNING;
             }
             break;
         case CST816S_RUNNING:
@@ -113,42 +118,41 @@ void app_CST816S(void)
 
 bool CST816S_read_touch(void)
 {
-    uint8_t data[10];
-    twi_rx(CST816S_ADDR, 0, data, 8);
-    dev.numTouchPoints = data[CST816S_TOUCH_INDEX] & 0x0F;
-    // uint8_t pointID = data[data[5]] >> 4;
+    uint8_t touchData[10];
+    twi_rx(CST816S_ADDR, 0, touchData, 8);
+    cst_data.numTouchPoints = touchData[CST816S_TOUCH_INDEX] & 0x0F;
 
-    if(dev.numTouchPoints == 0)
+    if(cst_data.numTouchPoints == 0)
     {
-        dev.touch_active = false;
-        dev.gesture = GESTURE_NONE;
+        cst_data.touch_active = false;
+        cst_data.gesture = GESTURE_NONE;
     }
     else
     {
-        dev.touch_active = true;
-        dev.gesture = data[CST816S_GESTURE_ID_INDEX] >> 6;
-        dev.touch_event = data[CST816S_EVENT_INDEX] & EVENT_MASK;
-        dev.point.x = (data[CST816S_X_MSB] << 8) | (data[CST816S_X_LSB]);
-        dev.point.y = (data[CST816S_Y_MSB] << 8) | (data[CST816S_Y_LSB]);
+        cst_data.touch_active = true;
+        cst_data.gesture = touchData[CST816S_GESTURE_ID_INDEX] >> 6;
+        cst_data.touch_event = touchData[CST816S_EVENT_INDEX] & EVENT_MASK;
+        cst_data.point.x = (touchData[CST816S_X_MSB] << 8) | (touchData[CST816S_X_LSB]);
+        cst_data.point.y = (touchData[CST816S_Y_MSB] << 8) | (touchData[CST816S_Y_LSB]);
     }
 
-    return dev.touch_active;
+    return cst_data.touch_active;
 }
 
 bool CST816S_get_touch_active(void)
 {
-    return dev.touch_active;
+    return cst_data.touch_active;
 }
 
 uint8_t CST816S_get_touch_num(void)
 {
-    return dev.numTouchPoints;
+    return cst_data.numTouchPoints;
 }
 
 void CST816S_get_xy(int16_t * x, int16_t * y)
 {
-    *x = dev.point.x;
-    *y = dev.point.y;
+    *x = cst_data.point.x;
+    *y = cst_data.point.y;
 }
 
 /**

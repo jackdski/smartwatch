@@ -61,6 +61,10 @@
 #include "nrf_error.h"
 #include "nrf_error_soc.h"
 
+#ifndef __STATIC_INLINE
+#define __STATIC_INLINE static inline
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

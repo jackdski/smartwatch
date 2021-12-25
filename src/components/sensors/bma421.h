@@ -11,11 +11,11 @@
 #include "bma423.h"
 
 typedef enum {
-  SENSORS_INITIALIZATION,
-  SENSORS_ACTIVE,
-  SENSORS_LOW_POWER,
-  SENSORS_WAKEUP
-} eSensorsState;
+  BMA_STATE_INITIALIZATION,
+  BMA_STATE_ACTIVE,
+  BMA_STATE_LOW_POWER,
+  BMA_STATE_WAKEUP
+} BMA_State_E;
 
 typedef enum {
   BMA_INT_SINGLE_TAP    = BMA423_SINGLE_TAP_INT,
@@ -26,23 +26,23 @@ typedef enum {
   BMA_INT_ANY_MOT       = BMA423_ANY_MOT_INT,
   BMA_INT_NO_MOT        = BMA423_NO_MOT_INT,
   BMA_INT_ERROR         = BMA423_ERROR_INT,
-} eBMAInterruptSource;
+} BMA_InterruptSource_E;
 
 typedef struct {
-  eSensorsState         state;
-  eBMAInterruptSource   interrupt_source;
+  BMA_State_E           state;
+  BMA_InterruptSource_E interrupt_source;
   bool                  interrupt_chg_req;
   uint32_t              step_count;
 } bma_ctrl_t;
 
 bool bma_init(void);
-void init_bma_gpio_interrupt(void * irq_pfn);
-bool bma423_get_device_id(void);
-bool bma423_set_interrupt_source(eBMAInterruptSource int_source);
-bool bma423_get_interrupt_status();
-void update_step_count(void);
-uint32_t get_step_count(void);
-void delay(uint32_t period_us, void * intf_ptr);
-bool sleep_bma(void);
+void init_bmaGpioInterrupt(void * irq_pfn);
+bool bma_getDeviceID(void);
+bool bma_setInterruptSource(BMA_InterruptSource_E int_source);
+bool bma_getInterruptStatus();
+void bma_updateStepCount(void);
+uint32_t bma_getStepCount(void);
+bool bma_isActive(void);
+bool bma_goToLowPower(void);
 
 #endif /* BMA421_H_s */

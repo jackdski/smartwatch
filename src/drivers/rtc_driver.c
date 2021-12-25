@@ -13,7 +13,8 @@
 #define RTC_ALARM_CHANNEL           1
 
 
-const nrf_drv_rtc_t rtc = {
+const nrf_drv_rtc_t rtc =
+{
     .p_reg            = NRF_RTC2,
     .irq              = RTC2_IRQn,
     .instance_id      = NRFX_RTC0_INST_IDX,

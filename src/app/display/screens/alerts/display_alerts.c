@@ -59,7 +59,7 @@ void display_alert(void)
         case ALERT_BATTERY_CHARGED:
             lv_label_set_text(alert_label, "Battery Fully Charged!");
             break;
-        
+
         case ALERT_HEART_RATE_HIGH:
             lv_label_set_text(alert_label, "High Heart Rate Detected");
             break;
@@ -83,5 +83,5 @@ void display_alert_callback(TimerHandle_t xTimer)
 
     alert = NO_ACTIVE_ALERT;
     return_screen = DISPLAY_SCREEN_HOME;
-    display_alert_timer_disable();
+    // display_alert_timer_disable(); // TODO
 }

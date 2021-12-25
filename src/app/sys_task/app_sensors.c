@@ -40,7 +40,7 @@ static SensorData_t sensor_data = {
     {
         .soc                = 0,
         .level              = BATTERY_LEVEL_DEFAULT,
-        .prev_level         = BATTERY_LEVEL_DEFAULT, 
+        .prev_level         = BATTERY_LEVEL_DEFAULT,
         .charging_state     = BATTERY_CHARGING_IDLE
     }
 };
@@ -49,13 +49,13 @@ static SensorData_t sensor_data = {
 /** Public Functions **/
 void app_accel(void)
 {
-    update_step_count();
-    sensor_data.imu.steps = get_step_count();
+    bma_updateStepCount();
+    sensor_data.imu.steps = bma_getStepCount();
 
     // alternate between wrist wear int. and single tap int.
     sensor_data.imu.interrupt_source ^= 0x08;
-    bma423_set_interrupt_source(sensor_data.imu.interrupt_source);
-    if(bma423_get_interrupt_status())
+    bma_setInterruptSource(sensor_data.imu.interrupt_source);
+    if(bma_getInterruptStatus())
     {
         vTaskResume(thDisplay);
     }
@@ -69,7 +69,7 @@ void app_battery(void)
     if(is_charging_complete())
     {
         sensor_data.battery.charging_state = BATTERY_CHARGING_COMPLETE;
-        haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
+        app_haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
     }
     else
     {
@@ -78,8 +78,8 @@ void app_battery(void)
             sensor_data.battery.charging_state = BATTERY_CHARGING_ACTIVE;
 
             if(get_battery_chargingPrevious() == false)
-            {            
-                haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
+            {
+                app_haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
             }
         }
         else
@@ -87,8 +87,8 @@ void app_battery(void)
             sensor_data.battery.charging_state = BATTERY_CHARGING_IDLE;
 
             if(get_battery_chargingPrevious() == true)
-            {            
-                haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
+            {
+                app_haptic_request(HAPTIC_PULSE_START_STOP_CHARGING);
             }
         }
     }
@@ -123,7 +123,7 @@ static void set_battery_status(uint8_t soc)
     else if(soc <= BATTERY_SOC_MED)
     {
         sensor_data.battery.prev_level = sensor_data.battery.level;
-        sensor_data.battery.level = BATTERY_LEVEL_MEDIUM;     
+        sensor_data.battery.level = BATTERY_LEVEL_MEDIUM;
     }
     else if(soc <= BATTERY_SOC_HIGH)
     {
@@ -137,7 +137,7 @@ static void set_battery_status(uint8_t soc)
             set_alert(ALERT_BATTERY_CHARGED);
         }
 
-        sensor_data.battery.prev_level = sensor_data.battery.level; 
+        sensor_data.battery.prev_level = sensor_data.battery.level;
         sensor_data.battery.level = BATTERY_LEVEL_FULL;
     }
     else

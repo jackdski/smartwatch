@@ -13,35 +13,41 @@
 #define HEART_RATE_LOWER_LIMIT  35U
 
 
-HRS_t hrs;
+static HRS_t hrs_data;
 
 bool app_heart_rate_init(void)
 {
-    hrs.channel = 0;
-    hrs.heart_rate = 0;
-    hrs.upper_limit = HEART_RATE_UPPER_LIMIT;
-    hrs.lower_limit = HEART_RATE_LOWER_LIMIT;
+    bool ret = true;
 
-    if(HRS3300_get_device_id())
+    hrs_data.channel = 0;
+    hrs_data.heart_rate = 0;
+    hrs_data.upper_limit = HEART_RATE_UPPER_LIMIT;
+    hrs_data.lower_limit = HEART_RATE_LOWER_LIMIT;
+
+    if (HRS3300_get_device_id())
     {
         HRS3300_update();
-        return true;
     }
-    return false;
+    else
+    {
+        ret = false;
+    }
+    return ret;
 }
 
 void app_heart_rate(void)
 {
-    hrs.channel ^= 1;  // flip channels
+    hrs_data.channel ^= 1;  // flip channels
     HRS3300_enable(true);
-    hrs.heart_rate = HRS3300_get_sample(hrs.channel);
+    hrs_data.heart_rate = HRS3300_get_sample(hrs_data.channel);
     HRS3300_enable(false);
 
-    if(hrs.heart_rate >= HEART_RATE_UPPER_LIMIT)
+    if (hrs_data.heart_rate >= HEART_RATE_UPPER_LIMIT)
     {
         set_alert(ALERT_HEART_RATE_HIGH);
     }
-    else if((hrs.heart_rate > 0U) && (hrs.heart_rate <= HEART_RATE_LOWER_LIMIT))
+    else if ((hrs_data.heart_rate > 0U) &&
+             (hrs_data.heart_rate <= HEART_RATE_LOWER_LIMIT))
     {
         set_alert(ALERT_HEART_RATE_LOW);
     }
@@ -53,6 +59,6 @@ void app_heart_rate(void)
 
 uint16_t app_heart_rate_getHeartRate(void)
 {
-    return hrs.heart_rate;
+    return hrs_data.heart_rate;
 }
 

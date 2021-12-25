@@ -225,20 +225,20 @@ SRC_FILES += \
   $(PROJ_DIR)/app/sys_task/sys_task.c \
   $(PROJ_DIR)/app/sys_task/app_sensors.c \
   $(PROJ_DIR)/app/sys_task/app_heart_rate.c \
-  $(PROJ_DIR)/app/sys_task/app_settings.c \
   $(PROJ_DIR)/app/flash_task/flash_task.c \
   $(PROJ_DIR)/app/ble/ble_ancs.c \
   $(PROJ_DIR)/app/ble/ble_general.c \
-  $(PROJ_DIR)/app/display_task/display_common.c \
-  $(PROJ_DIR)/app/display_task/display.c \
-  $(PROJ_DIR)/app/display_task/alerts/display_alerts.c \
-  $(PROJ_DIR)/app/display_task/drv_touchscreen/drv_touchscreen.c \
-  $(PROJ_DIR)/app/display_task/boot_up/display_boot_up.c \
-  $(PROJ_DIR)/app/display_task/brightness/display_brightness.c \
-  $(PROJ_DIR)/app/display_task/heart_rate/display_heart_rate.c \
-  $(PROJ_DIR)/app/display_task/home/display_home.c \
-  $(PROJ_DIR)/app/display_task/settings/display_settings.c \
-  $(PROJ_DIR)/app/display_task/steps/display_steps.c \
+  $(PROJ_DIR)/app/display/display_common.c \
+  $(PROJ_DIR)/app/display/display.c \
+  $(PROJ_DIR)/app/display/drv_touchscreen/drv_touchscreen.c \
+  $(PROJ_DIR)/app/display/screens/alerts/display_alerts.c \
+  $(PROJ_DIR)/app/display/screens/app_selection/display_app_selection.c \
+  $(PROJ_DIR)/app/display/screens/boot_up/display_boot_up.c \
+  $(PROJ_DIR)/app/display/screens/brightness/display_brightness.c \
+  $(PROJ_DIR)/app/display/screens/heart_rate/display_heart_rate.c \
+  $(PROJ_DIR)/app/display/screens/home/display_home.c \
+  $(PROJ_DIR)/app/display/screens/settings/display_settings.c \
+  $(PROJ_DIR)/app/display/screens/steps/display_steps.c \
   $(PROJ_DIR)/main.c \
 
 
@@ -259,15 +259,17 @@ INC_FOLDERS += \
   $(PROJ_DIR)/components/touchscreen \
   $(PROJ_DIR)/components/watchdog \
   $(PROJ_DIR)/app/ble \
-  $(PROJ_DIR)/app/display_task \
-  $(PROJ_DIR)/app/display_task/alerts/ \
-  $(PROJ_DIR)/app/display_task/drv_touchscreen/ \
-  $(PROJ_DIR)/app/display_task/boot_up/ \
-  $(PROJ_DIR)/app/display_task/brightness/ \
-  $(PROJ_DIR)/app/display_task/heart_rate/ \
-  $(PROJ_DIR)/app/display_task/home/ \
-  $(PROJ_DIR)/app/display_task/settings/ \
-  $(PROJ_DIR)/app/display_task/steps/ \
+  $(PROJ_DIR)/app/display \
+  $(PROJ_DIR)/app/display/drv_touchscreen/ \
+  $(PROJ_DIR)/app/display/screens \
+  $(PROJ_DIR)/app/display/screens/alerts/ \
+  $(PROJ_DIR)/app/display/screens/app_selection/ \
+  $(PROJ_DIR)/app/display/screens/boot_up/ \
+  $(PROJ_DIR)/app/display/screens/brightness/ \
+  $(PROJ_DIR)/app/display/screens/heart_rate/ \
+  $(PROJ_DIR)/app/display/screens/home/ \
+  $(PROJ_DIR)/app/display/screens/settings/ \
+  $(PROJ_DIR)/app/display/screens/steps/ \
   $(PROJ_DIR)/app/sys_task \
   $(PROJ_DIR)/app/flash_task \
   $(LVGL_DIR)/lv_core \
@@ -485,6 +487,7 @@ LIB_FILES += -lc -lnosys -lm
 
 # Default target - first one defined
 default: nrf52832_xxaa
+	python3 scripts/analyze_map.py $(OUTPUT_DIRECTORY)/nrf52832_xxaa.map
 
 # Print all targets that can be built
 help:

@@ -8,21 +8,21 @@
 
 #include "nrf_drv_rtc.h"
 
-#define SHORT_DAY_MONTHS        (FEBRUARY)
 #define IS_LEAP_YEAR(YEAR)      ((YEAR % 4) == 0)
 
 #define THIRTY_DAY_MONTHS       (APRIL | JUNE | SEPTEMBER | NOVEMBER)
 #define THIRTY_ONE_DAY_MONTHS   (JANUARY | MARCH | MAY | JUNE | JULY | AUGUST | OCTOBER | DECEMBER)
 
 
-static Time_t time = {
-    .hour = 12,
-    .minute = 10,
-    .second = 0,
+static Time_t time =
+{
+    .hour = 12U,
+    .minute = 10U,
+    .second = 0U,
     .day_of_week = MONDAY,
-    .day = 1,
+    .day = 1U,
     .month = NOVEMBER,
-    .year = 2020
+    .year = 2020U
 };
 
 /** RTC HANDLER **/
@@ -35,6 +35,11 @@ void rtc_handler(nrf_drv_rtc_int_type_t int_type)
 }
 
 /** TIME **/
+void init_time(void)
+{
+    rtc_config(&rtc_handler);
+}
+
 void update_time(Time_t new_time)
 {
     memcpy(&time, &new_time, sizeof(Time_t));
@@ -55,17 +60,17 @@ void update_time_weekday(eWeekday weekday)
 void increment_time_second(uint8_t sec)
 {
     time.second += sec;
-    if(time.second >= 60)
+    if (time.second >= 60U)
     {
         time.minute++;
-        time.second = 0;
+        time.second = 0U;
     }
-    if(time.minute >= 60)
+    if (time.minute >= 60U)
     {
         time.hour++;
-        time.minute = 0;
+        time.minute = 0U;
     }
-    if(time.hour >= 24)
+    if (time.hour >= 24U)
     {
         increment_time_day();
     }
@@ -77,19 +82,21 @@ void increment_time_day(void)
     time.hour = 0;
 
     bool increment_month = false;
-    if((time.month & THIRTY_DAY_MONTHS) && (time.day > 30))
+    if ((time.month & THIRTY_DAY_MONTHS) && (time.day > 30U))
     {
         increment_month = true;
     }
-    else if((time.month & THIRTY_ONE_DAY_MONTHS) && (time.day > 31))
+    else if ((time.month & THIRTY_ONE_DAY_MONTHS) && (time.day > 31U))
     {
         increment_month = true;
     }
-    else if((time.month & IS_LEAP_YEAR(time.year)) && (time.day > 29))
+    else if ((time.month & IS_LEAP_YEAR(time.year)) && (time.day > 29U))
     {
         increment_month = true;
     }
-    else if((time.month & !IS_LEAP_YEAR(time.year)) && (time.day > 28))
+    else if ((time.month &&
+             (IS_LEAP_YEAR(time.year) == false)) &&
+             (time.day > 28U))
     {
         increment_month = true;
     }
@@ -98,7 +105,7 @@ void increment_time_day(void)
         // nothing - month does not need to be incremented
     }
 
-    if(increment_month == true)
+    if (increment_month)
     {
         increment_time_month(time.month);
     }
@@ -106,22 +113,63 @@ void increment_time_day(void)
 
 void increment_time_month(eMonth month)
 {
-    switch(month) {
-    case JANUARY: time.month = FEBRUARY; break;
-    case FEBRUARY: time.month = MARCH; break;
-    case MARCH: time.month = APRIL; break;
-    case APRIL: time.month = MAY; break;
-    case MAY: time.month = JUNE; break;
-    case JUNE: time.month = JULY; break;
-    case JULY: time.month = AUGUST; break;
-    case AUGUST: time.month = SEPTEMBER; break;
-    case SEPTEMBER: time.month = OCTOBER; break;
-    case OCTOBER: time.month = NOVEMBER; break;
-    case NOVEMBER: time.month = DECEMBER; break;
-    case DECEMBER: time.month = JANUARY; break;
+    switch(month)
+    {
+        case JANUARY:
+            time.month = FEBRUARY;
+            break;
+
+        case FEBRUARY:
+            time.month = MARCH;
+            break;
+
+        case MARCH:
+            time.month = APRIL;
+            break;
+
+        case APRIL:
+            time.month = MAY;
+            break;
+
+        case MAY:
+            time.month = JUNE;
+            break;
+
+        case JUNE:
+            time.month = JULY;
+            break;
+
+        case JULY:
+            time.month = AUGUST;
+            break;
+
+        case AUGUST:
+            time.month = SEPTEMBER;
+            break;
+
+        case SEPTEMBER:
+            time.month = OCTOBER;
+            break;
+
+        case OCTOBER:
+            time.month = NOVEMBER;
+            break;
+
+        case NOVEMBER:
+            time.month = DECEMBER;
+            break;
+
+        case DECEMBER:
+            time.month = JANUARY;
+            break;
+
+        default:
+            // nothing
+            break;
+
     }
 
-    time.day = 1;
+    time.day = 1U;
 }
 
 void get_time(Time_t * t)
@@ -132,19 +180,20 @@ void get_time(Time_t * t)
 // ENUM TO STRINGS
 char * get_month_str(void)
 {
-    switch(time.month) {
-    case JANUARY: return "January";
-    case FEBRUARY: return "February";
-    case MARCH: return "March";
-    case APRIL: return "April";
-    case MAY: return "May";
-    case JUNE: return "June";
-    case JULY: return "July";
-    case AUGUST: return "August";
-    case SEPTEMBER: return "September";
-    case OCTOBER: return "October";
-    case NOVEMBER: return "November";
-    case DECEMBER: return "December";
+    switch(time.month)
+    {
+        case JANUARY:   return "January";
+        case FEBRUARY:  return "February";
+        case MARCH:     return "March";
+        case APRIL:     return "April";
+        case MAY:       return "May";
+        case JUNE:      return "June";
+        case JULY:      return "July";
+        case AUGUST:    return "August";
+        case SEPTEMBER: return "September";
+        case OCTOBER:   return "October";
+        case NOVEMBER:  return "November";
+        case DECEMBER:  return "December";
     }
     return "ERR";
 //    return month_of_year[time.month];
@@ -152,14 +201,15 @@ char * get_month_str(void)
 
 char * get_weekday_str(void)
 {
-    switch(time.day_of_week){
-    case MONDAY: return "Monday";
-    case TUESDAY: return "Tuesday";
-    case WEDNESDAY: return "Wednesday";
-    case THURSDAY: return "Thursday";
-    case FRIDAY: return "Friday";
-    case SATURDAY: return "Saturday";
-    case SUNDAY: return "Sunday";
+    switch(time.day_of_week)
+    {
+        case MONDAY:    return "Monday";
+        case TUESDAY:   return "Tuesday";
+        case WEDNESDAY: return "Wednesday";
+        case THURSDAY:  return "Thursday";
+        case FRIDAY:    return "Friday";
+        case SATURDAY:  return "Saturday";
+        case SUNDAY:    return "Sunday";
     }
     return "ERR";
 //    return day_of_week[time.day_of_week];
@@ -214,9 +264,9 @@ void format_time_standard(char * ret_str)
 {
     char str[10];
     uint8_t hour = time.hour;
-    if(hour > 12)
+    if (hour > 12U)
     {
-        hour -= 12;
+        hour -= 12U;
         sprintf(str, "%d:%d%s", hour, time.minute, "pm");
     }
     else

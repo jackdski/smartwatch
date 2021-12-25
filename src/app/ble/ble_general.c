@@ -470,13 +470,12 @@ void peer_manager_init(void)
  * @details This function is called when a successful connection has been established.
  */
 void apple_notification_setup(void)
-{
-    ret_code_t ret;
-    
+{    
     vTaskDelay(pdMS_TO_TICKS(100));
     // nrf_delay_ms(100); // Delay because we cannot add a CCCD to close to starting encryption. iOS specific.
 
 #if (FEATURE_ANCS)
+    ret_code_t ret;
     ret = ble_ancs_c_notif_source_notif_enable(&m_ancs_c);
     APP_ERROR_CHECK(ret);
 

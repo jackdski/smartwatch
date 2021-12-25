@@ -54,7 +54,11 @@
         "hrs3300.h": "c",
         "app_heart_rate.h": "c",
         "sgm40561.h": "c",
-        "nrfx_spim.h": "c"
+        "nrfx_spim.h": "c",
+        "stdint.h": "c",
+        "cstdint": "c",
+        "stdint-gcc.h": "c",
+        "xt25f32b.h": "c"
     },
     "workbench.colorTheme": "Monokai",
     "editor.fontSize": 12,

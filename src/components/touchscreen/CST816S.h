@@ -57,18 +57,6 @@ enum
     CST816S_REG_ESD_SATUREATE     = 0xED
 };
 
-typedef struct
-{
-    uint8_t blank_0;
-    uint8_t gesture;
-    uint8_t x_msb;
-    uint8_t x_lsb;
-    uint8_t touchID_y_msb;
-    uint8_t y_lsb;
-    uint8_t pressure;
-    uint8_t blank_1;
-} CST816S_TouchEvent_t;
-
 typedef enum
 {
     GESTURE_NONE,
@@ -89,14 +77,6 @@ typedef enum
     CONTACT
 } TouchEvent_E;
 
-typedef void (*i2c_read_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t * buffer);
-typedef void (*i2c_write_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
-
-typedef struct
-{
-    int16_t x;
-    int16_t y;
-} TouchPoint_t;
 
 typedef enum
 {
@@ -106,22 +86,43 @@ typedef enum
     CST816S_RUNNING
 } CST816S_state_E;
 
-typedef struct 
+typedef struct
 {
-    TouchPoint_t  point;
-    Gesture_E     gesture;
-    Gesture_E     prev_gesture;
-    TouchEvent_E  touch_event;
-    uint8_t       numTouchPoints;
-    uint8_t       pressure;
-    bool          touch_active;
-    bool          asleep;
-    TimerHandle_t timer;
+    int16_t x;
+    int16_t y;
+} TouchPoint_t;
+
+typedef struct
+{
+    uint8_t blank_0;
+    uint8_t gesture;
+    uint8_t x_msb;
+    uint8_t x_lsb;
+    uint8_t touchID_y_msb;
+    uint8_t y_lsb;
+    uint8_t pressure;
+    uint8_t blank_1;
+} CST816S_TouchEvent_t;
+
+// typedef void (*i2c_read_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t * buffer);
+// typedef void (*i2c_write_reg)(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
+
+typedef struct
+{
+    bool            initialized;
+    bool            touch_active;
+    bool            asleep;
+    TouchPoint_t    point;
+    Gesture_E       gesture;
+    Gesture_E       prev_gesture;
+    TouchEvent_E    touch_event;
+    uint8_t         numTouchPoints;
+    uint8_t         pressure;
+    TimerHandle_t   timer;
     CST816S_state_E state;
     // i2c_read_reg  i2c_read;
     // i2c_write_reg i2c_write;
 } CST816S_t;
-
 
 
 uint8_t init_CST816S(void);

@@ -22,7 +22,7 @@ typedef struct
     flash_task_states_E state;
 } flash_task_data_t;
 
-flash_task_data_t data = 
+flash_task_data_t flash_data =
 {
     .state = FLASH_TASK_STATE_INITIALIZATION
 };
@@ -45,7 +45,7 @@ void flash_task(void * arg)
 
     while(1)
     {
-        switch (data.state)
+        switch (flash_data.state)
         {
             case FLASH_TASK_STATE_INITIALIZATION:
             {
@@ -54,7 +54,7 @@ void flash_task(void * arg)
                     // (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
                     if (XT25F32B_getDeviceID() != 0x00)
                     {
-                        data.state = FLASH_TASK_STATE_RUNNING;
+                        flash_data.state = FLASH_TASK_STATE_RUNNING;
                     }
                 };
             }
@@ -70,7 +70,7 @@ void flash_task(void * arg)
 
             case FLASH_TASK_STATE_SLEEP:
                 break;
-            
+
             default:
                 break;
         }

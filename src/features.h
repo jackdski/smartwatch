@@ -4,7 +4,7 @@
 /*          FEATURES            */
 #define FEATURE_DISPLAY         1
 #define FEATURE_TOUCHSCREEN     1
-#define FEATURE_BMA_IMU         0
+#define FEATURE_BMA_IMU         1
 #define FEATURE_FLASH           1
 #define FEATURE_WATCHDOG        0
 #define FEATURE_SLEEP           0

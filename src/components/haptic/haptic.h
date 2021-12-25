@@ -23,7 +23,7 @@ typedef enum
   HAPTIC_PULSE_CALL,
   HAPTIC_PULSE_ALARM,
 
-  HAPTIC_PULSE_COUNT
+  HAPTIC_PULSE_COUNT,
 } haptic_pulse_E;
 
 typedef enum
@@ -36,28 +36,26 @@ typedef enum
 
 typedef struct
 {
-  haptic_pulse_E     state;
-  haptic_pulse_E     request;
   haptic_strength_E   strength;
-  uint16_t          period_ms;
-  uint8_t           pulses;
-  uint8_t           duty_cycle;
-  uint16_t          ticks;
+  uint8_t             repeats;
+  uint32_t            period_ms;
+} haptic_pulse_config_t;
+
+
+typedef struct
+{
+  haptic_pulse_config_t * config;
+  haptic_pulse_E          state;
+  uint8_t                 duty_cycle;
+  uint8_t                 repeats;
 } Haptic_t;
 
 // App
-void init_haptic(void);
+void app_haptic_init(void);
 void app_haptic(void);
 void haptic_timer_callback(TimerHandle_t timerx);
 
-
 // Public Functions
-void haptic_disable(void);
-void haptic_start(haptic_pulse_E new_state);
-uint16_t haptic_get_period_ms(void);
-uint8_t haptic_get_pulses(void);
-void haptic_pulse_run(void);
-void haptic_request(haptic_pulse_E request_type);
-void haptic_reset(void);
+void app_haptic_request(haptic_pulse_E request_type);
 
 #endif //BLINKYEXAMPLEPROJECT_SRC_COMPONENTS_HAPTIC_H

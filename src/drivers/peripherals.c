@@ -5,6 +5,9 @@
 #include "peripherals.h"
 #include "app_config.h"
 
+#include "nrf52.h"
+#include "nrf52_bitfields.h"
+
 #include <stdbool.h>
 
 

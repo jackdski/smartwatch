@@ -298,6 +298,7 @@ toolchains/Unity/test/tests/self_assessment_utils.h
 /build_debug/*
 /build_test/*
 /build/*
+/_build/*
 
 
 /venv/

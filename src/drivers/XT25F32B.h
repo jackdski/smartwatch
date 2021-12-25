@@ -1,6 +1,8 @@
 #include "app_config.h"
-#include <stdint.h>
+#include "stdint.h"
 
+#ifndef XT25F32B_H_
+#define XT25F32B_H_
 
 /** Page 15 **/
 #define SPI_FLASH_WREN              0x06
@@ -58,3 +60,6 @@ uint8_t XT25F32B_read_block(uint32_t block, void * buffer, uint32_t size);
 
 uint8_t XT25F32B_getManufacturerID(void);
 uint8_t XT25F32B_getDeviceID(void);
+
+
+#endif // XT25F32B_H_

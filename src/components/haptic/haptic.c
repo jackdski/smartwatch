@@ -20,50 +20,66 @@ static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle);
 
 
 // Private Variables
-static Haptic_t haptic = {
-    .state      = HAPTIC_PULSE_NONE,
-    .request    = HAPTIC_PULSE_NONE,
-    .strength   = HAPTIC_STRENGTH_INACTIVE,
-    .period_ms  = 0,
-    .pulses     = 0,
-    .duty_cycle = 0,
-    .ticks      = 0
+static haptic_pulse_config_t haptic_pulse_configs[HAPTIC_PULSE_COUNT] =
+{
+    [HAPTIC_PULSE_NONE] =
+    {
+        .strength   = HAPTIC_STRENGTH_INACTIVE,
+        .period_ms  = 0U,
+        .repeats    = 0U,
+    },
+    [HAPTIC_PULSE_INITIALIZATION] =
+    {
+        .strength   = HAPTIC_STRENGTH_MEDIUM,
+        .period_ms  = 1500U,
+        .repeats    = 0U,
+    },
+    [HAPTIC_PULSE_TEXT_MSG] =
+    {
+        .strength   = HAPTIC_STRENGTH_STRONG,
+        .period_ms  = 500U,
+        .repeats    = 2U,
+    },
+    [HAPTIC_PULSE_CALL] =
+    {
+        .strength   = HAPTIC_STRENGTH_STRONG,
+        .period_ms  = 100U,
+        .repeats    = 3U,
+    },
+    [HAPTIC_PULSE_ALARM] =
+    {
+        .strength   = HAPTIC_STRENGTH_MEDIUM,
+        .period_ms  = 750U,
+        .repeats    = 20U,
+    },
+    [HAPTIC_PULSE_LOW_BATTERY] =
+    {
+        .strength   = HAPTIC_STRENGTH_WEAK,
+        .period_ms  = 200U,
+        .repeats    = 1U,
+    },
+    [HAPTIC_PULSE_START_STOP_CHARGING] =
+    {
+        .strength   = HAPTIC_STRENGTH_MEDIUM,
+        .period_ms  = 500U,
+        .repeats    = 1U,
+    },
 };
 
-// App
-void app_haptic(void)
-{
-    if(xQueueReceive(haptic_queue, &haptic.request, pdMS_TO_TICKS(0)))
-    {
-        // start if haptic is inactive or request is higher priority
-        if((haptic.state != HAPTIC_PULSE_NONE) || (haptic.request > haptic.state))
-        {
-            haptic_start(haptic.request);
-            xTimerChangePeriod(haptic_timer, haptic.period_ms, 10);
-            xTimerStart(haptic_timer, 10);
-        }
-    }
-}
-
-void haptic_timer_callback(TimerHandle_t timerx)
-{
-    UNUSED_PARAMETER(timerx);
-
-    if (haptic_get_pulses() > 1)
-    {
-        haptic_pulse_run();
-        xTimerStart(haptic_timer, 5);
-    }
-    else
-    {
-        haptic_reset();
-        haptic_disable();
-        xTimerStop(haptic_timer, pdMS_TO_TICKS(100));
-    }
-}
-
+static Haptic_t haptic = {
+    .config     = &haptic_pulse_configs[HAPTIC_PULSE_INITIALIZATION],
+    .state      = HAPTIC_PULSE_NONE,
+    .duty_cycle = 0,
+    .repeats    = 0
+};
 
 // Private Functions
+
+static void haptic_set_pulse(haptic_pulse_E pulse)
+{
+    haptic.config = &haptic_pulse_configs[HAPTIC_PULSE_NONE];
+    haptic.repeats = haptic.config->repeats;
+}
 
 static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle)
 {
@@ -71,97 +87,72 @@ static void haptic_set_pwm_duty_cycle(uint8_t duty_cycle)
     pwm_set_duty_cycle(HAPTIC_PWM_INDEX, haptic.duty_cycle);
 }
 
-
-
-// Public Functions
-
-void haptic_disable(void)
+static void haptic_private_start(haptic_pulse_E new_state)
 {
-    pwm_disable(HAPTIC_PWM_INDEX);
-}
-
-void haptic_start(haptic_pulse_E new_state)
-{
-    switch(new_state)
-    {
-    case HAPTIC_PULSE_INITIALIZATION:
-        haptic.strength = HAPTIC_STRENGTH_MEDIUM;
-        haptic.period_ms = 1500;
-        haptic.pulses = 1;  // actuation is toggled over course of 2s
-        break;
-    case HAPTIC_PULSE_TEXT_MSG:
-        haptic.strength = HAPTIC_STRENGTH_STRONG;
-        haptic.period_ms = 500;
-        haptic.pulses = 4;  // actuation is toggled over course of 2s
-        break;
-    case HAPTIC_PULSE_CALL:
-        // This haptic actuation will require consecutive timer starting
-        haptic.strength = HAPTIC_STRENGTH_STRONG;
-        haptic.period_ms = 1000;
-        haptic.pulses = 1;
-        break;
-    case HAPTIC_PULSE_ALARM:
-        haptic.strength = HAPTIC_STRENGTH_MEDIUM;
-        haptic.period_ms = 1000;
-        haptic.pulses = 20;  // actuation is toggled over course of 10s
-        break;
-    case HAPTIC_PULSE_LOW_BATTERY:
-        haptic.strength = HAPTIC_STRENGTH_WEAK;
-        haptic.period_ms = 200;
-        haptic.pulses = 1;
-        break;
-    case HAPTIC_PULSE_START_STOP_CHARGING:
-        haptic.strength = HAPTIC_STRENGTH_MEDIUM;
-        haptic.period_ms = 500;
-        haptic.pulses = 1;
-        break;
-    case HAPTIC_PULSE_NONE:
-    default:
-        haptic.strength = HAPTIC_STRENGTH_INACTIVE;
-        haptic.period_ms = 0;
-        haptic.pulses = 0;
-        haptic.state = HAPTIC_PULSE_NONE;
-        haptic_disable();
-        return;
-    }
-
     haptic.state = new_state;
-    haptic_set_pwm_duty_cycle(haptic.strength);
+    haptic_set_pulse(new_state);
+    haptic_set_pwm_duty_cycle(haptic.config->strength);
 }
 
-void haptic_pulse_run(void)
+static void haptic_private_runPulse(void)
 {
-    if(haptic.duty_cycle != 0)
+    if (haptic.duty_cycle != 0)
     {
         haptic_set_pwm_duty_cycle(0);
-        haptic.pulses--;
+        haptic.repeats--;
     }
     else
     {
-        haptic_set_pwm_duty_cycle(haptic.strength);
+        haptic_set_pwm_duty_cycle(haptic.config->strength);
     }
 }
 
-void haptic_reset(void)
+static void haptic_private_reset(void)
 {
-    haptic.strength = HAPTIC_STRENGTH_INACTIVE;
-    haptic.period_ms = 0;
-    haptic.pulses = 0;
+    haptic.state = HAPTIC_PULSE_NONE;
+    pwm_disable(HAPTIC_PWM_INDEX);
+}
+
+// Public Functions
+
+void app_haptic_init(void)
+{
     haptic.state = HAPTIC_PULSE_NONE;
 }
 
-void haptic_request(haptic_pulse_E request_type)
+void app_haptic(void)
+{
+    haptic_pulse_E request = HAPTIC_PULSE_NONE;
+    if(xQueueReceive(haptic_queue, &request, pdMS_TO_TICKS(0)))
+    {
+        // start if haptic is inactive or request is higher priority
+        if((haptic.state == HAPTIC_PULSE_NONE) || (request > haptic.state))
+        {
+            haptic_private_start(request);
+            xTimerChangePeriod(haptic_timer, haptic.config->period_ms, 0);
+            xTimerStart(haptic_timer, 0);
+        }
+    }
+}
+
+void app_haptic_request(haptic_pulse_E request_type)
 {
     const haptic_pulse_E request = request_type;
     xQueueSend(haptic_queue, &request, 0);
 }
 
-uint16_t haptic_get_period_ms(void)
+void haptic_timer_callback(TimerHandle_t timerx)
 {
-    return haptic.period_ms;
-}
+    UNUSED_PARAMETER(timerx);
 
-uint8_t haptic_get_pulses(void)
-{
-    return haptic.pulses;
+    if (haptic.repeats > 1U)
+    {
+        haptic_private_runPulse();
+        xTimerStart(haptic_timer, 5);
+    }
+    else
+    {
+        haptic_private_reset();
+        xTimerStop(haptic_timer, pdMS_TO_TICKS(100));
+    }
 }

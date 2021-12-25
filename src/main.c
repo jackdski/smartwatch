@@ -13,6 +13,8 @@
 #include "nrf_gpiote.h"
 
 // nRF driver files
+#include "nrf52.h"
+#include "nrf52_bitfields.h"
 #include "nrf_sdh_soc.h"
 #include "nrf_sdh_freertos.h"
 
@@ -179,12 +181,14 @@ void sleep_mode_enter(void)
 
 /**@brief Function for initializing power management.
  */
+#if 0
 static void power_management_init(void)
 {
     ret_code_t err_code;
     err_code = nrf_pwr_mgmt_init();
     APP_ERROR_CHECK(err_code);
 }
+#endif
 
 void vApplicationIdleHook( void )
 {
@@ -271,9 +275,9 @@ int main(void)
 
     error_event_group = xEventGroupCreate();
 
-    //
-    // Create tasks
-    //
+/*
+ * Create tasks
+ */
     if(pdPASS != xTaskCreate(sys_task,
                              "SysTask",
                              TASK_SYSTASK_STACK_SIZE,
@@ -294,17 +298,6 @@ int main(void)
     {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
-
-    if(pdPASS != xTaskCreate(UIupdate_Task,
-                             "UI Update",
-                             TASK_DISPLAY_STACK_SIZE,
-                             NULL,
-                             4,
-                             &thUIupdate))
-    {
-        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
-    }
-    vTaskSuspend(thUIupdate);
 #endif /* FEATURE_DISPLAY */
 
 #if (FEATURE_FLASH)
@@ -370,7 +363,7 @@ int main(void)
 
     vTaskStartScheduler();
 
-    while(true)
+    while(1)
     {
         APP_ERROR_HANDLER(NRF_ERROR_FORBIDDEN);
     }

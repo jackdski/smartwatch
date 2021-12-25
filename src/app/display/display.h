@@ -17,7 +17,7 @@
 #include "display_drv.h"
 
 typedef enum
-{
+    {
     DISPLAY_STATE_INITIALIZATION,
     DISPLAY_STATE_RUN,
     DISPLAY_STATE_GO_TO_SLEEP,
@@ -27,35 +27,29 @@ typedef enum
 
 typedef struct
 {
-  bool                  initialized:1;
-  bool                  active:1;
-  bool                  always_on:1;
-  bool                  debug:1;
-  bool                  button_pressed:1;
-  bool                  touch_active:1;
-  Display_States_E      state;
-  DisplayScreens_E      screen;
-  eBacklightSetting     backlight_setting;
-  eDisplayRotation      rotation_setting;
+    bool                  initialized:1;
+    bool                  active:1;
+    bool                  always_on:1;
+    bool                  debug:1;
+    bool                  button_pressed:1;
+    bool                  touch_active:1;
+    Display_States_E      state;
+    DisplayScreens_E      screen;
+    eBacklightSetting     backlight_setting;
+    eDisplayRotation      rotation_setting;
 } Display_Control_t;
 
 typedef struct
 {
-  bool                    charging:1;
-  DisplayBatteryStatus_E  battery_status;
-  uint8_t                 soc;
-  uint16_t                heart_rate;
+    bool                    charging:1;
+    DisplayBatteryStatus_E  battery_status;
+    uint8_t                 soc;
+    uint16_t                heart_rate;
 } DisplayData_t;
 
 // Display App
-void UIupdate_Task(void * arg);
 void Display_Task(void * arg);
 void vDisplayTimeoutCallback(TimerHandle_t xTimer);
-void display_timeout_refresh(void);
-void display_timeout_enable(void);
-void display_timeout_disable(void);
-void display_alert_timer_enable(void);
-void display_alert_timer_disable(void);
 bool display_get_charging_status(void);
 DisplayBatteryStatus_E display_get_battery_status(void);
 DisplayScreens_E display_get_current_screen(void);
@@ -67,7 +61,5 @@ void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * 
 void display_brightness_test(void);
 void display_color_fill_test(void);
 
-// Shared Data
-void display_setting_changed(eSetting setting);
 
 #endif //DISPLAY_H_
